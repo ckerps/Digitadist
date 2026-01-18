@@ -1,3 +1,5 @@
+import { Pedido } from "./pedido";
+
 export type TipoCliente = 'razon_social' | 'persona';
 
 export interface Cliente {
@@ -7,7 +9,9 @@ export interface Cliente {
   direccion: string;
   cuit: string;
   telefono: string;
+  pedidos?: Pedido[];
 }
+
 
 export interface NuevoCliente {
   nombre: string;

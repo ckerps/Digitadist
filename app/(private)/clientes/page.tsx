@@ -24,7 +24,7 @@ export default function ClientesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { clientes, isLoadingList, errorList, createCliente } = useClientes();
+  const { clientes, isLoadingList, errorList, createCliente } = useClientes({ itemsPerPage, currentPage });
 
   const handleRowClick = (id: number) => {
     router.push(`/clientes/${id}`);
@@ -42,7 +42,7 @@ export default function ClientesPage() {
 
   if (isLoadingList || !clientes) {
     return (
-      <ClientSkeleton />
+      <LoadingPage />
     );
   }
 
@@ -53,9 +53,9 @@ export default function ClientesPage() {
   }
 
   return (
-    <div className="min-h-screen w-full">
-        <div className="mb-2 md:mb-8 ">
-          <h1 className="text-2xl md:text-4xl font-bold text-neutral-900">Clientes</h1>
+    <div className="h-full w-full">
+        <div className="mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">Clientes</h1>
         </div>
 
         <div className=" rounded-xl shadow-lg border border-neutral-200 overflow-hidden">

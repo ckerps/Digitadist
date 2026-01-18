@@ -1,9 +1,10 @@
-// src/api/clientes.api.ts
+// src/api/pedidos.api.ts
 
-import { ClientePaginado, Cliente, NuevoCliente } from "@/types/cliente";
+import { NuevoPedido, Pedido, PedidosPaginado } from "@/types/pedido";
 
 
-const BASE_URL = '/api/clientes';
+
+const BASE_URL = '/api/pedidos';
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -13,26 +14,25 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
-export const clientesApi = {
-  async getAll(itemsPerPage: number, currentPage: number): Promise<ClientePaginado> {
-    const response = await fetch(`${BASE_URL}?items=${itemsPerPage}&page=${currentPage}`, {
+export const pedidosApi = {
+  async getAll(filters: Partial<Pedido>): Promise<PedidosPaginado> {
+    const response = await fetch(BASE_URL, {
+      method: 'GET',
+      credentials: 'include',
+      body: JSON.stringify(filters),
+    });
+    return handleResponse(response);
+  },
+
+  async getById(id: string): Promise<Pedido> {
+    const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'GET',
       credentials: 'include',
     });
     return handleResponse(response);
   },
 
-  async getById(id: string, pedidos: boolean): Promise<Cliente> {
-    const url = new URL(`${BASE_URL}/${id}`, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'); // URL absoluta
-    url.searchParams.set('pedidos', pedidos.toString()); // 'true' o 'false'
-    const response = await fetch(url.toString(), { // Convierte a string para fetch
-      method: 'GET',
-      credentials: 'include',
-    });
-    return handleResponse(response);
-  },
-
-  async create(cliente: NuevoCliente): Promise<Cliente> {
+  async create(cliente: NuevoPedido): Promise<Pedido> {
     const response = await fetch(BASE_URL, {
       method: 'POST',
       headers: {
@@ -44,13 +44,13 @@ export const clientesApi = {
     return handleResponse(response);
   },
 
-  async update(id: string, cliente: Partial<Cliente>): Promise<Cliente> {
+  async update(id: string, pedido: Partial<Pedido>): Promise<Pedido> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(cliente),
+      body: JSON.stringify(pedido),
       credentials: 'include',
     });
     return handleResponse(response);
@@ -63,4 +63,5 @@ export const clientesApi = {
     });
     await handleResponse(response);
   },
+  
 };

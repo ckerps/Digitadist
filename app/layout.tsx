@@ -27,12 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased p-2`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased py-4 px-2 align-baseline`}>
         <QueryProvider>
           <SidebarProvider>
             <AppSidebar />
             <SidebarTrigger/>
-            <main className="p-6 flex flex-1">
+            <main className="px-2 h-full flex flex-1">
             {children}
             </main>
           </SidebarProvider>

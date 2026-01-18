@@ -21,7 +21,7 @@ export function ClienteFilters({
   onNewClienteClick,
 }: ClienteFiltersProps) {
   return (
-    <div className="p-2 md:p-6 border-b border-neutral-200 bg-gradient-to-r from-red-50 to-white rounded-lg">
+    <div className="p-2 md:p-4 border-b border-neutral-200">
       <div className="flex flex-col lg:flex-row gap-2 md:gap-4 items-start lg:items-center justify-between">
         <div className="flex-1 flex flex-col sm:flex-row gap-2 md:gap-3 w-full lg:w-auto">
           <div className="relative flex-1">
@@ -34,7 +34,7 @@ export function ClienteFilters({
             />
           </div>
           <Select value={filterType} onValueChange={onFilterTypeChange}>
-            <SelectTrigger className="w-full sm:w-[200px] border-neutral-300">
+            <SelectTrigger className="w-full sm:w-50 border-neutral-300">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>

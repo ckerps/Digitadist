@@ -1,13 +1,20 @@
 import { ClienteRepository } from "@/repositories/cliente.repository"
+import { PedidoRepository } from "@/repositories/pedido.repository";
 import { NuevoCliente } from "@/types/cliente"
 
 export class ClienteService {
-    static async obtenerTodos() {
-        return ClienteRepository.obtenerTodos()
+    static async obtenerTodos(itemsPerPage: number, currentPage: number) {
+        return ClienteRepository.obtenerTodos(itemsPerPage, currentPage)
     }
 
     static async obtenerPorId(id: number) {
         return ClienteRepository.obtenerPorId(id)
+    }
+
+    static async obtenerConPedidos(id: number) {
+        const cliente = await ClienteRepository.obtenerPorId(id);
+        const pedidos = await PedidoRepository.obtenerPorClienteId(id);
+        return {...cliente, pedidos };
     }
 
     static async crear(data: NuevoCliente) {

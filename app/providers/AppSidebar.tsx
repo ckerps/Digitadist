@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { User2, LayoutDashboard, BookUserIcon, ClipboardCheckIcon, BoxIcon, ChartLineIcon, UserIcon } from "lucide-react";
+import { User2, LayoutDashboard, BookUserIcon, ClipboardCheckIcon, BoxIcon, ChartLineIcon, UserIcon, CircleDollarSignIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -34,6 +34,11 @@ export default function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton onClick={() => router.push('/productos')} >
               <BoxIcon /> Productos
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={() => router.push('/ofertas')} >
+              <CircleDollarSignIcon /> Ofertas
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

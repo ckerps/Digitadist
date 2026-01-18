@@ -8,19 +8,26 @@ import { NextRequest, NextResponse } from 'next/server';
  * Obtiene un cliente por ID
  */
 export async function GET(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const cliente = await ClienteService.obtenerPorId(Number(params.id));
-
+    const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const pedidos = searchParams.get('pedidos') === 'true';
+    let cliente;
+    if(pedidos){
+        cliente = await ClienteService.obtenerConPedidos(Number(id));
+    } else {
+        cliente = await ClienteService.obtenerPorId(Number(id));
+    }
     if (!cliente) {
       return NextResponse.json(
         { error: 'Cliente no encontrado' },
         { status: 404 }
       );
     }
-
+    console.log("Cliente encontrado:", cliente);
     return NextResponse.json(cliente, { status: 200 });
   } catch (error) {
     console.error('Error al obtener cliente:', error);

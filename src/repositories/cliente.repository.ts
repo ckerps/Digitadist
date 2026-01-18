@@ -19,13 +19,13 @@ const mockClientes: Cliente[] = [
 ];
 
 export class ClienteRepository {
-  static async obtenerTodos() {
+  static async obtenerTodos(itemsPerPage: number, currentPage: number) {
     return new Promise((resolve) => {
-        setTimeout(() => resolve({totalPages: 1, currentPage: 1, clientes: mockClientes, totalItems: mockClientes.length }), 100);
+        setTimeout(() => resolve({totalPages: Math.ceil(mockClientes.length / itemsPerPage), currentPage: currentPage, clientes: mockClientes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage), totalItems: mockClientes.length }), 100);
     });
   }
 
-  static async obtenerPorId(id: number) {
+  static async obtenerPorId(id: number): Promise<Cliente | undefined> {
     return new Promise((resolve) => {
         setTimeout(() => resolve(mockClientes.find(cliente => cliente.id === id)), 100);
     });

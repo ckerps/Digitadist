@@ -8,4 +8,21 @@ export interface Pedido {
   estado: EstadoPedido;
   pago: EstadoPago;
   total: number;
+  clienteId: string;
+}
+
+export interface NuevoPedido {
+  direccionEntrega: string;
+  fechaEstimada: string;
+  estado: EstadoPedido;
+  pago: EstadoPago;
+  total: number;
+  clienteId: string;
+}
+
+export interface PedidosPaginado {
+  pedidos: Pedido[];
+  totalPages: number;
+  currentPage: number;
+  totalItems: number;
 }
