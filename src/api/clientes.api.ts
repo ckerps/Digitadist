@@ -14,17 +14,27 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const clientesApi = {
-  async getAll(itemsPerPage: number, currentPage: number): Promise<ClientePaginado> {
-    const response = await fetch(`${BASE_URL}?items=${itemsPerPage}&page=${currentPage}`, {
+  async getAll({filters, itemsPerPage, currentPage} : {filters?: Partial<Cliente>, itemsPerPage?: number, currentPage?: number}): Promise<ClientePaginado> {
+    const url = new URL(`${BASE_URL}`, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+    
+    if (itemsPerPage) url.searchParams.append('itemsPerPage', itemsPerPage.toString());
+    if (currentPage) url.searchParams.append('currentPage', currentPage.toString());
+    
+    filters && Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url.searchParams.append(key, String(value));
+      }
+    });
+
+    const response = await fetch(url.toString(), {
       method: 'GET',
       credentials: 'include',
     });
     return handleResponse(response);
   },
 
-  async getById(id: string, pedidos: boolean): Promise<Cliente> {
+  async getById(id: string): Promise<Cliente> {
     const url = new URL(`${BASE_URL}/${id}`, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'); // URL absoluta
-    url.searchParams.set('pedidos', pedidos.toString()); // 'true' o 'false'
     const response = await fetch(url.toString(), { // Convierte a string para fetch
       method: 'GET',
       credentials: 'include',
@@ -44,7 +54,7 @@ export const clientesApi = {
     return handleResponse(response);
   },
 
-  async update(id: string, cliente: Partial<Cliente>): Promise<Cliente> {
+  async update(id: number, cliente: Partial<Cliente>): Promise<Cliente> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: {
@@ -56,7 +66,7 @@ export const clientesApi = {
     return handleResponse(response);
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'DELETE',
       credentials: 'include',

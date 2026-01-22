@@ -1,23 +1,24 @@
-export type EstadoPedido = 'entregado' | 'registrado' | 'finalizado' | 'en_preparacion';
-export type EstadoPago = 'pagado' | 'en_deuda';
+import { AgregarProducto } from "./producto";
+
+export enum EstadoPedido { entregado, registrado, finalizado, en_preparacion };
+export enum EstadoPago { pagado, en_deuda };
 
 export interface Pedido {
-  id: string;
+  id: number;
   direccionEntrega: string;
   fechaEstimada: string;
   estado: EstadoPedido;
   pago: EstadoPago;
   total: number;
-  clienteId: string;
+  clienteId: number;
 }
 
 export interface NuevoPedido {
   direccionEntrega: string;
   fechaEstimada: string;
-  estado: EstadoPedido;
-  pago: EstadoPago;
   total: number;
-  clienteId: string;
+  clienteId: number;
+  productos: AgregarProducto[]
 }
 
 export interface PedidosPaginado {

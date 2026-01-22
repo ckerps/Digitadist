@@ -15,16 +15,26 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const pedidosApi = {
-  async getAll(filters: Partial<Pedido>): Promise<PedidosPaginado> {
-    const response = await fetch(BASE_URL, {
+  async getAll({filters, itemsPerPage, currentPage} : {filters?: Partial<Pedido>, itemsPerPage?: number, currentPage?: number}): Promise<PedidosPaginado> {
+    const url = new URL(`${BASE_URL}`, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+    
+    if (itemsPerPage) url.searchParams.append('itemsPerPage', itemsPerPage.toString());
+    if (currentPage) url.searchParams.append('currentPage', currentPage.toString());
+    
+    filters && Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url.searchParams.append(key, String(value));
+      }
+    });
+
+    const response = await fetch(url.toString(), {
       method: 'GET',
       credentials: 'include',
-      body: JSON.stringify(filters),
     });
     return handleResponse(response);
   },
 
-  async getById(id: string): Promise<Pedido> {
+  async getById(id: number): Promise<Pedido> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'GET',
       credentials: 'include',
@@ -32,19 +42,19 @@ export const pedidosApi = {
     return handleResponse(response);
   },
 
-  async create(cliente: NuevoPedido): Promise<Pedido> {
+  async create(pedido: NuevoPedido): Promise<Pedido> {
     const response = await fetch(BASE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(cliente),
+      body: JSON.stringify(pedido),
       credentials: 'include',
     });
     return handleResponse(response);
   },
 
-  async update(id: string, pedido: Partial<Pedido>): Promise<Pedido> {
+  async update(id: number, pedido: Partial<Pedido>): Promise<Pedido> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: {
@@ -56,12 +66,11 @@ export const pedidosApi = {
     return handleResponse(response);
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
     await handleResponse(response);
   },
-  
 };

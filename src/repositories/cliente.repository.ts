@@ -39,7 +39,7 @@ export class ClienteRepository {
 
   static async actualizar(id: number, data: Partial<NuevoCliente>) {
     return new Promise((resolve) => {
-        setTimeout(() => resolve(data), 100);
+        setTimeout(() => resolve({...data, id}), 100);
     });
   }
 

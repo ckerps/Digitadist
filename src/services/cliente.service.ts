@@ -11,12 +11,6 @@ export class ClienteService {
         return ClienteRepository.obtenerPorId(id)
     }
 
-    static async obtenerConPedidos(id: number) {
-        const cliente = await ClienteRepository.obtenerPorId(id);
-        const pedidos = await PedidoRepository.obtenerPorClienteId(id);
-        return {...cliente, pedidos };
-    }
-
     static async crear(data: NuevoCliente) {
         // validaciones de negocio
         if (!data.nombre) {
