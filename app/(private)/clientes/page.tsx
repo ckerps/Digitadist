@@ -6,15 +6,15 @@ import {
   ClienteTable,
   ClienteFilters,
   ClienteForm,
-  Pagination,
   MobileClienteTable,
 } from './components';
 import { useClientes } from './hooks/useClientes';
 import { NuevoCliente } from '@/types/cliente';
-import { Spinner } from '../../components/ui/spinner';
 import ErrorPage from '../../error';
 import LoadingPage from '../../loading';
-import ClientSkeleton from './components/ClientSkeleton';
+import { itemsPerPage } from '../utils';
+import { Pagination } from '../components/Pagination';
+
 
 export default function ClientesPage() {
   const router = useRouter();
@@ -22,7 +22,6 @@ export default function ClientesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   const { clientes, isLoadingList, errorList, createCliente } = useClientes({ itemsPerPage, currentPage });
 

@@ -4,6 +4,7 @@ import { Pagination as ShadcnPagination, PaginationContent, PaginationItem, Pagi
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../../../components/ui/button';
+import { getVisiblePages } from '../../utils';
 
 interface PaginationProps {
   currentPage: number;
@@ -22,41 +23,10 @@ export function Pagination({
 }: PaginationProps) {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
-  // Calcular qué páginas mostrar
-  const getVisiblePages = () => {
-    const maxVisible = 5;
-    const pages: (number | 'ellipsis')[] = [];
-    
-    if (totalPages <= maxVisible) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    if (currentPage <= 3) {
-      for (let i = 1; i <= maxVisible; i++) {
-        pages.push(i);
-      }
-    } else if (currentPage >= totalPages - 2) {
-      for (let i = totalPages - maxVisible + 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-      pages.push('ellipsis');
-      for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-        pages.push(i);
-      }
-      pages.push('ellipsis');
-      pages.push(totalPages);
-    }
-
-    return pages;
-  };
-
-  const visiblePages = getVisiblePages();
+  const visiblePages = getVisiblePages(totalPages, currentPage);
 
   return (
-    <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between">
+    <div className="mt-2 px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between">
       <p className="text-sm text-neutral-600">
         Mostrando {startItem} - {endItem} de {totalItems} resultados
       </p>

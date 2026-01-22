@@ -1,6 +1,6 @@
 'use client';
 
-import { NuevoCliente, TipoCliente } from "@/types/cliente";
+import { Cliente, NuevoCliente, TipoCliente } from "@/types/cliente";
 import { useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
@@ -14,16 +14,17 @@ interface ClienteFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (cliente: NuevoCliente) => void;
+  cliente?: Cliente;
 }
 
-export function ClienteForm({ open, onOpenChange, onSave }: ClienteFormProps) {
+export function ClienteForm({ open, onOpenChange, onSave, cliente }: ClienteFormProps) {
   const [formData, setFormData] = useState<NuevoCliente>({
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    cuit: '',
-    direccion: '',
-    tipo: 'razon_social',
+    nombre: cliente?.nombre || '',
+    apellido: cliente?.apellido || '',
+    telefono: cliente?.telefono || '',
+    cuit: cliente?.cuit || '',
+    direccion: cliente?.direccion || '',
+    tipo: cliente?.tipo || 'razon_social',
   });
 
   const handleSubmit = () => {
@@ -41,7 +42,7 @@ export function ClienteForm({ open, onOpenChange, onSave }: ClienteFormProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-neutral-900">Nuevo Cliente</DialogTitle>
         </DialogHeader>

@@ -5,31 +5,20 @@ import { useCallback } from "react";
 
 interface UseClientesReturn {
   clientes: ClientePaginado | undefined;
-  
   isLoadingList: boolean;
-  
   errorList: Error | null;
   errorCreate: Error | null;
-  errorUpdate: Error | null;
-  errorDelete: Error | null;
-  
   createCliente: (cliente: NuevoCliente) => Promise<Cliente>;
-  updateCliente: (id: string, cliente: Partial<Cliente>) => Promise<Cliente>;
-  deleteCliente: (id: string) => Promise<void>;
-  
   isCreating: boolean;
-  isUpdating: boolean;
-  isDeleting: boolean;
-  
   refetchList: () => Promise<QueryObserverResult<ClientePaginado, Error>>;
 }
 
-export function useClientes({itemsPerPage, currentPage}: { itemsPerPage: number, currentPage: number }): UseClientesReturn {
+export function useClientes({ itemsPerPage, currentPage, filters}: { itemsPerPage?: number, currentPage?: number, filters?: Partial<Cliente> }): UseClientesReturn {
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({
     queryKey: ['clientes:list', currentPage],
-    queryFn: () => clientesApi.getAll(itemsPerPage, currentPage),
+    queryFn: () => clientesApi.getAll({itemsPerPage, currentPage, filters}),
     staleTime: 1000 * 60 * 5,
   });
 
@@ -40,42 +29,11 @@ export function useClientes({itemsPerPage, currentPage}: { itemsPerPage: number,
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, cliente }: { id: string; cliente: Partial<Cliente> }) =>
-      clientesApi.update(id, cliente),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['clientes:list'] });
-      queryClient.invalidateQueries({ queryKey: ['clientes:detail', variables.id] });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => clientesApi.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clientes:list'] });
-      queryClient.invalidateQueries({ queryKey: ['clientes:detail'] });
-    },
-  });
-
   const createCliente = useCallback(
     async (cliente: NuevoCliente) => {
       return createMutation.mutateAsync(cliente);
     },
     [createMutation]
-  );
-
-  const updateCliente = useCallback(
-    async (id: string, cliente: Partial<Cliente>) => {
-      return updateMutation.mutateAsync({ id, cliente });
-    },
-    [updateMutation]
-  );
-
-  const deleteCliente = useCallback(
-    async (id: string) => {
-      return deleteMutation.mutateAsync(id);
-    },
-    [deleteMutation]
   );
 
   const refetchList = useCallback(
@@ -89,14 +47,8 @@ export function useClientes({itemsPerPage, currentPage}: { itemsPerPage: number,
     isLoadingList: listQuery.isLoading,
     errorList: listQuery.error as Error | null,
     errorCreate: createMutation.error as Error | null,
-    errorUpdate: updateMutation.error as Error | null,
-    errorDelete: deleteMutation.error as Error | null,
     createCliente,
-    updateCliente,
-    deleteCliente,
     isCreating: createMutation.isPending,
-    isUpdating: updateMutation.isPending,
-    isDeleting: deleteMutation.isPending,
     refetchList,
   };
 }

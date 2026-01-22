@@ -31,7 +31,7 @@ export default function RootLayout({
         <QueryProvider>
           <SidebarProvider>
             <AppSidebar />
-            <SidebarTrigger/>
+            <SidebarTrigger className="md:relative md:inline-block absolute top-4 left-4 md:top-auto md:left-auto z-10 m-1" />
             <main className="px-2 h-full flex flex-1">
             {children}
             </main>

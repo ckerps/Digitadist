@@ -5,42 +5,37 @@ import { useCallback } from "react";
 
 interface UseClientesReturn {
   cliente: Cliente | undefined;
-  
   isLoadingDetail: boolean;
-  
   errorDetail: Error | null;
   errorUpdate: Error | null;
   errorDelete: Error | null;
-  
-  updateCliente: (id: string, cliente: Partial<Cliente>) => Promise<Cliente>;
-  deleteCliente: (id: string) => Promise<void>;
-  
+  updateCliente: (id: number, cliente: Partial<Cliente>) => Promise<Cliente>;
+  deleteCliente: (id: number) => Promise<void>;
   isUpdating: boolean;
   isDeleting: boolean;
-  
   refetchDetail: () => Promise<QueryObserverResult<Cliente, Error>>;
 }
 
-export function useClienteDetail({clienteId, pedidos}: { clienteId?: string, pedidos?: boolean}): UseClientesReturn {
+export function useClienteDetail({clienteId}: { clienteId: string}): UseClientesReturn {
   const queryClient = useQueryClient();
 
   const detailQuery = useSuspenseQuery({
     queryKey: ['clientes:detail', clienteId],
-    queryFn: () => clientesApi.getById(clienteId!, pedidos!),
+    queryFn: () => clientesApi.getById(clienteId),
     staleTime: 1000 * 60 * 5,
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, cliente }: { id: string; cliente: Partial<Cliente> }) =>
+    mutationFn: ({ id, cliente }: { id: number; cliente: Partial<Cliente> }) =>
       clientesApi.update(id, cliente),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['clientes:list'] });
-      queryClient.invalidateQueries({ queryKey: ['clientes:detail', variables.id] });
+      queryClient.refetchQueries({ queryKey: ['clientes:detail', variables.id] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => clientesApi.delete(id),
+    mutationFn: (id: number) => clientesApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientes:list'] });
       queryClient.invalidateQueries({ queryKey: ['clientes:detail'] });
@@ -48,14 +43,14 @@ export function useClienteDetail({clienteId, pedidos}: { clienteId?: string, ped
   });
 
   const updateCliente = useCallback(
-    async (id: string, cliente: Partial<Cliente>) => {
+    async (id: number, cliente: Partial<Cliente>) => {
       return updateMutation.mutateAsync({ id, cliente });
     },
     [updateMutation]
   );
 
   const deleteCliente = useCallback(
-    async (id: string) => {
+    async (id: number) => {
       return deleteMutation.mutateAsync(id);
     },
     [deleteMutation]

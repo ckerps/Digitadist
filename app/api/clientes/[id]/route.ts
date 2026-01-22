@@ -13,21 +13,15 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { searchParams } = new URL(request.url);
-    const pedidos = searchParams.get('pedidos') === 'true';
-    let cliente;
-    if(pedidos){
-        cliente = await ClienteService.obtenerConPedidos(Number(id));
-    } else {
-        cliente = await ClienteService.obtenerPorId(Number(id));
-    }
+    
+    const cliente = await ClienteService.obtenerPorId(Number(id));
+  
     if (!cliente) {
       return NextResponse.json(
         { error: 'Cliente no encontrado' },
         { status: 404 }
       );
     }
-    console.log("Cliente encontrado:", cliente);
     return NextResponse.json(cliente, { status: 200 });
   } catch (error) {
     console.error('Error al obtener cliente:', error);
@@ -48,9 +42,10 @@ export async function PUT(
 ) {
   try {
     const body: Partial<Cliente> = await request.json();
+    const { id } = await params;
 
     const clienteActualizado = await ClienteService.actualizar(
-      Number(params.id),
+      Number(id),
       body
     );
 
@@ -80,7 +75,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const eliminado = await ClienteService.eliminar(Number(params.id));
+    const { id } = await params;
+    const eliminado = await ClienteService.eliminar(Number(id));
 
     if (!eliminado) {
       return NextResponse.json(

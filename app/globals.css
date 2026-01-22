@@ -144,30 +144,7 @@ html {
   /* Global custom scrollbar */
   html, body {
     scrollbar-width: thin;
-    scrollbar-color: #3b82f6 #e5e7eb;
-  }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #e5e7eb;
-    border-radius: 9999px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #3b82f6;
-    border-radius: 9999px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #2563eb;
+    scrollbar-color: #909090 #e5e7eb;
   }
   
-}
-
-@layer utilities {
-  /* Other utilities if needed */
 }

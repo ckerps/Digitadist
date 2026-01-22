@@ -1,22 +1,21 @@
 import { pedidosApi } from "@/api/pedidos.api";
-import { Pedido, PedidosPaginado } from "@/types/pedido";
-import { QueryObserverResult, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { PedidosPaginado } from "@/types/pedido";
+import { QueryObserverResult, useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 interface UsePedidosByClienteReturn {
-  pedidos: PedidosPaginado | undefined;
+  pedidos: PedidosPaginado;
   isLoading: boolean;
   error: Error | null;
   refetchPedidos: () => Promise<QueryObserverResult<PedidosPaginado, Error>>;
 
 }
- 
-export function usePedidosByCliente(clienteId?: string): UsePedidosByClienteReturn {
-  const queryClient = useQueryClient();
+
+export function usePedidosByCliente({clienteId, itemsPerPage, currentPage}: {clienteId?: number, itemsPerPage?: number, currentPage?: number}): UsePedidosByClienteReturn {
 
   const pedidosQuery = useSuspenseQuery({
-    queryKey: ['pedidosByCliente:list'],
-    queryFn: () => pedidosApi.getAll({ clienteId }),
+    queryKey: ['pedidosByCliente:list', itemsPerPage, currentPage, clienteId],
+    queryFn: () => pedidosApi.getAll({ clienteId }, itemsPerPage, currentPage),
     staleTime: 1000 * 60 * 5,
   });
 
@@ -26,8 +25,9 @@ export function usePedidosByCliente(clienteId?: string): UsePedidosByClienteRetu
     [pedidosQuery]
   );
 
+
   return {
-    pedidos: pedidosQuery.data,
+    pedidos: pedidosQuery.data as PedidosPaginado,
     isLoading: pedidosQuery.isLoading,
     error: pedidosQuery.error as Error | null,
     refetchPedidos: refetchDetail,
