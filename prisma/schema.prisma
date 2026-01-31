@@ -11,4 +11,187 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EnumTipoCliente {
+  persona
+  razon_social
+}
+
+enum EnumPresentacion {
+  gramos
+  litros
+}
+
+enum EnumTipoValor {
+  int
+  string
+  bool
+}
+
+enum EnumAtributosLog {
+  codigo
+  nombre
+  presentacion
+  tam_pack
+  costo
+  regargo
+  stock_minimo
+  activo
+  imagen
+  categoria
+  vencimiento
+}
+
+enum EnumTipoDescuento {
+  monto
+  porcentaje
+}
+
+enum EnumEstadoPedido {
+  registrado
+  en_preparacion
+  entregado
+  finalizado
+  cancelado
+}
+
+enum EnumEstadoPago {
+  pagado
+  en_deuda
+}
+
+enum EnumCondicionVenta {
+  contado
+  transferencia
+}
+
+model Rol {
+  id       Int       @id @default(autoincrement())
+  nombre   String    @unique
+  usuarios Usuario[]
+}
+
+model Usuario {
+  id                  Int       @id @default(autoincrement())
+  nombre              String
+  apellido            String
+  rol_id              Int
+  rol                 Rol       @relation(fields: [rol_id], references: [id])
+  email               String    @unique
+  telefono            String
+  password            String
+  fecha_creacion      DateTime  @default(now())
+  fecha_actualizacion DateTime? @updatedAt
+  activo              Boolean
+  productoLogs ProductoLog[]
+  pedidos Pedido[]
+}
+
+model Cliente {
+  id        Int             @id @default(autoincrement())
+  tipo      EnumTipoCliente
+  nombre    String
+  direccion String
+  cuit      String?         @unique @db.VarChar(11)
+  email     String          @unique
+  telefono  String          @db.VarChar(20)
+  activo    Boolean
+  pedidos Pedido[]
+}
+
+model Categoria {
+  id          Int        @id @default(autoincrement())
+  nombre      String     @unique
+  descripcion String     @db.Text
+  productos   Producto[]
+}
+
+model Producto {
+  id                  Int              @id @default(autoincrement())
+  codigo              String           @unique
+  nombre              String
+  presentacion        EnumPresentacion
+  tam_pack            Int
+  costo               Decimal
+  porcentaje_recargo  Float
+  stock_actual        Int
+  stock_minimo        Int?
+  activo              Boolean          @default(true)
+  imagen              String?
+  categoria_id        Int
+  categoria           Categoria        @relation(fields: [categoria_id], references: [id])
+  fecha_vencimiento   DateTime?
+  fecha_creacion      DateTime         @default(now())
+  fecha_actualizacion DateTime?        @updatedAt
+
+  productoLogs ProductoLog[]
+  ofertas      Oferta[]
+
+  detallePedidos DetallePedido[]
+}
+
+model Configuracion {
+  id         Int           @id @default(autoincrement())
+  nombre     String        @unique
+  valor      String
+  tipo_valor EnumTipoValor
+}
+
+model ProductoLog {
+  id             Int              @id @default(autoincrement())
+  usuario_id     Int
+  usuario        Usuario          @relation(fields: [usuario_id], references: [id])
+  producto_id    Int
+  producto       Producto         @relation(fields: [producto_id], references: [id])
+  atributo       EnumAtributosLog
+  valor_anterior String
+  valor_nuevo    String
+  fecha_creacion DateTime         @default(now())
+}
+
+model Oferta {
+  id                  Int               @id @default(autoincrement())
+  producto_id         Int
+  producto            Producto          @relation(fields: [producto_id], references: [id])
+  tipo                EnumTipoDescuento
+  valor               Decimal
+  fecha_inicio        DateTime
+  fecha_fin           DateTime
+  fecha_creacion      DateTime          @default(now())
+  fecha_actualizacion DateTime?         @updatedAt
+  activa              Boolean
+}
+
+model Pedido {
+  id                     Int                @id @default(autoincrement())
+  cliente_id             Int
+  cliente                Cliente            @relation(fields: [cliente_id], references: [id])
+  vendedor_id            Int
+  vendedor               Usuario            @relation(fields: [vendedor_id], references: [id])
+  fecha_creacion         DateTime           @default(now())
+  total                  Decimal
+  costo                  Decimal
+  descuento              Decimal?
+  estado                 EnumEstadoPedido
+  estado_pago            EnumEstadoPago
+  direccion_entrega      String
+  fecha_entrega_estimada DateTime
+  condicion_venta        EnumCondicionVenta
+
+  detallePedidos DetallePedido[]
+}
+
+model DetallePedido {
+  producto_id     Int
+  producto        Producto @relation(fields: [producto_id], references: [id])
+  pedido_id       Int
+  pedido          Pedido   @relation(fields: [pedido_id], references: [id])
+  cantidad        Int
+  precio_unitario Decimal
+  descuento       Decimal?
+  subtotal        Decimal
+
+  @@id([pedido_id, producto_id])
 }
