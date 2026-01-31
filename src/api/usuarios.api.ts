@@ -1,11 +1,10 @@
-// src/api/clientes.api.ts
+// src/api/usuarios.api.ts
 
-import { Cliente } from "@/generated/prisma/client";
-import { ClientePaginado, FiltrosCliente, NuevoCliente, UpdateCliente } from "@/types/cliente";
+import { Usuario } from "@/generated/prisma/client";
+import { FiltrosUsuario, NuevoUsuario, UsuarioPaginado, UpdateUsuario } from "@/types/usuario";
 
-const BASE_URL = '/api/clientes';
+const BASE_URL = '/api/usuarios';
 
-// Tipamos mejor el error para que el frontend sepa si es de validación (Zod)
 export interface ApiError extends Error {
   details?: Record<string, string[]>;
 }
@@ -14,29 +13,24 @@ async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     const error = new Error(errorData?.error || 'Error en la solicitud') as ApiError;
-    // Capturamos los detalles de Zod que enviamos desde el backend
     error.details = errorData?.details; 
     throw error;
   }
   return response.json();
 }
 
-export const clientesApi = {
-  
+export const usuariosApi = {
   async getAll({ filters, itemsPerPage, currentPage }: { 
-    filters?: FiltrosCliente, 
+    filters?: FiltrosUsuario, 
     itemsPerPage?: number, 
     currentPage?: number 
-  }): Promise<ClientePaginado> {
+  }): Promise<UsuarioPaginado> {
     
-    // 1. Crear la URL dentro de la función para evitar acumular parámetros
-    const url = new URL(BASE_URL, window.location.origin);
+    const url = new URL(BASE_URL, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
     
-    // 2. Agregar paginación
     if (itemsPerPage) url.searchParams.append('itemsPerPage', itemsPerPage.toString());
     if (currentPage) url.searchParams.append('currentPage', currentPage.toString());
     
-    // 3. Agregar filtros (solo si tienen valor)
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== "") {
@@ -49,35 +43,37 @@ export const clientesApi = {
       method: 'GET',
       credentials: 'include',
     });
-    return handleResponse<ClientePaginado>(response);
+    return handleResponse<UsuarioPaginado>(response);
   },
 
-  async getById(id: number): Promise<Cliente> {
-    const response = await fetch(`${BASE_URL}/${id}`, { 
+  async getById(id: number): Promise<Usuario> {
+    const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'GET',
       credentials: 'include',
     });
-    return handleResponse<Cliente>(response);
+    return handleResponse<Usuario>(response);
   },
 
-  async create(cliente: NuevoCliente): Promise<Cliente> {
+
+  async create(usuario: NuevoUsuario): Promise<Usuario> {
     const response = await fetch(BASE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(cliente),
+      body: JSON.stringify(usuario),
       credentials: 'include',
     });
-    return handleResponse<Cliente>(response);
+    return handleResponse<Usuario>(response);
   },
 
-  async update(id: number, cliente: UpdateCliente): Promise<Cliente> {
+
+  async update(id: number, usuario: UpdateUsuario): Promise<Usuario> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(cliente),
+      body: JSON.stringify(usuario),
       credentials: 'include',
     });
-    return handleResponse<Cliente>(response);
+    return handleResponse<Usuario>(response);
   },
 
   async delete(id: number): Promise<void> {
@@ -86,5 +82,5 @@ export const clientesApi = {
       credentials: 'include',
     });
     await handleResponse(response);
-  },
+  }
 };
