@@ -1,57 +1,60 @@
-import { ClienteService } from '@/services/cliente.service'
 import { PedidoService } from '@/services/pedido.service';
-import { NuevoCliente } from '@/types/cliente'
 import { NextRequest, NextResponse } from 'next/server'
+import * as z from 'zod';
 
-const defaultItemsPerPage = process.env.DEFAULT_ITEMS_PER_PAGE || 10;
 
 /**
  * GET /api/pedidos
- * Obtiene todos los pedidos, paginados y opionalmente filtrados
+ * Obtiene todos los pedidos
  */
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const itemsPerPage = url.searchParams.get('itemsPerPage') ?? defaultItemsPerPage;
-    const currentPage = url.searchParams.get('currentPage') ?? 1;
+    const itemsPerPage = parseInt(url.searchParams.get('items') || '10');
+    const currentPage = parseInt(url.searchParams.get('page') || '1');
     const filters : Partial<{ [key: string]: string }> = {};
-    url.searchParams.forEach((value, key) => {
-      if (key !== 'itemsPerPage' && key !== 'currentPage') {
-        filters[key] = value;
-      }
+      url.searchParams.forEach((value, key) => {
+        if (key !== 'itemsPerPage' && key !== 'currentPage') {
+          filters[key] = value;
+        }
     });
 
-    console.log('Filters:', filters, 'ItemsPerPage:', itemsPerPage, 'CurrentPage:', currentPage);
-
-    const pedidos = await PedidoService.obtenerTodos(filters, +itemsPerPage, +currentPage)
+    const pedidos = await PedidoService.obtenerTodos(itemsPerPage, currentPage, filters)
     return NextResponse.json(pedidos, { status: 200 })
-  } catch (error) {
-    console.error('Error al obtener pedidos:', error)
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        type: "ValidationError", 
+        details: error.flatten().fieldErrors 
+      }, { status: 400 });
+    }
 
-    return NextResponse.json(
-      { error: 'Error al obtener pedidos' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
 /**
- * POST /api/clientes
- * Crea un nuevo cliente
+ * POST /api/pedidos
+ * Crea un nuevo pedido
  */
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body: NuevoCliente = await request.json()
+    const body = await req.json();
+    const resultado = await PedidoService.crear(body?.pedido, body?.detalle);
+    
+    return NextResponse.json(resultado, { status: 201 });
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        type: "ValidationError", 
+        details: error.flatten().fieldErrors 
+      }, { status: 400 });
+    }
 
-    const cliente = await ClienteService.crear(body)
+    if (error.message === "El pedido debe tener al menos un producto") {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
 
-    return NextResponse.json(cliente, { status: 201 })
-  } catch (error) {
-    console.error('Error al crear cliente:', error)
-
-    return NextResponse.json(
-      { error: 'Error al crear cliente' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

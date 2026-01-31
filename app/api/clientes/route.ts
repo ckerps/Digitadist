@@ -1,6 +1,7 @@
 import { ClienteService } from '@/services/cliente.service'
 import { NuevoCliente } from '@/types/cliente'
 import { NextRequest, NextResponse } from 'next/server'
+import * as z from 'zod';
 
 
 /**
@@ -15,13 +16,15 @@ export async function GET(request: NextRequest) {
 
     const clientes = await ClienteService.obtenerTodos(itemsPerPage, currentPage)
     return NextResponse.json(clientes, { status: 200 })
-  } catch (error) {
-    console.error('Error al obtener clientes:', error)
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        type: "ValidationError", 
+        details: error.flatten().fieldErrors 
+      }, { status: 400 });
+    }
 
-    return NextResponse.json(
-      { error: 'Error al obtener clientes' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -29,19 +32,25 @@ export async function GET(request: NextRequest) {
  * POST /api/clientes
  * Crea un nuevo cliente
  */
-export async function POST(request: NextRequest) {
+// app/api/clientes/route.ts
+export async function POST(req: Request) {
   try {
-    const body: NuevoCliente = await request.json()
+    const body = await req.json();
+    const resultado = await ClienteService.crear(body);
+    
+    return NextResponse.json(resultado, { status: 201 });
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        type: "ValidationError", 
+        details: error.flatten().fieldErrors 
+      }, { status: 400 });
+    }
 
-    const cliente = await ClienteService.crear(body)
+    if (error.message === "Ya existe un cliente con ese CUIT") {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
 
-    return NextResponse.json(cliente, { status: 201 })
-  } catch (error) {
-    console.error('Error al crear cliente:', error)
-
-    return NextResponse.json(
-      { error: 'Error al crear cliente' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
