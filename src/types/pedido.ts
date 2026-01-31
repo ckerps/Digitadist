@@ -1,24 +1,28 @@
-import { AgregarProducto } from "./producto";
-
-export enum EstadoPedido { entregado, registrado, finalizado, en_preparacion };
-export enum EstadoPago { pagado, en_deuda };
-
-export interface Pedido {
-  id: number;
-  direccionEntrega: string;
-  fechaEstimada: string;
-  estado: EstadoPedido;
-  pago: EstadoPago;
-  total: number;
-  clienteId: number;
-}
+import { DetallePedido, Pedido } from "@/generated/prisma/client";
+import { EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido } from "@/generated/prisma/enums";
 
 export interface NuevoPedido {
-  direccionEntrega: string;
-  fechaEstimada: string;
+  cliente_id: number;
+  vendedor_id: number;
   total: number;
-  clienteId: number;
-  productos: AgregarProducto[]
+  costo: number;
+  descuento?: number;
+  estado: EnumEstadoPedido;
+  estado_pago: EnumEstadoPago;
+  direccion_entrega: string;
+  fecha_entrega_estimada: Date;
+  condicion_venta: EnumCondicionVenta;
+}
+
+export interface UpdatePedido {
+  total?: number;
+  costo?: number;
+  descuento?: number;
+  estado?: EnumEstadoPedido;
+  estado_pago?: EnumEstadoPago;
+  direccion_entrega?: string;
+  fecha_entrega_estimada?: Date;
+  condicion_venta?: EnumCondicionVenta;
 }
 
 export interface PedidosPaginado {
@@ -26,4 +30,31 @@ export interface PedidosPaginado {
   totalPages: number;
   currentPage: number;
   totalItems: number;
+}
+
+export interface NuevoDetallePedido {
+  producto_id: number;
+  cantidad: number;
+  precio_unitario: number;
+  descuento: number;
+  subtotal: number;
+}
+
+export interface UpdateDetallePedido {
+  producto_id: number;
+  pedido_id: number;
+  cantidad?: number;
+  precio_unitario?: number;
+  descuento?: number;
+  subtotal?: number;
+}
+
+export interface FiltrosPedido {
+  cliente_id?: number;
+  vendedor_id?: number;
+  estado?: EnumEstadoPedido;
+  estado_pago?: EnumEstadoPago;
+  direccion_entrega?: string;
+  fecha_entrega_estimada?: Date;
+  condicion_venta?: EnumCondicionVenta;
 }

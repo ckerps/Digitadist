@@ -1,23 +1,24 @@
-export type TipoCliente = 'razon_social' | 'persona';
-
-export interface Cliente {
-  id: number;
-  tipo: TipoCliente;
-  nombre: string;
-  apellido?: string;
-  direccion: string;
-  cuit: string;
-  telefono: string;
-}
-
+import { Cliente, EnumTipoCliente } from "@/generated/prisma/client";
 
 export interface NuevoCliente {
   nombre: string;
-  apellido?: string;
   telefono: string;
-  cuit: string;
+  cuit?: string;
   direccion: string;
-  tipo: TipoCliente;
+  tipo: EnumTipoCliente;
+  email: string;
+  activo: boolean;
+}
+
+export interface UpdateCliente {
+  id: number;
+  nombre?: string;
+  telefono?: string;
+  cuit?: string;
+  direccion?: string;
+  tipo?: EnumTipoCliente;
+  email?: string;
+  activo?: boolean;
 }
 
 export interface ClientePaginado {
@@ -25,4 +26,14 @@ export interface ClientePaginado {
   totalPages: number;
   currentPage: number;
   totalItems: number;
+}
+
+export interface FiltrosCliente {
+  id?: number;
+  nombre?: string;
+  telefono?: string;
+  cuit?: string;
+  tipo?: EnumTipoCliente;
+  email?: string;
+  activo?: boolean;
 }
