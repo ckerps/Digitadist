@@ -1,39 +1,110 @@
-import { EstadoPago, EstadoPedido, Pedido, PedidosPaginado } from "@/types/pedido";
+import { FiltrosPedido, NuevoDetallePedido, NuevoPedido, PedidosPaginado, UpdateDetallePedido, UpdatePedido } from "@/types/pedido";
+import { FiltrosPedidoSchema, NuevoDetallePedidoSchema, NuevoPedidoSchema, PaginacionSchema, UpdateDetallePedidoSchema, UpdatePedidoSchema } from "./zodSchemas";
+import { prisma } from "@/lib/prisma";
+import { EnumEstadoPedido, Pedido } from "@/generated/prisma/client";
 
-const mockPedidos: Pedido[] = [
-  { id: 3001, direccionEntrega: '123 Industrial Ave', fechaEstimada: '2024-06-05', estado: EstadoPedido.entregado, pago: EstadoPago.pagado, total: 2500.0, clienteId: 3001 },
-  { id: 1002, direccionEntrega: '45 Market St', fechaEstimada: '2024-06-06', estado: EstadoPedido.registrado, pago: EstadoPago.en_deuda, total: 1200.0, clienteId: 3001 },
-  { id: 1003, direccionEntrega: '78 Elm Rd', fechaEstimada: '2024-06-07', estado: EstadoPedido.finalizado, pago: EstadoPago.pagado, total: 500.0, clienteId: 1003 },
-  { id: 1004, direccionEntrega: '90 Commerce Blvd', fechaEstimada: '2024-06-08', estado: EstadoPedido.en_preparacion, pago: EstadoPago.en_deuda, total: 750.0, clienteId: 1004 },
-  { id: 1005, direccionEntrega: '12 Ocean Dr', fechaEstimada: '2024-6-9', estado: EstadoPedido.entregado, pago: EstadoPago.pagado, total: 300.5, clienteId : 18 },
-  { id: 1007, direccionEntrega: '210 Fairway Ln', fechaEstimada: '2024-06-11', estado: EstadoPedido.entregado, pago: EstadoPago.pagado, total: 2300.0, clienteId: 1007 },
-];
 
 export const PedidoRepository = {
-  async obtenerTodos(filters: Partial<Pedido>, itemsPerPage: number, currentPage: number): Promise<PedidosPaginado> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-          let filtered = mockPedidos;
-          if (filters.clienteId) {
-            filtered = mockPedidos.filter(pedido => pedido.clienteId === Number(filters.clienteId));
-          }
-          const totalItems = filtered.length;
-          const totalPages = Math.ceil(totalItems / itemsPerPage);
-          const startIndex = (currentPage - 1) * itemsPerPage;
-          const endIndex = startIndex + itemsPerPage;
-          const pedidos = filtered.slice(startIndex, endIndex);
-          resolve({
-            pedidos,
-            totalPages,
-            currentPage,
-            totalItems
-          });
-        }, 100);
+  async obtenerTodos(itemsPerPage: number, currentPage: number, filtros?: FiltrosPedido): Promise<PedidosPaginado> {
+    const skip = (currentPage - 1) * itemsPerPage;
+
+    const pedidos = await prisma.pedido.findMany({
+      where: {
+        cliente_id: filtros?.cliente_id ?? undefined,
+        vendedor_id: filtros?.vendedor_id ?? undefined,
+        estado: filtros?.estado ?? undefined,
+        estado_pago: filtros?.estado_pago ?? undefined,
+        direccion_entrega: filtros?.direccion_entrega ?? undefined,
+        fecha_entrega_estimada: filtros?.fecha_entrega_estimada ?? undefined,
+        condicion_venta: filtros?.condicion_venta ?? undefined
+      },
+      skip,
+      take: itemsPerPage,
+      orderBy: { id: 'desc' }
+    });
+
+    const totalCount = await prisma.pedido.count();
+
+    return {
+      pedidos,
+      totalItems: totalCount,
+      totalPages: Math.ceil(totalCount / itemsPerPage),
+      currentPage: currentPage
+    }
+  },
+
+  async obtenerPorId(id: number): Promise<Pedido> {
+    const pedido = await prisma.pedido.findUnique({ where: { id }, include: { detallePedidos: true } });
+    return pedido;
+  },
+
+  // async crear(data: NuevoPedido) {
+  //   const pedido = await NuevoPedidoSchema.parse(data);
+  //   const result = await prisma.pedido.create({ data: pedido })
+  //   return result;
+  // },
+
+  // async crearDetallePedido(data: NuevoDetallePedido[]) {
+  //   const result = await Promise.all([
+  //     data?.forEach(async (dat) => {
+  //       const detalle = await NuevoDetallePedidoSchema.parse(dat);
+  //       return await prisma.detallePedido.create({ data: detalle });
+  //     })
+  //   ])
+  //   return result;
+  // },
+
+  async crearConDetalle(pedido: NuevoPedido, detalle: NuevoDetallePedido[]) {
+    return await prisma.pedido.create({
+      data: {
+        ...pedido,
+        detallePedidos: {
+          create: detalle.map(d => ({
+            producto_id: d.producto_id,
+            cantidad: d.cantidad,
+            precio_unitario: d.precio_unitario,
+            descuento: d.descuento,
+            subtotal: d.subtotal
+          }))
+        }
+      },
+      include: { detallePedidos: true }
     });
   },
 
-  async obtenerPorId(id: number): Promise<Pedido | null> {
-    const p = mockPedidos.find((m) => m.id === id) || null;
-    return new Promise<Pedido | null>((resolve) => setTimeout(() => resolve(p), 100));
+  async actualizar(id: number, data: UpdatePedido) {
+    const result = await prisma.pedido.update({ where: { id }, data: data })
+    return result;
   },
+
+  async actualizarDetallePedido(data: UpdateDetallePedido) {
+    const result = await prisma.detallePedido.update({
+      where: {
+        pedido_id_producto_id: {
+          pedido_id: data.pedido_id,
+          producto_id: data.producto_id
+        }
+      }, data
+    })
+    return result;
+  },
+
+  async eliminar(id: number) {
+    const result = await prisma.pedido.update({ where: { id }, data: {
+      estado: EnumEstadoPedido.cancelado
+    } })
+    return result;
+  },
+
+  async eliminarDetallePedido(producto_id: number, pedido_id: number) {
+    const result = await prisma.detallePedido.delete({
+      where: {
+        pedido_id_producto_id: {
+          pedido_id,
+          producto_id
+        }
+      }
+    })
+    return result;
+  }
 };
