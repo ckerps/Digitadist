@@ -1,10 +1,10 @@
 'use client';
 
-import { Pagination as ShadcnPagination, PaginationContent, PaginationItem, PaginationEllipsis } from '../../../components/ui/pagination';
+import { Pagination as ShadcnPagination, PaginationContent, PaginationItem, PaginationEllipsis } from '../../components/ui/pagination';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '../../../components/ui/button';
-import { getVisiblePages } from '../../utils';
+import { getVisiblePages } from '../utils';
+import { Button } from '@/components/ui/button';
 
 interface PaginationProps {
   currentPage: number;

@@ -25,7 +25,7 @@ export function DatePicker({props, fecha, onChange}: {props?: React.HTMLAttribut
         <Button
           variant="outline"
           data-empty={!selectedDate}
-          className="data-[empty=true]:text-muted-foreground w-70 justify-start text-left font-normal"
+          className="data-[empty=true]:text-muted-foreground justify-start text-left font-normal h-10 w-full"
         >
           <CalendarIcon />
           {selectedDate ? format(selectedDate, "PPP") : <span>Seleccionar una fecha</span>}

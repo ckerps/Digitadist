@@ -38,7 +38,7 @@ export function PedidoFilters({
             />
           </div>
           <Select value={estadoFilter} onValueChange={onEstadoFilterChange}>
-            <SelectTrigger className="w-full sm:w-50 border-neutral-300">
+            <SelectTrigger className="w-full sm:w-30 border-neutral-300">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Estado" />
             </SelectTrigger>
@@ -51,7 +51,7 @@ export function PedidoFilters({
             </SelectContent>
           </Select>
           <Select value={pagoFilter} onValueChange={onPagoFilterChange}>
-            <SelectTrigger className="w-full sm:w-50 border-neutral-300">
+            <SelectTrigger className="w-full sm:w-30 border-neutral-300">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Pago" />
             </SelectTrigger>
@@ -61,14 +61,15 @@ export function PedidoFilters({
               <SelectItem value="en_deuda">En Deuda</SelectItem>
             </SelectContent>
           </Select>
+          <Button
+            onClick={onNewPedidoClick}
+            className="bg-red-600 hover:bg-red-700 text-white shadow-md w-full sm:w-auto"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Pedido
+          </Button>
         </div>
-        <Button
-          onClick={onNewPedidoClick}
-          className="bg-red-600 hover:bg-red-700 text-white shadow-md w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nuevo Pedido
-        </Button>
+
       </div>
     </div>
   );

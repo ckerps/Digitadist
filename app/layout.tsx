@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProvider from "./providers/QueryProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "./providers/AppSidebar";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
           <SidebarProvider>
             <AppSidebar />
             <SidebarTrigger className="md:relative md:inline-block absolute top-4 left-4 md:top-auto md:left-auto z-10 m-1" />
+            <Toaster />
             <main className="px-2 h-full flex flex-1">
             {children}
             </main>

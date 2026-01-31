@@ -13,7 +13,7 @@ import { NuevoCliente } from '@/types/cliente';
 import ErrorPage from '../../error';
 import LoadingPage from '../../loading';
 import { itemsPerPage } from '../utils';
-import { Pagination } from '../components/Pagination';
+import { Pagination } from '../shared/Pagination';
 
 
 export default function ClientesPage() {
@@ -53,11 +53,11 @@ export default function ClientesPage() {
 
   return (
     <div className="h-full w-full">
-        <div className="mb-2">
+        <div className="my-1 ml-10 md:ml-0">
           <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">Clientes</h1>
         </div>
 
-        <div className=" rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
+        <div className="md:rounded-xl md:shadow-lg md:border border-neutral-200 overflow-hidden">
           <ClienteFilters
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -73,7 +73,7 @@ export default function ClientesPage() {
             />
           </div>
 
-          <div className='block md:hidden'>
+          <div className='block mt-2 md:mt-0 md:hidden'>
             <MobileClienteTable
               clientes={clientes?.clientes ?? []}
               onRowClick={handleRowClick}

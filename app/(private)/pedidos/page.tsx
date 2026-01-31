@@ -8,7 +8,7 @@ import { NuevoPedido } from '@/types/pedido';
 import LoadingPage from '../../loading';
 import ErrorPage from '../../error';
 import { MobilePedidosTable, PedidoFilters, PedidosTable } from './components';
-import { Pagination } from '../components/Pagination';
+import { Pagination } from '../shared/Pagination';
 
 export default function PedidosPage() {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function PedidosPage() {
 
   return (
     <div className="h-full w-full">
-        <div className="mb-2">
+        <div className="my-1 ml-10 md:ml-0">
           <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">Pedidos</h1>
         </div>
 

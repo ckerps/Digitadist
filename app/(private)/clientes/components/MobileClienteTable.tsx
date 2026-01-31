@@ -14,7 +14,7 @@ interface ClienteTableProps {
 
 export function MobileClienteTable({ clientes, onRowClick }: ClienteTableProps) {
     return (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto grid gap-2">
             {clientes.map((cliente) => (
                 <Card
                     key={cliente.id}
