@@ -4,7 +4,8 @@ import { productosApi } from "@/api/productos.api";
 import { NuevoPedido, Pedido, PedidosPaginado } from "@/types/pedido";
 import { Producto, ProductosPaginado } from "@/types/producto";
 import { QueryObserverResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
+import { toast } from "sonner";
 
 interface UseProductosReturn {
   productos: ProductosPaginado | undefined;
@@ -21,6 +22,12 @@ export function useProductos({filters, itemsPerPage, currentPage}: { filters?: P
     queryFn: () => productosApi.getAll({ filters, itemsPerPage, currentPage }),
     staleTime: 1000 * 60 * 5,
   });
+
+  useEffect(() => {
+    if (listQuery.error) {
+      toast.error(`Error al cargar productos: ${(listQuery.error as Error).message}`);
+    }
+  }, [listQuery.error]);
 
   const refetchList = useCallback(
     () => listQuery.refetch(),

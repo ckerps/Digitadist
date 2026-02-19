@@ -34,7 +34,14 @@ export const PedidoRepository = {
   },
 
   async obtenerPorId(id: number): Promise<PedidoConProductos | null> {
-    const pedido = await prisma.pedido.findUnique({ where: { id }, include: { detallePedidos: {include: { producto: true }} } });
+    const pedido = await prisma.pedido.findUnique({ 
+      where: { id }, 
+      include: { 
+        detallePedidos: { include: { producto: true } },
+        cliente: true,
+        vendedor: true
+      } 
+    });
     return pedido;
   },
 

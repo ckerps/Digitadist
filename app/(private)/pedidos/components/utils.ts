@@ -1,6 +1,6 @@
-import { EstadoPago, EstadoPedido } from "@/types/pedido";
+import { EnumEstadoPago, EnumEstadoPedido } from "@prisma/client";
 
-export const getEstadoBadge = (estado: EstadoPedido) => {
+export const getEstadoBadge = (estado: EnumEstadoPedido) => {
   const variants: Record<string, { label: string; className: string }> = {
     entregado: { label: 'Entregado', className: 'bg-green-600 hover:bg-green-700' },
     registrado: { label: 'Registrado', className: 'bg-blue-600 hover:bg-blue-700' },
@@ -10,8 +10,8 @@ export const getEstadoBadge = (estado: EstadoPedido) => {
   return variants[estado] || variants.registrado;
 };
 
-export const getPagoBadge = (pago: EstadoPago) => {
-  return pago === EstadoPago.pagado
+export const getPagoBadge = (pago: EnumEstadoPago) => {
+  return pago === EnumEstadoPago.pagado
     ? { label: 'Pagado', className: 'bg-green-600 hover:bg-green-700' }
     : { label: 'En Deuda', className: 'bg-red-600 hover:bg-red-700' };
 };

@@ -1,19 +1,19 @@
 import { pedidosApi } from "@/api/pedidos.api";
-import { Pedido } from "@/types/pedido";
+import { PedidoConProductos } from "@/types/pedido";
 import { QueryObserverResult, useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 interface UsePedidosReturn {
-  pedido: Pedido | undefined;
+  pedido:  PedidoConProductos | undefined;
   isLoadingDetail: boolean;
   errorDetail: Error | null;
   errorUpdate: Error | null;
   errorDelete: Error | null;
-  updatePedido: (id: number, pedido: Partial<Pedido>) => Promise<Pedido>;
+  updatePedido: (id: number, pedido: Partial<PedidoConProductos>) => Promise<PedidoConProductos>;
   deletePedido: (id: number) => Promise<void>;
   isUpdating: boolean;
   isDeleting: boolean;
-  refetchDetail: () => Promise<QueryObserverResult<Pedido, Error>>;
+  refetchDetail: () => Promise<QueryObserverResult<PedidoConProductos, Error>>;
 }
 
 export function usePedidoDetail({pedidoId}: { pedidoId: number}): UsePedidosReturn {
@@ -26,7 +26,7 @@ export function usePedidoDetail({pedidoId}: { pedidoId: number}): UsePedidosRetu
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, pedido }: { id: number; pedido: Partial<Pedido> }) =>
+    mutationFn: ({ id, pedido }: { id: number; pedido: Partial<PedidoConProductos> }) =>
       pedidosApi.update(id, pedido),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['pedidos:list'] });
@@ -43,7 +43,7 @@ export function usePedidoDetail({pedidoId}: { pedidoId: number}): UsePedidosRetu
   });
 
   const updatePedido = useCallback(
-    async (id: number, pedido: Partial<Pedido>) => {
+    async (id: number, pedido: Partial<PedidoConProductos>) => {
       return updateMutation.mutateAsync({ id, pedido });
     },
     [updateMutation]

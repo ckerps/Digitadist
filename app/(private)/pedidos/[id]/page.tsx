@@ -1,27 +1,37 @@
 'use client';
 
 import React, { useState, Suspense } from 'react';
-import { ArrowLeft, Edit, Trash2, Package } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Package, Clock, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { usePedidoDetail } from '../hooks/usePedidoDetail';
 import LoadingPage from '../../../loading';
 import ErrorPage from '../../../error';
-import { UpdatePedido } from '@/types/pedido';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '../../../components/ui/card';
-import { ListaProductosSeleccionados } from '../components/ListaProductosSeleccionados';
 import { Pagination } from '../../shared/Pagination';
 import { itemsPerPage } from '../../utils';
+import {
+  PedidoInfo,
+  DetallePedidoTable,
+  MobileDetallePedidoTable,
+  CambiarEstadoModal,
+  CambiarPagoModal,
+  AgregarProductoModal,
+  CancelarPedidoModal
+} from '../components';
+import { EnumEstadoPedido, EnumEstadoPago } from '@prisma/client';
 
 export default function PedidoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDesactivarModalOpen, setIsDesactivarModalOpen] = useState(false);
+  const [isCambiarEstadoOpen, setIsCambiarEstadoOpen] = useState(false);
+  const [isCambiarPagoOpen, setIsCambiarPagoOpen] = useState(false);
+  const [isAgregarProductoOpen, setIsAgregarProductoOpen] = useState(false);
+  const [isCancelarOpen, setIsCancelarOpen] = useState(false);
   const router = useRouter();
 
-  const { pedido, deletePedido, updatePedido, isLoadingDetail, errorDetail } = usePedidoDetail({ pedidoId: +id });
+  const { pedido, deletePedido, updatePedido, isLoadingDetail, errorDetail, isUpdating, isDeleting } = usePedidoDetail({ pedidoId: +id });
 
   if (isLoadingDetail) {
     return <LoadingPage />;
@@ -32,51 +42,101 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
     return <ErrorPage message={errorDetail?.message || "Error al cargar el pedido."} />;
   }
 
-  const { productos } = useProductosByPedido({ pedidoId: pedido.id, itemsPerPage, currentPage });
-
-  const handleUpdatePedido = async (pedido: UpdatePedido) => {
+  const handleCambiarEstado = async (nuevoEstado: EnumEstadoPedido) => {
     try {
-      await updatePedido(+id, pedido);
-      setIsEditModalOpen(false);
-      setCurrentPage(1);
+      await updatePedido(+id, { estado: nuevoEstado });
       //@TODO: toast
     } catch (error) {
       //@TODO: toast
-      console.error('Error al actualizar el pedido:', error);
+      console.error('Error al cambiar estado del pedido:', error);
     }
   };
 
-  const handleDesactivarPedido = async () => {
+  const handleCambiarPago = async (nuevoPago: EnumEstadoPago) => {
+    try {
+      await updatePedido(+id, { estado_pago: nuevoPago });
+      //@TODO: toast
+    } catch (error) {
+      //@TODO: toast
+      console.error('Error al cambiar pago del pedido:', error);
+    }
+  };
+
+  const handleAgregarProducto = async (productoData: {
+    producto_id: number;
+    cantidad: number;
+    precio_unitario: number;
+    descuento?: number;
+    subtotal: number;
+  }) => {
+    try {
+      // TODO: Implementar endpoint para agregar detalle a pedido existente
+      //@TODO: toast
+    } catch (error) {
+      //@TODO: toast
+      console.error('Error al agregar producto:', error);
+    }
+  };
+
+  const handleCancelarPedido = async () => {
     try {
       await deletePedido(+id);
-      setIsDesactivarModalOpen(false);
-      setCurrentPage(1);
+      setIsCancelarOpen(false);
       //@TODO: toast
       router.push('/pedidos');
     } catch (error) {
       //@TODO: toast
-      console.error('Error al desactivar el pedido:', error);
+      console.error('Error al cancelar el pedido:', error);
     }
   };
 
   return (
     <div className="min-h-screen overflow-hidden w-full">
-      <div className="mb-2">
-        <div className="flex items-start justify-end">
-          <div className="flex gap-2">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/pedidos')}
+            className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200 self-start sm:self-auto"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver a Pedidos
+          </Button>
+          <div className="flex gap-2 flex-wrap justify-end w-full sm:w-auto">
             <Button
-              variant="ghost"
-              onClick={() => router.push('/pedidos')}
-              className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200"
+              variant="outline"
+              className="border-neutral-300 gap-1"
+              onClick={() => setIsCambiarEstadoOpen(true)}
+              disabled={pedido.estado === 'cancelado'}
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver a Pedidos
+              <Clock className="h-4 w-4" />
+              <div className='hidden sm:block'>Estado</div>
             </Button>
-            <Button variant="outline" className="border-neutral-300 gap-1" onClick={() => setIsEditModalOpen(true)}>
-              <Edit className="h-4 w-4" />
-              <div className='hidden sm:block'>Editar</div>
+            <Button
+              variant="outline"
+              className="border-neutral-300 gap-1"
+              onClick={() => setIsCambiarPagoOpen(true)}
+              disabled={pedido.estado === 'cancelado'}
+            >
+              <CreditCard className="h-4 w-4" />
+              <div className='hidden sm:block'>Pago</div>
             </Button>
-            <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 gap-1" onClick={() => setIsDesactivarModalOpen(true)}>
+            <Button
+              variant="outline"
+              className="border-neutral-300 gap-1"
+              onClick={() => setIsAgregarProductoOpen(true)}
+              disabled={pedido.estado === 'cancelado'}
+            >
+              <Plus className="h-4 w-4" />
+              <div className='hidden sm:block'>Agregar</div>
+            </Button>
+            <Button
+              variant="outline"
+              className="border-red-300 text-red-600 hover:bg-red-50 gap-1"
+              onClick={() => setIsCancelarOpen(true)}
+              disabled={pedido.estado === 'cancelado'}
+            >
               <Trash2 className="h-4 w-4" />
               <div className='hidden sm:block'>Cancelar</div>
             </Button>
@@ -84,49 +144,63 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
         </div>
       </div>
 
+      {/* Pedido Info */}
       <Suspense fallback={<Skeleton className="h-32 w-full mb-6" />}>
         <PedidoInfo pedido={pedido} />
       </Suspense>
 
-      <div className="mb-2">
+      {/* Detalle Pedido Section */}
+      <div className="mb-4">
         <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 inline-flex items-center">
           <Package className="h-6 w-6 mr-2" />
-          Detalle Pedido
+          Productos del Pedido
         </h1>
       </div>
 
-      <Card className='hidden sm:block p-0'>
+      {/* Desktop Table */}
+      <Card className='hidden sm:block p-0 mb-6'>
         <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-          <DetallePedidoTable productos={pedido?.detallePedido ?? []} />
+          <DetallePedidoTable productos={pedido?.detallePedidos ?? []} />
         </Suspense>
       </Card>
 
-      <div className='block sm:hidden'>
+      {/* Mobile View */}
+      <div className='block sm:hidden mb-6'>
         <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-          <MobileDetallePedidoTable productos={pedido?.detallePedido} />
+          <MobileDetallePedidoTable productos={pedido?.detallePedidos ?? []} />
         </Suspense>
       </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={pedido?.totalPages}
-        totalItems={pedidos?.totalItems}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setCurrentPage}
+      {/* Modals */}
+      <CambiarEstadoModal
+        open={isCambiarEstadoOpen}
+        onOpenChange={setIsCambiarEstadoOpen}
+        onConfirm={handleCambiarEstado}
+        estadoActual={pedido.estado}
+        isLoading={isUpdating}
       />
 
-      <ClienteForm
-        open={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        onSave={handleUpdateCliente}
-        cliente={cliente}
+      <CambiarPagoModal
+        open={isCambiarPagoOpen}
+        onOpenChange={setIsCambiarPagoOpen}
+        onConfirm={handleCambiarPago}
+        estadoPagoActual={pedido.estado_pago}
+        isLoading={isUpdating}
       />
 
-      <DesactivarClienteModal
-        open={isDesactivarModalOpen}
-        onOpenChange={setIsDesactivarModalOpen}
-        onConfirm={handleDesactivarCliente}
-        cliente={cliente}
+      <AgregarProductoModal
+        open={isAgregarProductoOpen}
+        onOpenChange={setIsAgregarProductoOpen}
+        onConfirm={handleAgregarProducto}
+        isLoading={isUpdating}
+      />
+
+      <CancelarPedidoModal
+        open={isCancelarOpen}
+        onOpenChange={setIsCancelarOpen}
+        onConfirm={handleCancelarPedido}
+        pedidoId={pedido.id}
+        isLoading={isDeleting}
       />
     </div>
   );

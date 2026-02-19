@@ -1,4 +1,4 @@
-import { DetallePedido, EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, Pedido, Producto } from "@prisma/client";
+import { DetallePedido, EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, Pedido, Producto, Cliente, Usuario } from "@prisma/client";
 
 export interface NuevoPedido {
   cliente_id: number;
@@ -60,4 +60,6 @@ export interface FiltrosPedido {
 
 export interface PedidoConProductos extends Pedido {
   detallePedidos: (DetallePedido & { producto: Producto})[];
+  cliente?: Cliente;
+  vendedor?: Usuario;
 }
