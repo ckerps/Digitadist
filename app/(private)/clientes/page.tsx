@@ -30,13 +30,9 @@ export default function ClientesPage() {
   };
 
   const handleSaveCliente = async (cliente: NuevoCliente) => {
-    try {
-      await createCliente(cliente);
-      setIsModalOpen(false);
-      setCurrentPage(1);
-    } catch (error) {
-      console.error('Error al crear cliente:', error);
-    }
+    await createCliente(cliente);
+    setIsModalOpen(false);
+    setCurrentPage(1);
   };
 
   if (isLoadingList || !clientes) {

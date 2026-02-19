@@ -15,7 +15,7 @@ export function usePedidosByCliente({clienteId, itemsPerPage, currentPage}: {cli
 
   const pedidosQuery = useSuspenseQuery({
     queryKey: ['pedidosByCliente:list', itemsPerPage, currentPage, clienteId],
-    queryFn: () => pedidosApi.getAll({ clienteId }, itemsPerPage, currentPage),
+    queryFn: () => pedidosApi.getAll({filters: {cliente_id: clienteId}, itemsPerPage, currentPage}),
     staleTime: 1000 * 60 * 5,
   });
 

@@ -16,7 +16,7 @@ import { useClienteDetail } from '../hooks/useClienteDetail';
 import { usePedidosByCliente } from '../hooks/usePedidosByCliente';
 import LoadingPage from '../../../loading';
 import ErrorPage from '../../../error';
-import { NuevoCliente } from '@/types/cliente';
+import { UpdateCliente } from '@/types/cliente';
 import { itemsPerPage } from '../../utils';
 import { MobilePedidosTable, PedidosTable } from '../../pedidos/components';
 import { Pagination } from '../../shared/Pagination';
@@ -28,7 +28,8 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
   const [isDesactivarModalOpen, setIsDesactivarModalOpen] = useState(false);
   const router = useRouter();
 
-  const { cliente, isLoadingDetail, errorDetail, updateCliente, deleteCliente } = useClienteDetail({ clienteId: id });
+  const { cliente, isLoadingDetail, errorDetail, updateCliente, deleteCliente } = useClienteDetail({ clienteId: +id });
+  const { pedidos } = usePedidosByCliente({ clienteId: cliente?.id, itemsPerPage, currentPage });
 
   if (isLoadingDetail) {
     return <LoadingPage />;
@@ -39,9 +40,8 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
     return <ErrorPage message={errorDetail?.message || "Error al cargar el cliente."} />;
   }
 
-  const { pedidos } = usePedidosByCliente({ clienteId: cliente.id, itemsPerPage, currentPage });
 
-  const handleUpdateCliente = async (cliente: NuevoCliente) => {
+  const handleUpdateCliente = async (id: number, cliente: UpdateCliente) => {
     try {
       await updateCliente(+id, cliente);
       setIsEditModalOpen(false);
@@ -125,7 +125,7 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
       <ClienteForm
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
-        onSave={handleUpdateCliente}
+        onUpdate={handleUpdateCliente}
         cliente={cliente}
       />
 

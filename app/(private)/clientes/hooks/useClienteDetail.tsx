@@ -1,7 +1,9 @@
 import { clientesApi } from "@/api/clientes.api";
-import { Cliente } from "@/types/cliente";
-import { QueryObserverResult, useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { UpdateCliente } from "@/types/cliente";
+import { Cliente } from "@prisma/client";
+import { QueryObserverResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect } from "react";
+import { toast } from "sonner";
 
 interface UseClientesReturn {
   cliente: Cliente | undefined;
@@ -9,24 +11,30 @@ interface UseClientesReturn {
   errorDetail: Error | null;
   errorUpdate: Error | null;
   errorDelete: Error | null;
-  updateCliente: (id: number, cliente: Partial<Cliente>) => Promise<Cliente>;
+  updateCliente: (id: number, cliente: UpdateCliente) => Promise<Cliente>;
   deleteCliente: (id: number) => Promise<void>;
   isUpdating: boolean;
   isDeleting: boolean;
   refetchDetail: () => Promise<QueryObserverResult<Cliente, Error>>;
 }
 
-export function useClienteDetail({clienteId}: { clienteId: string}): UseClientesReturn {
+export function useClienteDetail({clienteId}: { clienteId: number}): UseClientesReturn {
   const queryClient = useQueryClient();
 
-  const detailQuery = useSuspenseQuery({
+  const detailQuery = useQuery({
     queryKey: ['clientes:detail', clienteId],
     queryFn: () => clientesApi.getById(clienteId),
     staleTime: 1000 * 60 * 5,
   });
 
+  useEffect(() => {
+    if (detailQuery.error) {
+      toast.error(`Error al cargar cliente: ${(detailQuery.error as Error).message}`);
+    }
+  }, [detailQuery.error]);
+
   const updateMutation = useMutation({
-    mutationFn: ({ id, cliente }: { id: number; cliente: Partial<Cliente> }) =>
+    mutationFn: ({ id, cliente }: { id: number; cliente: UpdateCliente }) =>
       clientesApi.update(id, cliente),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['clientes:list'] });
@@ -43,7 +51,7 @@ export function useClienteDetail({clienteId}: { clienteId: string}): UseClientes
   });
 
   const updateCliente = useCallback(
-    async (id: number, cliente: Partial<Cliente>) => {
+    async (id: number, cliente: UpdateCliente) => {
       return updateMutation.mutateAsync({ id, cliente });
     },
     [updateMutation]

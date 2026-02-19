@@ -1,7 +1,9 @@
 import { clientesApi } from "@/api/clientes.api";
-import { Cliente, ClientePaginado, NuevoCliente } from "@/types/cliente";
+import { Cliente } from "@prisma/client";
+import { ClientePaginado, FiltrosCliente, NuevoCliente } from "@/types/cliente";
 import { QueryObserverResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { toast } from "sonner";
 
 interface UseClientesReturn {
   clientes: ClientePaginado | undefined;
@@ -13,7 +15,7 @@ interface UseClientesReturn {
   refetchList: () => Promise<QueryObserverResult<ClientePaginado, Error>>;
 }
 
-export function useClientes({ itemsPerPage, currentPage, filters}: { itemsPerPage?: number, currentPage?: number, filters?: Partial<Cliente> }): UseClientesReturn {
+export function useClientes({ itemsPerPage, currentPage, filters}: { itemsPerPage?: number, currentPage?: number, filters?: FiltrosCliente }): UseClientesReturn {
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({
@@ -26,6 +28,9 @@ export function useClientes({ itemsPerPage, currentPage, filters}: { itemsPerPag
     mutationFn: (cliente: NuevoCliente) => clientesApi.create(cliente),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientes:list'] });
+    },
+    onError: (error: Error) => {
+      toast.error(`Error al crear cliente: ${error.message}`);
     },
   });
 
