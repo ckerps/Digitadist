@@ -1,6 +1,6 @@
 // src/api/clientes.api.ts
 
-import { Cliente } from "@/generated/prisma/client";
+import { Cliente } from "@prisma/client";
 import { ClientePaginado, FiltrosCliente, NuevoCliente, UpdateCliente } from "@/types/cliente";
 
 const BASE_URL = '/api/clientes';
@@ -12,11 +12,11 @@ export interface ApiError extends Error {
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const error = new Error(errorData?.error || 'Error en la solicitud') as ApiError;
-    // Capturamos los detalles de Zod que enviamos desde el backend
-    error.details = errorData?.details; 
-    throw error;
+    const errorData = await response.json().catch(() => ({ error: 'Error parsing response' }));
+    const apiError = new Error(errorData || 'Unknown error') as ApiError;
+    apiError.details = errorData.details;
+    console.log('API Error:', apiError.message);
+    throw apiError;
   }
   return response.json();
 }
@@ -61,6 +61,7 @@ export const clientesApi = {
   },
 
   async create(cliente: NuevoCliente): Promise<Cliente> {
+    console.log('Creating cliente:', cliente);
     const response = await fetch(BASE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

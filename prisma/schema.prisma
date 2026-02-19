@@ -5,13 +5,13 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
+  engineType = "library"
+  // output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum EnumTipoCliente {
@@ -74,19 +74,19 @@ model Rol {
 }
 
 model Usuario {
-  id                  Int       @id @default(autoincrement())
+  id                  Int           @id @default(autoincrement())
   nombre              String
   apellido            String
   rol_id              Int
-  rol                 Rol       @relation(fields: [rol_id], references: [id])
-  email               String    @unique
+  rol                 Rol           @relation(fields: [rol_id], references: [id])
+  email               String        @unique
   telefono            String
   password            String
-  fecha_creacion      DateTime  @default(now())
-  fecha_actualizacion DateTime? @updatedAt
+  fecha_creacion      DateTime      @default(now())
+  fecha_actualizacion DateTime?     @updatedAt
   activo              Boolean
-  productoLogs ProductoLog[]
-  pedidos Pedido[]
+  productoLogs        ProductoLog[]
+  pedidos             Pedido[]
 }
 
 model Cliente {
@@ -98,7 +98,7 @@ model Cliente {
   email     String          @unique
   telefono  String          @db.VarChar(20)
   activo    Boolean
-  pedidos Pedido[]
+  pedidos   Pedido[]
 }
 
 model Categoria {

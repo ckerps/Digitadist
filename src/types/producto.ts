@@ -1,4 +1,4 @@
-import { EnumAtributosLog, EnumPresentacion, EnumTipoDescuento, Producto } from "@/generated/prisma/client";
+import { EnumAtributosLog, EnumPresentacion, EnumTipoDescuento, Producto } from "@prisma/client";
 
 
 export interface NuevoProducto {

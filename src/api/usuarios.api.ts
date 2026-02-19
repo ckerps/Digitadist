@@ -1,6 +1,6 @@
 // src/api/usuarios.api.ts
 
-import { Usuario } from "@/generated/prisma/client";
+import { Usuario } from "@prisma/client";
 import { FiltrosUsuario, NuevoUsuario, UsuarioPaginado, UpdateUsuario } from "@/types/usuario";
 
 const BASE_URL = '/api/usuarios';

@@ -1,5 +1,4 @@
-import { DetallePedido, Pedido } from "@/generated/prisma/client";
-import { EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido } from "@/generated/prisma/enums";
+import { DetallePedido, EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, Pedido, Producto } from "@prisma/client";
 
 export interface NuevoPedido {
   cliente_id: number;
@@ -57,4 +56,8 @@ export interface FiltrosPedido {
   direccion_entrega?: string;
   fecha_entrega_estimada?: Date;
   condicion_venta?: EnumCondicionVenta;
+}
+
+export interface PedidoConProductos extends Pedido {
+  detallePedidos: (DetallePedido & { producto: Producto})[];
 }

@@ -1,6 +1,6 @@
 import { ClientePaginado, NuevoCliente, UpdateCliente } from "@/types/cliente";
 import { prisma } from "@/lib/prisma";
-import { Cliente } from "@/generated/prisma/client";
+import { Cliente } from "@prisma/client";
 import { NuevoClienteSchema, PaginacionSchema, UpdateClienteSchema } from "./zodSchemas";
 
 export class ClienteRepository {
@@ -24,12 +24,12 @@ export class ClienteRepository {
     };
   }
 
-  static async obtenerPorId(id: number): Promise<Cliente> {
+  static async obtenerPorId(id: number): Promise<Cliente | null> {
     const cliente = await prisma.cliente.findUnique({ where: { id } })
     return cliente;
   }
 
-  static async obtenerPorCuit(cuit: string): Promise<Cliente> {
+  static async obtenerPorCuit(cuit: string): Promise<Cliente | null> {
     const cliente = await prisma.cliente.findUnique({ where: { cuit } })
     return cliente;
   }

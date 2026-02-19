@@ -1,4 +1,4 @@
-import { Usuario } from "@/generated/prisma/client";
+import { Usuario } from "@prisma/client";
 import { UsuarioRepository } from "@/repositories/usuario.repository";
 import { FiltrosUsuarioSchema, NuevoUsuarioSchema, PaginacionSchema, UpdateUsuarioSchema } from "@/repositories/zodSchemas";
 import { FiltrosUsuario, NuevoUsuario, UpdateUsuario, UsuarioPaginado } from "@/types/usuario";
@@ -40,7 +40,7 @@ export class UsuarioService {
         return UsuarioRepository.actualizar(id, validatedData);
     }
 
-    static async eliminar(id: number) : Promise<void>{
+    static async eliminar(id: number) : Promise<Usuario>{
         if (id <= 0) throw new Error("ID inválido");
         return UsuarioRepository.eliminar(id);
     }

@@ -1,5 +1,6 @@
 import { ClienteRepository } from "@/repositories/cliente.repository"
 import { NuevoClienteSchema, PaginacionSchema, UpdateClienteSchema } from "@/repositories/zodSchemas";
+import { NuevoCliente, UpdateCliente } from "@/types/cliente";
 
 export class ClienteService {
     static async obtenerTodos(itemsPerPage: number, currentPage: number) {
@@ -18,7 +19,7 @@ export class ClienteService {
         return cliente;
     }
 
-    static async crear(data: any) {
+    static async crear(data: NuevoCliente) {
         const validatedData = NuevoClienteSchema.parse(data);
 
         if (validatedData.cuit) {
@@ -29,8 +30,8 @@ export class ClienteService {
         return ClienteRepository.crear(validatedData);
     }
 
-    static async actualizar(id: number, data: any) {
-        if (id <= 0 || id !== data.id) throw new Error("ID inválido");
+    static async actualizar(id: number, data: UpdateCliente) {
+        if (id <= 0) throw new Error("ID inválido");
         
         const validatedData = UpdateClienteSchema.parse(data);
 

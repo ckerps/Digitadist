@@ -1,6 +1,6 @@
 // src/api/productos.api.ts
 
-import { Producto } from "@/generated/prisma/client";
+import { Producto } from "@prisma/client";
 import { FiltrosProducto, NuevoProducto, ProductosPaginado, UpdateProducto } from "@/types/producto";
 
 const BASE_URL = '/api/productos';

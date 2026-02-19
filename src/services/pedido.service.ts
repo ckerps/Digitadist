@@ -1,6 +1,6 @@
 import { PedidoRepository } from "@/repositories/pedido.repository";
 import { FiltrosPedidoSchema, NuevoDetallePedidoSchema, NuevoPedidoSchema, PaginacionSchema, UpdatePedidoSchema } from "@/repositories/zodSchemas";
-import { FiltrosPedido, NuevoDetallePedido, NuevoPedido, UpdatePedido } from "@/types/pedido";
+import { FiltrosPedido, NuevoDetallePedido, NuevoPedido, PedidoConProductos, UpdatePedido } from "@/types/pedido";
 import * as z from 'zod';
 
 export class PedidoService {
@@ -11,7 +11,7 @@ export class PedidoService {
         return await PedidoRepository.obtenerTodos(paginacion.itemsPerPage, paginacion.currentPage, filtros);
     }
 
-    static async obtenerPorId(id: number) {
+    static async obtenerPorId(id: number): Promise<PedidoConProductos> {
         const pedido = await PedidoRepository.obtenerPorId(id);
 
         if (!pedido) {

@@ -37,9 +37,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const resultado = await ClienteService.crear(body);
-    
     return NextResponse.json(resultado, { status: 201 });
   } catch (error: any) {
+    console.error('Error creating cliente:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         type: "ValidationError", 

@@ -1,5 +1,8 @@
-import { EnumAtributosLog, EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, EnumPresentacion, EnumTipoCliente, EnumTipoDescuento } from '@/generated/prisma/enums';
+import { EnumAtributosLog, EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, EnumPresentacion, EnumTipoCliente, EnumTipoDescuento } from '@prisma/client'
 import * as z from 'zod';
+
+// Helper para campos opcionales que tratan "" como undefined
+const optionalString = (schema: z.ZodString) => z.preprocess((val) => val === "" ? undefined : val, schema.optional());
 
 export const PaginacionSchema = z.object({
     itemsPerPage: z.coerce.number().gt(0).lt(100),
@@ -9,7 +12,7 @@ export const PaginacionSchema = z.object({
 export const NuevoClienteSchema = z.object({
     nombre: z.string().min(2, "Minimo 2 digitos"),
     telefono: z.string().min(10, "Mínimo 10 dígitos").transform((val) => val.replace(/\D/g, "")),
-    cuit: z.string().length(11, "Debe tener 11 dígitos").regex(/^\d+$/, "Solo números").optional(),
+    cuit: z.preprocess((val) => val === "" ? undefined : val, z.string().length(11, "Debe tener 11 dígitos").regex(/^\d+$/, "Solo números").optional()),
     direccion: z.string().min(5).max(20),
     tipo: z.enum([EnumTipoCliente.persona, EnumTipoCliente.razon_social]),
     email: z.email(),
@@ -52,8 +55,8 @@ export const UpdatePedidoSchema = z.object({
 })
 
 export const FiltrosPedidoSchema = z.object({
-    cliente_id: z.number().gt(0).optional(),
-    vendedor_id: z.number().gt(0).optional(),
+    cliente_id: z.coerce.number().gt(0).optional(),
+    vendedor_id: z.coerce.number().gt(0).optional(),
     estado: z.enum(EnumEstadoPedido).optional(),
     estado_pago: z.enum(EnumEstadoPago).optional(),
     direccion_entrega: z.string().min(0).max(20).optional(),

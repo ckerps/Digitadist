@@ -1,4 +1,4 @@
-import { Cliente, EnumTipoCliente } from "@/generated/prisma/client";
+import { Cliente, EnumTipoCliente, Pedido } from "@prisma/client";
 
 export interface NuevoCliente {
   nombre: string;
@@ -10,8 +10,11 @@ export interface NuevoCliente {
   activo: boolean;
 }
 
+export interface ClienteConPedidos extends Cliente {
+  pedidos: Pedido[];
+}
+
 export interface UpdateCliente {
-  id: number;
   nombre?: string;
   telefono?: string;
   cuit?: string;

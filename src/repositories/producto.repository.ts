@@ -1,7 +1,7 @@
 import { FiltrosProducto, NuevoProducto, ProductosPaginado, UpdateProducto } from "@/types/producto";
 import { FiltrosProductoSchema, NuevoProductoSchema, PaginacionSchema, UpdateProductoSchema } from "./zodSchemas";
 import { prisma } from "@/lib/prisma";
-import { Producto } from "@/generated/prisma/client";
+import { Producto } from "@prisma/client";
 
 export const ProductoRepository = {
   async obtenerTodos(itemsPerPage: number, currentPage: number, filtros?: FiltrosProducto): Promise<ProductosPaginado> {
@@ -34,7 +34,7 @@ export const ProductoRepository = {
     }
   },
 
-  async obtenerPorId(id: number): Promise<Producto> {
+  async obtenerPorId(id: number): Promise<Producto | null> {
     const producto = await prisma.producto.findUnique({ where: { id } });
     return producto;
   },
@@ -49,7 +49,7 @@ export const ProductoRepository = {
     return result;
   },
 
-  async eliminar(id: number) {
+  async eliminar(id: number): Promise<Producto> {
     const result = await prisma.producto.update({
       where: { id }, data: {
         activo: false

@@ -1,4 +1,4 @@
-import { Producto } from "@/generated/prisma/client";
+import { Cliente, Producto } from "@prisma/client";
 import { ProductoRepository } from "@/repositories/producto.repository";
 import { FiltrosProductoSchema, NuevoProductoSchema, PaginacionSchema, UpdateProductoSchema } from "@/repositories/zodSchemas";
 import { FiltrosProducto, NuevoProducto, ProductosPaginado, UpdateProducto } from "@/types/producto";
@@ -40,7 +40,7 @@ export class ProductoService {
         return ProductoRepository.actualizar(id, validatedData);
     }
 
-    static async eliminar(id: number) : Promise<void>{
+    static async eliminar(id: number) : Promise<Producto>{
         if (id <= 0) throw new Error("ID inválido");
         return ProductoRepository.eliminar(id);
     }

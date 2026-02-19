@@ -1,7 +1,7 @@
 import { FiltrosUsuario, NuevoUsuario, UpdateUsuario, UsuarioPaginado } from "@/types/usuario";
 import { FiltrosUsuarioSchema, NuevoUsuarioSchema, PaginacionSchema, UpdateUsuarioSchema } from "./zodSchemas";
 import { prisma } from "@/lib/prisma";
-import { Usuario } from "@/generated/prisma/client";
+import { Usuario } from "@prisma/client";
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const myPlaintextPassword = 's0/\/\P4$$w0rD';

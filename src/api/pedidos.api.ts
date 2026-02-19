@@ -1,7 +1,7 @@
 // src/api/pedidos.api.ts
 
-import { Pedido } from "@/generated/prisma/client"; // Asegúrate de importar el tipo de Prisma
-import { FiltrosPedido, NuevoPedido, PedidosPaginado } from "@/types/pedido";
+import { Pedido } from "@prisma/client"; // Asegúrate de importar el tipo de Prisma
+import { FiltrosPedido, NuevoPedido, PedidoConProductos, PedidosPaginado } from "@/types/pedido";
 
 const BASE_URL = '/api/pedidos';
 
@@ -48,12 +48,12 @@ export const pedidosApi = {
     return handleResponse<PedidosPaginado>(response);
   },
 
-  async getById(id: number): Promise<Pedido> {
+  async getById(id: number): Promise<PedidoConProductos> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'GET',
       credentials: 'include',
     });
-    return handleResponse<Pedido>(response);
+    return handleResponse<PedidoConProductos>(response);
   },
 
   async create(pedido: NuevoPedido): Promise<Pedido> {
@@ -66,14 +66,14 @@ export const pedidosApi = {
     return handleResponse<Pedido>(response);
   },
 
-  async update(id: number, pedido: Partial<Pedido>): Promise<Pedido> {
+  async update(id: number, pedido: Partial<PedidoConProductos>): Promise<PedidoConProductos> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(pedido),
       credentials: 'include',
     });
-    return handleResponse<Pedido>(response);
+    return handleResponse<PedidoConProductos>(response);
   },
 
   async delete(id: number): Promise<void> {

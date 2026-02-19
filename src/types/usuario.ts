@@ -1,4 +1,4 @@
-import { Usuario } from "@/generated/prisma/client";
+import { Usuario } from "@prisma/client";
 
 export interface NuevoUsuario {
     nombre: string;

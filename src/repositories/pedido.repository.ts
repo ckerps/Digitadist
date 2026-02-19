@@ -1,7 +1,7 @@
-import { FiltrosPedido, NuevoDetallePedido, NuevoPedido, PedidosPaginado, UpdateDetallePedido, UpdatePedido } from "@/types/pedido";
+import { FiltrosPedido, NuevoDetallePedido, NuevoPedido, PedidoConProductos, PedidosPaginado, UpdateDetallePedido, UpdatePedido } from "@/types/pedido";
 import { FiltrosPedidoSchema, NuevoDetallePedidoSchema, NuevoPedidoSchema, PaginacionSchema, UpdateDetallePedidoSchema, UpdatePedidoSchema } from "./zodSchemas";
 import { prisma } from "@/lib/prisma";
-import { EnumEstadoPedido, Pedido } from "@/generated/prisma/client";
+import { EnumEstadoPedido, Pedido } from "@prisma/client";
 
 
 export const PedidoRepository = {
@@ -10,8 +10,8 @@ export const PedidoRepository = {
 
     const pedidos = await prisma.pedido.findMany({
       where: {
-        cliente_id: filtros?.cliente_id ?? undefined,
-        vendedor_id: filtros?.vendedor_id ?? undefined,
+        cliente_id: filtros?.cliente_id ? +filtros?.cliente_id : undefined,
+        vendedor_id: filtros?.vendedor_id ? +filtros?.vendedor_id : undefined,
         estado: filtros?.estado ?? undefined,
         estado_pago: filtros?.estado_pago ?? undefined,
         direccion_entrega: filtros?.direccion_entrega ?? undefined,
@@ -33,8 +33,8 @@ export const PedidoRepository = {
     }
   },
 
-  async obtenerPorId(id: number): Promise<Pedido> {
-    const pedido = await prisma.pedido.findUnique({ where: { id }, include: { detallePedidos: true } });
+  async obtenerPorId(id: number): Promise<PedidoConProductos | null> {
+    const pedido = await prisma.pedido.findUnique({ where: { id }, include: { detallePedidos: {include: { producto: true }} } });
     return pedido;
   },
 
