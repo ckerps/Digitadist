@@ -13,8 +13,7 @@ export function ClienteInfoCards({ cliente }: ClienteInfoCardsProps) {
   return (
     <>
       <div className="mb-2">
-        <div className="flex items-start justify-between">
-          <div>
+        <div className="flex justify-start gap-3 items-center">
             <h1 className="text-3xl font-bold text-neutral-900 mb-2">{cliente.nombre}</h1>
             <Badge
               variant="default"
@@ -26,7 +25,6 @@ export function ClienteInfoCards({ cliente }: ClienteInfoCardsProps) {
                 <><User className="h-3 w-3 mr-1" /> Persona</>
               )}
             </Badge>
-          </div>
         </div>
       </div>
 

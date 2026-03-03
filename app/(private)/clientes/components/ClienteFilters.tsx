@@ -1,9 +1,9 @@
 'use client';
 
 import { Filter, Plus, Search } from "lucide-react";
-import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
+import DebouncedInput from "../../shared/DebouncedInput";
 
 interface ClienteFiltersProps {
   searchTerm: string;
@@ -26,11 +26,10 @@ export function ClienteFilters({
         <div className="flex-1 flex flex-col sm:flex-row gap-2 md:gap-3 w-full lg:w-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-4 w-4" />
-            <Input
+            <DebouncedInput
               placeholder="Buscar por nombre, CUIT o teléfono..."
               value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 border-neutral-300 focus:border-red-500 focus:ring-red-500"
+              onChange={(value) => onSearchChange(value)}
             />
           </div>
           <Select value={filterType} onValueChange={onFilterTypeChange}>

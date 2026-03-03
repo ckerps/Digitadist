@@ -19,7 +19,7 @@ export function useClientes({ itemsPerPage, currentPage, filters}: { itemsPerPag
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({
-    queryKey: ['clientes:list', currentPage],
+    queryKey: ['clientes:list', currentPage, itemsPerPage, filters],
     queryFn: () => clientesApi.getAll({itemsPerPage, currentPage, filters}),
     staleTime: 1000 * 60 * 5,
   });

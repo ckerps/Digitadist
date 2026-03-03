@@ -1,12 +1,12 @@
 import { ClienteRepository } from "@/repositories/cliente.repository"
 import { NuevoClienteSchema, PaginacionSchema, UpdateClienteSchema } from "@/repositories/zodSchemas";
-import { NuevoCliente, UpdateCliente } from "@/types/cliente";
+import { NuevoCliente, UpdateCliente, FiltrosCliente } from "@/types/cliente";
 
 export class ClienteService {
-    static async obtenerTodos(itemsPerPage: number, currentPage: number) {
+    static async obtenerTodos(itemsPerPage: number, currentPage: number, filtros?: FiltrosCliente) {
         if (itemsPerPage > 100) itemsPerPage = 100; // Límite de seguridad
         const { itemsPerPage: take, currentPage: page } = PaginacionSchema.parse({ itemsPerPage, currentPage });
-        return await ClienteRepository.obtenerTodos(take, page);
+        return await ClienteRepository.obtenerTodos(take, page, filtros);
     }
 
     static async obtenerPorId(id: number) {

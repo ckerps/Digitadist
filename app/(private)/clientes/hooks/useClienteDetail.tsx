@@ -1,6 +1,5 @@
 import { clientesApi } from "@/api/clientes.api";
-import { UpdateCliente } from "@/types/cliente";
-import { Cliente } from "@prisma/client";
+import { Cliente, UpdateCliente } from "@/types/cliente";
 import { QueryObserverResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
@@ -52,6 +51,7 @@ export function useClienteDetail({clienteId}: { clienteId: number}): UseClientes
 
   const updateCliente = useCallback(
     async (id: number, cliente: UpdateCliente) => {
+      console.log(cliente);
       return updateMutation.mutateAsync({ id, cliente });
     },
     [updateMutation]

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 import {
   ClienteInfoCards,
-  ClienteForm,
+  EditarClienteModal,
   DesactivarClienteModal,
 } from '../components';
 import { useRouter } from 'next/navigation';
@@ -40,10 +40,9 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
     return <ErrorPage message={errorDetail?.message || "Error al cargar el cliente."} />;
   }
 
-
-  const handleUpdateCliente = async (id: number, cliente: UpdateCliente) => {
+  const handleUpdateCliente = async (data: UpdateCliente) => {
     try {
-      await updateCliente(+id, cliente);
+      await updateCliente(+id, data);
       setIsEditModalOpen(false);
       setCurrentPage(1);
       //@TODO: toast
@@ -122,10 +121,10 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
         onPageChange={setCurrentPage}
       />
 
-      <ClienteForm
-        open={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        onUpdate={handleUpdateCliente}
+<EditarClienteModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSave={handleUpdateCliente}
         cliente={cliente}
       />
 

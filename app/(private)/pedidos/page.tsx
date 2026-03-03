@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import { usePedidos } from './hooks/usePedidos';
 import { itemsPerPage } from '../utils';
 import { NuevoPedido } from '@/types/pedido';
-import LoadingPage from '../../loading';
 import ErrorPage from '../../error';
-import { MobilePedidosTable, PedidoFilters, PedidosTable } from './components';
+import { MobilePedidosTable, PedidoFilters, PedidosTable, PedidosTableSkeleton, MobilePedidosTableSkeleton } from './components';
 import { Pagination } from '../shared/Pagination';
 
 export default function PedidosPage() {
@@ -26,11 +25,21 @@ export default function PedidosPage() {
     router.push(`/pedidos/${id}`);
   };
 
-  if (isLoadingList || !pedidos) {
-    return (
-      <LoadingPage />
-    );
-  }
+  // Resetear página cuando cambian los filtros
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleEstadoFilterChange = (value: string) => {
+    setFiltros({...filtros, estadoFilter: value});
+    setCurrentPage(1);
+  };
+
+  const handlePagoFilterChange = (value: string) => {
+    setFiltros({...filtros, pagoFilter: value});
+    setCurrentPage(1);
+  };
 
   if (errorList) {
     return (
@@ -47,27 +56,40 @@ export default function PedidosPage() {
         <div className=" rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
           <PedidoFilters
             searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             estadoFilter={filtros.estadoFilter}
-            onEstadoFilterChange={(value) => setFiltros({...filtros, estadoFilter: value})}
+            onEstadoFilterChange={handleEstadoFilterChange}
             pagoFilter={filtros.pagoFilter}
-            onPagoFilterChange={(value) => setFiltros({...filtros, pagoFilter: value})}
+            onPagoFilterChange={handlePagoFilterChange}
             onNewPedidoClick={() => router.push('/pedidos/nuevo')}
           />
 
-          <div className='hidden md:block'>
-            <PedidosTable
-              pedidos={pedidos?.pedidos ?? []}
-              onRowClick={handleRowClick}
-            />
-          </div>
+          {isLoadingList || !pedidos ? (
+            <>
+              <div className='hidden md:block'>
+                <PedidosTableSkeleton rows={itemsPerPage} />
+              </div>
+              <div className='block md:hidden'>
+                <MobilePedidosTableSkeleton rows={5} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className='hidden md:block'>
+                <PedidosTable
+                  pedidos={pedidos?.pedidos ?? []}
+                  onRowClick={handleRowClick}
+                />
+              </div>
 
-          <div className='block md:hidden'>
-            <MobilePedidosTable
-              pedidos={pedidos?.pedidos ?? []}
-              onRowClick={handleRowClick}
-            />
-          </div>
+              <div className='block md:hidden'>
+                <MobilePedidosTable
+                  pedidos={pedidos?.pedidos ?? []}
+                  onRowClick={handleRowClick}
+                />
+              </div>
+            </>
+          )}
 
           <Pagination
             currentPage={currentPage}

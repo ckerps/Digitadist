@@ -13,7 +13,7 @@ export const NuevoClienteSchema = z.object({
     nombre: z.string().min(2, "Minimo 2 digitos"),
     telefono: z.string().min(10, "Mínimo 10 dígitos").transform((val) => val.replace(/\D/g, "")),
     cuit: z.preprocess((val) => val === "" ? undefined : val, z.string().length(11, "Debe tener 11 dígitos").regex(/^\d+$/, "Solo números").optional()),
-    direccion: z.string().min(5).max(20),
+    direccion: z.string().min(5, "Mínimo 5 caracteres").max(20, "Máximo 20 caracteres"),
     tipo: z.enum([EnumTipoCliente.persona, EnumTipoCliente.razon_social]),
     email: z.email(),
     activo: z.boolean()
