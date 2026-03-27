@@ -68,15 +68,15 @@ export interface FiltrosPedido {
   searchTerm?: string;
   cliente_id?: number;
   vendedor_id?: number;
-  estado?: EnumEstadoPedido;
-  estado_pago?: EnumEstadoPago;
+  estado?: EnumEstadoPedido | '';
+  estado_pago?: EnumEstadoPago | '';
   direccion_entrega?: string;
   fecha_entrega_estimada?: Date;
   condicion_venta?: EnumCondicionVenta;
 }
 
 export interface PedidoConProductos extends Pedido {
-  detallePedidos: (DetallePedido & { producto: Producto})[];
+  detallePedidos: (DetallePedido & { producto: Producto })[];
   cliente: Cliente;
   vendedor: Usuario;
 }

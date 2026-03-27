@@ -50,13 +50,13 @@ export default function OfertasPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900">Ofertas</h1>
-          <p className="text-neutral-600 text-sm mt-1">Gestiona tus ofertas commerciales</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">Ofertas</h1>
+          <p className="text-muted-foreground text-sm mt-1">Gestiona tus ofertas comerciales</p>
         </div>
         <Button
           onClick={() => setNuevaOfertaModalOpen(true)}
           size="lg"
-          className="w-full md:w-auto"
+          className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nueva Oferta
@@ -64,11 +64,10 @@ export default function OfertasPage() {
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white border border-neutral-200 rounded-lg p-4 md:p-6 shadow-sm">
+      <div className="bg-white border border-neutral-200 rounded-lg p-2 shadow-sm">
         <FiltrosOfertas
           onApplyFiltros={handleApplyFiltros}
           onReset={handleResetFiltros}
-          onNewOfertaClick={() => setNuevaOfertaModalOpen(true)}
         />
       </div>
 

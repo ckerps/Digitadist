@@ -1,9 +1,8 @@
 'use client';
 
 import { Producto, EnumPresentacion } from "@prisma/client";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../../components/ui/card";
-import { Badge } from "../../../components/ui/badge";
-import { Package } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface MobileProductosTableProps {
   productos: Producto[];
@@ -41,55 +40,55 @@ export function MobileProductosTable({ productos, onRowClick }: MobileProductosT
   };
 
   return (
-    <div className="overflow-x-auto grid gap-3">
-      {productos.map((producto) => (
+    <div className="flex flex-col gap-3">
+      {(productos || []).map((producto) => (
         <Card
           key={producto.id}
           onClick={() => onRowClick(producto.id)}
-          className="hover:bg-red-50 cursor-pointer transition-colors duration-150"
+          className="hover:bg-accent cursor-pointer transition-colors duration-200 border-border/60 shadow-xs"
         >
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-start justify-between gap-2">
+            <CardTitle className="flex flex-wrap items-start justify-between gap-2 text-base font-semibold">
               <span className="flex-1 truncate">#{producto.id} - {producto.nombre}</span>
               <Badge
                 variant={producto.stock_actual && producto.stock_minimo && producto.stock_actual > producto.stock_minimo ? 'default' : 'destructive'}
                 className={
                   producto.stock_actual && producto.stock_minimo && producto.stock_actual > producto.stock_minimo
-                    ? 'bg-green-600 hover:bg-green-700 flex-shrink-0'
-                    : 'bg-red-600 hover:bg-red-700 flex-shrink-0'
+                    ? 'bg-green-600 hover:bg-green-700 flex-shrink-0 text-white'
+                    : 'bg-destructive hover:bg-destructive/90 flex-shrink-0 text-white'
                 }
               >
-                {producto.stock_actual}
+                Stock: {producto.stock_actual}
               </Badge>
             </CardTitle>
-            <CardDescription>
-              {getPresentacionLabel(producto.presentacion)} • {producto.tam_pack}{getPresentacionLabel(producto.presentacion) === 'Gramos' ? 'gr' : 'L'}
+            <CardDescription className="pt-1">
+              <Badge variant="secondary" className="bg-muted text-muted-foreground font-normal">
+                {getPresentacionLabel(producto.presentacion)} • {producto.tam_pack}{getPresentacionLabel(producto.presentacion) === 'Gramos' ? 'gr' : 'L'}
+              </Badge>
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <span className="text-neutral-500">Costo</span>
-                <p className="font-semibold text-neutral-900">${formatCurrency(producto.costo)}</p>
+                <span className="text-muted-foreground">Costo</span>
+                <p className="text-muted-foreground tracking-tight">${formatCurrency(producto.costo)}</p>
               </div>
               <div>
-                <span className="text-neutral-500">Precio Lista</span>
-                <p className="font-semibold text-neutral-900">${formatCurrency(getPrecioLista(producto.costo, producto.porcentaje_recargo))}</p>
+                <span className="text-muted-foreground">Precio Lista</span>
+                <p className="font-semibold text-foreground tracking-tight">${formatCurrency(getPrecioLista(producto.costo, producto.porcentaje_recargo))}</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-neutral-200">
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
               <div>
-                <span className="text-neutral-500">Código</span>
-                <p className="font-mono text-neutral-700">{producto.codigo}</p>
+                <span className="text-muted-foreground flex flex-col">Código <span className="font-mono text-foreground">{producto.codigo || '-'}</span></span>
               </div>
               <div>
-                <span className="text-neutral-500">Vencimiento</span>
-                <p className="font-mono text-neutral-700">{formatDate(producto.fecha_vencimiento)}</p>
+                <span className="text-muted-foreground flex flex-col">Vencimiento <span className="font-mono text-foreground">{formatDate(producto.fecha_vencimiento)}</span></span>
               </div>
             </div>
             {producto.stock_minimo && (
-              <div className="text-xs text-neutral-500 pt-1">
-                Stock mínimo: {producto.stock_minimo}
+              <div className="text-xs text-muted-foreground pt-1">
+                Mínimo: {producto.stock_minimo}
               </div>
             )}
           </CardContent>

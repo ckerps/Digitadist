@@ -13,7 +13,7 @@ import { useProductos } from './hooks/useProductos';
 import ErrorPage from '../../error';
 import { itemsPerPage } from '../utils';
 import { Pagination } from '../shared/Pagination';
-import { Button } from '../../components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
 export default function ProductosPage() {
@@ -57,13 +57,13 @@ export default function ProductosPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900">Productos</h1>
-          <p className="text-neutral-600 text-sm mt-1">Gestiona tu catálogo de productos</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">Productos</h1>
+          <p className="text-muted-foreground text-sm mt-1">Gestiona tu catálogo de productos</p>
         </div>
         <Button
           onClick={() => router.push('/productos/nuevo')}
           size="lg"
-          className="w-full md:w-auto"
+          className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nuevo Producto
@@ -71,13 +71,12 @@ export default function ProductosPage() {
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white border border-neutral-200 rounded-lg p-4 md:p-6 shadow-sm">
+      <div className="bg-white border border-neutral-200 rounded-lg p-2 shadow-sm">
         <ProductoFilters
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
           actividadFilter={actividadFilter}
           onActividadFilterChange={handleActividadFilterChange}
-          onNewProductoClick={() => router.push('/productos/nuevo')}
         />
       </div>
 

@@ -9,17 +9,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '../../../components/ui/dialog';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../components/ui/select';
+} from '@/components/ui/select';
 import { UpdateProducto } from '@/types/producto';
 
 interface EditarProductoModalProps {
@@ -41,6 +41,7 @@ export function EditarProductoModal({
     stock_actual: producto.stock_actual,
     costo: producto.costo as any,
     porcentaje_recargo: producto.porcentaje_recargo,
+    imagen: producto.imagen || '',
   });
 
   const handleChange = (field: string, value: any) => {
@@ -145,6 +146,31 @@ export function EditarProductoModal({
               }
               className="border-neutral-300"
             />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="imagen" className="text-neutral-700 font-medium">
+              URL de Imagen
+            </Label>
+            <Input
+              id="imagen"
+              type="text"
+              value={formData.imagen ?? ''}
+              onChange={(e) => handleChange('imagen', e.target.value)}
+              placeholder="https://ejemplo.com/imagen.jpg"
+              className="border-neutral-300"
+            />
+            {formData.imagen && (
+              <div className="mt-2 border border-neutral-200 rounded-md overflow-hidden bg-neutral-50 flex items-center justify-center p-2">
+                <img
+                  src={formData.imagen}
+                  alt="Vista previa"
+                  className="max-h-32 object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=Error+al+cargar+imagen';
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 

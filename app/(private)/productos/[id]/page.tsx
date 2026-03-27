@@ -67,25 +67,25 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             variant="ghost"
             size="sm"
             onClick={() => router.push('/productos')}
-            className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <p className="text-sm text-neutral-600">Productos</p>
-            <h1 className="text-3xl md:text-4xl font-bold text-neutral-900">
+            <p className="text-sm text-muted-foreground">Productos</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               {producto.nombre}
             </h1>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button
             onClick={() => setIsEditModalOpen(true)}
             disabled={isUpdating || isDeleting}
             variant="outline"
-            className="border-neutral-200 gap-2"
+            className="gap-2"
           >
             <Edit className="h-4 w-4" />
             <span className="hidden sm:inline">Editar</span>
@@ -94,7 +94,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             onClick={() => setIsDesactivarModalOpen(true)}
             disabled={!producto.activo || isDeleting}
             variant="outline"
-            className="border-red-200 text-red-600 hover:bg-red-50 gap-2"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
           >
             <Trash2 className="h-4 w-4" />
             <span className="hidden sm:inline">Desactivar</span>
@@ -103,7 +103,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Product Info Section */}
-      <ProductoInfo producto={producto} />
+      <ProductoInfo producto={producto as any} />
 
       {/* Related Offers Section */}
       <div className="space-y-4">
@@ -131,7 +131,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={(data) => handleUpdateProducto(+id, data)}
-        producto={producto}
+        producto={producto as any}
         isSaving={isUpdating}
       />
 
@@ -139,7 +139,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         isOpen={isDesactivarModalOpen}
         onClose={() => setIsDesactivarModalOpen(false)}
         onConfirm={() => handleDesactivarProducto()}
-        producto={producto}
+        producto={producto as any}
         isDeleting={isDeleting}
       />
     </div>

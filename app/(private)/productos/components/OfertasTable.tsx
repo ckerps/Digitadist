@@ -1,7 +1,7 @@
 'use client';
 
 import { Oferta } from '@prisma/client';
-import { Badge } from '../../../components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../../components/ui/table';
+} from '@/components/ui/table';
 
 interface OfertasTableProps {
   ofertas: Oferta[];

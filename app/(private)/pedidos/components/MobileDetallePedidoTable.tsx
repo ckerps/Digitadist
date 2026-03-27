@@ -1,9 +1,9 @@
 'use client';
 
 import { DetallePedido, Producto } from "@prisma/client";
-import { Card, CardHeader, CardTitle, CardContent } from "../../../components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Trash2, Edit2 } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 
 interface MobileDetallePedidoTableProps {
   productos: (DetallePedido & { producto: Producto })[];

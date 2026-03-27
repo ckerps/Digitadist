@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card } from '../../../components/ui/card';
+import { Card } from '@/components/ui/card';
 
 interface MobileClienteTableSkeletonProps {
   rows?: number;

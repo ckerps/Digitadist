@@ -1,6 +1,8 @@
 import { ClienteService } from '@/services/cliente.service'
 import { ProductoService } from '@/services/producto.service';
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import * as z from 'zod';
 
 /**
@@ -46,7 +48,11 @@ export async function PUT(
     const body = await request.json();
     const productoId = Number(id);
 
-    const productoActualizado = await ProductoService.actualizar(productoId, body);
+    // Obtener la sesión para obtener el usuarioId
+    const session = await getServerSession(authOptions);
+    const usuarioId = session?.user ? Number((session.user as any).id) : undefined;
+
+    const productoActualizado = await ProductoService.actualizar(productoId, body, usuarioId);
 
     return NextResponse.json(productoActualizado, { status: 200 });
 

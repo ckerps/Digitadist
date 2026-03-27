@@ -7,7 +7,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useUsuarioDetail } from '../hooks/useUsuarioDetail';
 import LoadingPage from '../../../loading';
 import ErrorPage from '../../../error';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UpdateUsuario } from '@/types/usuario';
 import { toast } from 'sonner';
@@ -20,14 +20,14 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '../../../components/ui/label';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../components/ui/select';
+} from '@/components/ui/select';
 
 export default function UsuarioDetailPage() {
   const router = useRouter();

@@ -2,18 +2,18 @@
 
 import { NuevoCliente } from "@/types/cliente";
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { EnumTipoCliente, EnumTipoDescuento } from "@prisma/client";
 import { ActualizarOfertaSchema, NuevaOfertaSchema, NuevoClienteSchema } from "@/repositories/zodSchemas";
 import * as z from "zod";
 import { ActualizarOferta, NuevaOferta, OfertaConProducto } from "@/types/oferta";
 import SelectProducto from "../../shared/SelectProducto";
 import { Producto } from "@/types/producto";
-import { DatePicker } from "../../../components/ui/datepicker";
+import { DatePicker } from "@/components/ui/datepicker";
 
 interface EditarOfertaModalProps {
     open: boolean;

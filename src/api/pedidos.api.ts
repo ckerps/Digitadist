@@ -14,25 +14,25 @@ async function handleResponse<T>(response: Response): Promise<T> {
     const errorData = await response.json().catch(() => ({}));
     const error = new Error(errorData?.error || 'Error en la solicitud') as ApiError;
     // Esto captura errores de validación de Zod o de stock insuficiente
-    error.details = errorData?.details; 
+    error.details = errorData?.details;
     throw error;
   }
   return response.json();
 }
 
 export const pedidosApi = {
-  async getAll({ filters, itemsPerPage, currentPage }: { 
-    filters?: FiltrosPedido, 
-    itemsPerPage?: number, 
-    currentPage?: number 
+  async getAll({ filters, itemsPerPage, currentPage }: {
+    filters?: FiltrosPedido,
+    itemsPerPage?: number,
+    currentPage?: number
   }): Promise<PedidosPaginado> {
-    
+
     // IMPORTANTE: URL local a la función para no acumular parámetros de búsqueda
     const url = new URL(BASE_URL, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-    
+
     if (itemsPerPage) url.searchParams.append('itemsPerPage', itemsPerPage.toString());
     if (currentPage) url.searchParams.append('currentPage', currentPage.toString());
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== "") {

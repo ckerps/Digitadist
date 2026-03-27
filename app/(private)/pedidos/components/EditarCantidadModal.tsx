@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { Button } from "../../../components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface EditarCantidadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (cantidad: number, subtotal: number) => Promise<void>;
+  onConfirm: (cantidad: number, subtotal: number, descuento?: number) => Promise<void>;
   cantidadActual: number;
   precioUnitario: number;
   descuentoActual?: number;
@@ -26,16 +26,8 @@ export function EditarCantidadModal({
   isLoading
 }: EditarCantidadModalProps) {
   const [cantidad, setCantidad] = useState<number>(cantidadActual);
-  const [descuento, setDescuento] = useState<number>(descuentoActual || 0);
+  const [descuento, setDescuento] = useState<number>(descuentoActual);
   const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    if (open) {
-      setCantidad(cantidadActual);
-      setDescuento(descuentoActual || 0);
-      setError('');
-    }
-  }, [open, cantidadActual, descuentoActual]);
 
   const subtotal = (precioUnitario * cantidad) - descuento;
 
@@ -53,7 +45,7 @@ export function EditarCantidadModal({
     }
 
     try {
-      await onConfirm(cantidad, subtotal);
+      await onConfirm(cantidad, subtotal, descuento);
       onOpenChange(false);
     } catch (err) {
       setError('Error al actualizar la cantidad. Intenta de nuevo.');
@@ -96,7 +88,7 @@ export function EditarCantidadModal({
               type="number"
               min="0"
               value={descuento}
-              onChange={(e) => setDescuento(parseFloat(e.target.value) || 0)}
+              onChange={(e) => setDescuento(parseFloat(e.target.value) ?? undefined)}
               className="border-neutral-300"
             />
           </div>

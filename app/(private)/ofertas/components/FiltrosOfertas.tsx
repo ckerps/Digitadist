@@ -3,24 +3,23 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "../../../components/ui/label";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
+} from "@/components/ui/select";
 import { FiltrosOferta } from "@/types/oferta";
 import { Plus } from "lucide-react";
 
 interface FiltrosOfertasProps {
   onApplyFiltros: (filtros: FiltrosOferta) => void;
   onReset: () => void;
-  onNewOfertaClick: () => void;
 }
 
-export function FiltrosOfertas({ onApplyFiltros, onReset, onNewOfertaClick }: FiltrosOfertasProps) {
+export function FiltrosOfertas({ onApplyFiltros, onReset }: FiltrosOfertasProps) {
   const [id, setId] = useState("");
   const [tipo, setTipo] = useState("todos");
   const [estado, setEstado] = useState("todos");
@@ -138,13 +137,7 @@ export function FiltrosOfertas({ onApplyFiltros, onReset, onNewOfertaClick }: Fi
             </div>
           </div>
         </div>
-        <Button
-            onClick={onNewOfertaClick}
-            className="bg-red-600 hover:bg-red-700 text-white shadow-md w-full sm:w-auto"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Nueva Oferta
-          </Button>
+        
       </div>
     </div>
   );

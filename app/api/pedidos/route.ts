@@ -10,22 +10,26 @@ import * as z from 'zod';
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const itemsPerPage = parseInt(url.searchParams.get('items') || '10');
-    const currentPage = parseInt(url.searchParams.get('page') || '1');
-    const filters : Partial<{ [key: string]: string }> = {};
-      url.searchParams.forEach((value, key) => {
-        if (key !== 'itemsPerPage' && key !== 'currentPage') {
-          filters[key] = value;
-        }
-    });
+    const itemsPerPage = parseInt(url.searchParams.get('itemsPerPage') || '10');
+    const currentPage = parseInt(url.searchParams.get('currentPage') || '1');
 
-    const pedidos = await PedidoService.obtenerTodos(itemsPerPage, currentPage, filters)
+    // Extraer filtros de los query params
+    const filtros: any = {};
+    if (url.searchParams.has('searchTerm')) filtros.searchTerm = url.searchParams.get('searchTerm');
+    if (url.searchParams.has('cliente_id')) filtros.cliente_id = parseInt(url.searchParams.get('cliente_id') || '0');
+    if (url.searchParams.has('vendedor_id')) filtros.vendedor_id = parseInt(url.searchParams.get('vendedor_id') || '0');
+    if (url.searchParams.has('estado')) filtros.estado = url.searchParams.get('estado');
+    if (url.searchParams.has('estado_pago')) filtros.estado_pago = url.searchParams.get('estado_pago');
+    if (url.searchParams.has('direccion_entrega')) filtros.direccion_entrega = url.searchParams.get('direccion_entrega');
+    if (url.searchParams.has('condicion_venta')) filtros.condicion_venta = url.searchParams.get('condicion_venta');
+
+    const pedidos = await PedidoService.obtenerTodos(itemsPerPage, currentPage, Object.keys(filtros).length > 0 ? filtros : undefined)
     return NextResponse.json(pedidos, { status: 200 })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        type: "ValidationError", 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        type: "ValidationError",
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 
@@ -40,14 +44,15 @@ export async function GET(request: NextRequest) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    console.log(body)
     const resultado = await PedidoService.crear(body?.pedido, body?.detalle);
-    
+
     return NextResponse.json(resultado, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        type: "ValidationError", 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        type: "ValidationError",
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 

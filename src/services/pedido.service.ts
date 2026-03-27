@@ -54,7 +54,7 @@ export class PedidoService {
         if (!pedido) throw new Error("El pedido no existe");
 
         const validatedDetalle = NuevoDetallePedidoSchema.parse(detalle);
-        
+
         // Crear el detalle del producto con pedido_id incluido
         await PedidoRepository.crearDetallePedido({
             ...validatedDetalle,
@@ -66,7 +66,7 @@ export class PedidoService {
         const costoActual = parseFloat(pedido.costo as any);
         const nuevoTotal = totalActual + validatedDetalle.subtotal;
         const nuevoCosto = costoActual + (validatedDetalle.precio_unitario * validatedDetalle.cantidad);
-        
+
         await PedidoRepository.actualizar(pedidoId, {
             total: nuevoTotal,
             costo: nuevoCosto,

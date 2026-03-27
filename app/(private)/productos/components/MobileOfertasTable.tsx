@@ -1,8 +1,8 @@
 'use client';
 
 import { Oferta } from '@prisma/client';
-import { Badge } from '../../../components/ui/badge';
-import { Card } from '../../../components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 
 interface MobileOfertasTableProps {
   ofertas: Oferta[];

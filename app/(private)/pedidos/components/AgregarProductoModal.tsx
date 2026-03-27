@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { Button } from "../../../components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useProductos } from "../../productos/hooks/useProductos";
 import { Check } from "lucide-react";
 import SelectProducto from "../../shared/SelectProducto";
@@ -98,7 +98,7 @@ export function AgregarProductoModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md overflow-visible relative">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-neutral-900">Agregar Producto</DialogTitle>
         </DialogHeader>

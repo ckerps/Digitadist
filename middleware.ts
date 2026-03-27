@@ -27,17 +27,20 @@ export async function middleware(request: NextRequest) {
   }
 
   // Validar permisos por rol
-  const userRole = (token as any).role;
+  const userRole = ((token as any).role as string)?.toUpperCase() || '';
 
-  // Rutas solo para admin
-  if (adminOnlyRoutes.includes(pathname) && userRole !== 'admin') {
+  // Rutas solo para admin (ej: todo lo que empiece por /usuarios)
+  if (
+    adminOnlyRoutes.some((route) => pathname.startsWith(route)) &&
+    userRole !== 'ADMIN'
+  ) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
   // Rutas excluidas para vendedor
   if (
     vendorExcludedRoutes.some((route) => pathname.startsWith(route)) &&
-    userRole === 'vendedor'
+    userRole === 'VENDOR'
   ) {
     return NextResponse.redirect(new URL('/', request.url));
   }

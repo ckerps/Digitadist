@@ -27,6 +27,7 @@ const buttonVariants = cva(
         icon: "size-9",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
+        "icon-xs": "size-7 [&_svg]:size-3.5",
       },
     },
     defaultVariants: {
@@ -36,16 +37,33 @@ const buttonVariants = cva(
   }
 )
 
+export interface ButtonProps
+  extends React.ComponentProps<"button">,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+  render?: React.ReactElement
+}
+
 function Button({
   className,
   variant = "default",
   size = "default",
   asChild = false,
+  render,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
+}: ButtonProps) {
+  if (render) {
+    const renderElement = render as React.ReactElement<any>
+    return React.cloneElement(renderElement, {
+      ...props,
+      ...renderElement.props,
+      "data-slot": "button",
+      "data-variant": variant,
+      "data-size": size,
+      className: cn(buttonVariants({ variant, size, className }), renderElement.props.className),
+    })
+  }
+
   const Comp = asChild ? Slot : "button"
 
   return (

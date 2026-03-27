@@ -39,7 +39,7 @@ export const NuevoPedidoSchema = z.object({
     estado: z.enum(EnumEstadoPedido),
     estado_pago: z.enum(EnumEstadoPago),
     direccion_entrega: z.string().min(0).max(20),
-    fecha_entrega_estimada: z.date().min(Date.now()),
+    fecha_entrega_estimada: z.coerce.date().min(Date.now()),
     condicion_venta: z.enum(EnumCondicionVenta),
 })
 

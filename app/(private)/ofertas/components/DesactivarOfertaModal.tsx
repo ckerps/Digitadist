@@ -1,6 +1,6 @@
 'use client';
 
-import { Producto } from '@prisma/client';
+import { Oferta } from '@prisma/client';
 import {
   Dialog,
   DialogContent,
@@ -12,27 +12,27 @@ import {
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 
-interface DesactivarProductoModalProps {
+interface DesactivarOfertaModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
-  producto: Producto;
+  oferta: Oferta;
   isDeleting?: boolean;
 }
 
-export function DesactivarProductoModal({
+export function DesactivarOfertaModal({
   isOpen,
   onClose,
   onConfirm,
-  producto,
+  oferta,
   isDeleting = false,
-}: DesactivarProductoModalProps) {
+}: DesactivarOfertaModalProps) {
   const handleConfirm = async () => {
     try {
       await onConfirm();
       onClose();
     } catch (error) {
-      console.error('Error al desactivar producto:', error);
+      console.error('Error al desactivar oferta:', error);
     }
   };
 
@@ -45,9 +45,9 @@ export function DesactivarProductoModal({
               <AlertCircle className="h-6 w-6 text-red-600" />
             </div>
             <div className="flex-1">
-              <DialogTitle className="text-red-600">Desactivar Producto</DialogTitle>
+              <DialogTitle className="text-red-600">Desactivar Oferta</DialogTitle>
               <DialogDescription className="mt-2 text-neutral-600">
-                ¿Está seguro que desea desactivar el producto "{producto.nombre}"?
+                ¿Está seguro que desea desactivar la oferta #{oferta.id}?
               </DialogDescription>
             </div>
           </div>
@@ -55,8 +55,8 @@ export function DesactivarProductoModal({
 
         <div className="rounded-lg bg-red-50 p-4 text-sm border border-red-200">
           <p className="text-red-700">
-            <strong>Advertencia:</strong> Al desactivar este producto no se podrá usar en nuevos pedidos.
-            Los pedidos existentes no se verán afectados.
+            <strong>Advertencia:</strong> Al desactivar esta oferta, no se aplicará a nuevos pedidos de este producto.
+            Las ofertas ya aplicadas a pedidos existentes no se verán afectadas.
           </p>
         </div>
 

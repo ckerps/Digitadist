@@ -1,9 +1,8 @@
 'use client';
 
 import { Producto } from '@prisma/client';
-import { Package, DollarSign, Calendar, TrendingUp } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card';
-import { Badge } from '../../../components/ui/badge';
+import { Package, DollarSign, Calendar, TrendingUp, Tag, Percent } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface ProductoInfoProps {
   producto: Producto;
@@ -27,138 +26,86 @@ export function ProductoInfo({ producto }: ProductoInfoProps) {
   };
 
   const precioLista = parseFloat(producto.costo as any) * (1 + producto.porcentaje_recargo / 100);
-
   const isStockLow = producto.stock_actual < (producto.stock_minimo || 0);
 
   return (
-    <>
-      <div className="mb-6">
-        <div className="flex items-start justify-between flex-col sm:flex-row gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-900 mb-3">
-              {producto.nombre}
-            </h1>
-            <p className="text-sm text-neutral-600 mb-2">Código: {producto.codigo}</p>
-            <div className="flex gap-2 flex-wrap">
-              <Badge
-                variant="outline"
-                className={producto.activo ? 'bg-green-50 border-green-300 text-green-700' : 'bg-neutral-100 border-neutral-300 text-neutral-600'}
-              >
-                {producto.activo ? 'Activo' : 'Inactivo'}
-              </Badge>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-neutral-600 mb-1">Margen de ganancia</p>
-            <p className="text-3xl font-bold text-red-600">
-              {producto.porcentaje_recargo.toFixed(1)}%
-            </p>
+    <div className="bg-white border border-neutral-200 rounded-lg shadow-sm p-4 md:p-6 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <Tag className="w-4 h-4" /> Estado y Código
+          </p>
+          <div className="flex gap-2 items-center flex-wrap">
+            <span className="font-mono text-foreground">{producto.codigo || '-'}</span>
+            <Badge
+              variant="outline"
+              className={producto.activo ? 'bg-green-50 border-green-300 text-green-700' : 'bg-neutral-100 border-neutral-300 text-neutral-600'}
+            >
+              {producto.activo ? 'Activo' : 'Inactivo'}
+            </Badge>
           </div>
         </div>
-      </div>
+        
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <Percent className="w-4 h-4" /> Margen de ganancia
+          </p>
+          <p className="text-xl font-bold text-red-600">
+            {producto.porcentaje_recargo.toFixed(1)}%
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 text-sm">
-        <Card className="border-neutral-200 shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-linear-to-r from-red-50 to-white p-4">
-            <CardTitle className="lg:text-base flex items-center text-neutral-900">
-              <Package className="h-5 w-5 mr-2 text-red-600" />
-              Stock
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <p className={`text-lg font-bold ${isStockLow ? 'text-red-600' : 'text-green-600'}`}>
-                {producto.stock_actual}
-              </p>
-              <Badge
-                className={isStockLow ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}
-              >
-                {isStockLow ? 'Bajo' : 'OK'}
-              </Badge>
-            </div>
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <Package className="w-4 h-4" /> Stock Actual
+          </p>
+          <div className="flex items-center gap-2">
+            <p className={`font-bold ${isStockLow ? 'text-red-600' : 'text-green-600'}`}>
+              {producto.stock_actual}
+            </p>
             {producto.stock_minimo && (
-              <p className="text-xs text-neutral-500 mt-2">Min: {producto.stock_minimo}</p>
+              <span className="text-xs text-muted-foreground">(Min: {producto.stock_minimo})</span>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="border-neutral-200 shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-linear-to-r from-red-50 to-white p-4">
-            <CardTitle className="lg:text-base flex items-center text-neutral-900">
-              <DollarSign className="h-5 w-5 mr-2 text-red-600" />
-              Costo
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <p className="text-lg font-bold text-neutral-700">
-              ${formatCurrency(producto.costo)}
-            </p>
-          </CardContent>
-        </Card>
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <DollarSign className="w-4 h-4" /> Costo
+          </p>
+          <p className="font-medium text-foreground">${formatCurrency(producto.costo)}</p>
+        </div>
 
-        <Card className="border-neutral-200 shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-linear-to-r from-red-50 to-white p-4">
-            <CardTitle className="lg:text-base flex items-center text-neutral-900">
-              <TrendingUp className="h-5 w-5 mr-2 text-red-600" />
-              Precio de lista
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <p className="text-lg font-bold text-neutral-700">
-              ${formatCurrency(precioLista)}
-            </p>
-          </CardContent>
-        </Card>
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <TrendingUp className="w-4 h-4" /> Precio de Lista
+          </p>
+          <p className="font-bold text-foreground">${formatCurrency(precioLista)}</p>
+        </div>
 
-        <Card className="border-neutral-200 shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-linear-to-r from-red-50 to-white p-4">
-            <CardTitle className="lg:text-base flex items-center text-neutral-900">
-              <Calendar className="h-5 w-5 mr-2 text-red-600" />
-              Vencimiento
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <p className="text-neutral-700 font-medium">
-              {formatDate(producto.fecha_vencimiento)}
-            </p>
-          </CardContent>
-        </Card>
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <Calendar className="w-4 h-4" /> Vencimiento
+          </p>
+          <p className="font-medium text-foreground">{formatDate(producto.fecha_vencimiento)}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <Package className="w-4 h-4" /> Presentación
+          </p>
+          <p className="font-medium text-foreground">
+             {producto.tam_pack} {producto.presentacion === 'gramos' ? 'gr' : 'lt'}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+            <Calendar className="w-4 h-4" /> Fecha Creación
+          </p>
+          <p className="font-medium text-foreground">{formatDate(producto.fecha_creacion)}</p>
+        </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 text-sm">
-        <Card className="border-neutral-200 shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-linear-to-r from-red-50 to-white p-4">
-            <CardTitle className="lg:text-base flex items-center text-neutral-900">
-              <Package className="h-5 w-5 mr-2 text-red-600" />
-              Presentación
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-neutral-700 font-medium">
-                {producto.presentacion === 'gramos' ? 'Gramos' : 'Litros'}
-              </p>
-              <p className="text-lg font-bold text-neutral-900">
-                {producto.tam_pack} {producto.presentacion === 'gramos' ? 'gr' : 'lt'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-neutral-200 shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-linear-to-r from-red-50 to-white p-4">
-            <CardTitle className="lg:text-base flex items-center text-neutral-900">
-              <Calendar className="h-5 w-5 mr-2 text-red-600" />
-              Creación
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <p className="text-neutral-700">
-              {formatDate(producto.fecha_creacion)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    </>
+    </div>
   );
 }

@@ -1,8 +1,8 @@
 import { Producto } from "@/types/producto";
-import { Label } from "../../components/ui/label";
+import { Label } from "@/components/ui/label";
 import { useProductos } from "../productos/hooks/useProductos";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 interface SelectProps {

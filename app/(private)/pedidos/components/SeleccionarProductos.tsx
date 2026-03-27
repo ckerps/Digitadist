@@ -1,5 +1,5 @@
 import { AgregarProducto, Producto } from "@/types/producto";
-import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "../../../components/ui/combobox";
+import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 import { Cliente } from "@/types/cliente";
 import { useProductos } from "../../productos/hooks/useProductos";
 import { useState } from "react";
@@ -26,7 +26,7 @@ export function SeleccionarProductos({ productosSeleccionados, agregarProducto }
         <div>
 
             <Combobox items={filteredProductos} value={searchValue} onValueChange={(value) => setSearchValue(value ?? '')} >
-                <ComboboxInput placeholder="Escribi un nombre" className="h-10 w-full"/>
+                <ComboboxInput placeholder="Escribi un nombre" className="h-10 w-full" />
                 <ComboboxContent>
                     <ComboboxEmpty>Producto no encontrado.</ComboboxEmpty>
                     <ComboboxList>
@@ -35,7 +35,7 @@ export function SeleccionarProductos({ productosSeleccionados, agregarProducto }
                                 handleAgregarProducto(item?.id, item?.codigo, item?.nombre, item?.costo, item?.porcentaje_recargo);
                                 setSearchValue('');
                             }}>
-                                {item?.nombre} - {item?.codigo} - Stock: {item?.stock_actual} - ${+item?.costo + +item?.porcentaje_recargo}
+                                {item?.nombre} - {item?.codigo} - Stock: {item?.stock_actual} - ${(+item?.costo + (item?.costo * item?.porcentaje_recargo / 100)).toFixed(2)}
                             </ComboboxItem>
                         )}
                     </ComboboxList>

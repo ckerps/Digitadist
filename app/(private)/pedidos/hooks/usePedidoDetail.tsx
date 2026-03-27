@@ -4,7 +4,7 @@ import { QueryObserverResult, useMutation, useQuery, useQueryClient, useSuspense
 import { useCallback } from "react";
 
 interface UsePedidosReturn {
-  pedido:  PedidoConProductos | undefined;
+  pedido: PedidoConProductos | undefined;
   isLoadingDetail: boolean;
   errorDetail: Error | null;
   errorUpdate: Error | null;
@@ -19,7 +19,7 @@ interface UsePedidosReturn {
   refetchDetail: () => Promise<QueryObserverResult<PedidoConProductos, Error>>;
 }
 
-export function usePedidoDetail({pedidoId}: { pedidoId: number}): UsePedidosReturn {
+export function usePedidoDetail({ pedidoId }: { pedidoId: number }): UsePedidosReturn {
   const queryClient = useQueryClient();
 
   const detailQuery = useSuspenseQuery({
@@ -95,6 +95,7 @@ export function usePedidoDetail({pedidoId}: { pedidoId: number}): UsePedidosRetu
 
   const editarCantidad = useCallback(
     async (pedidoId: number, productoId: number, cantidad: number, subtotal: number, precio_unitario: number, descuento?: number) => {
+      console.log(descuento)
       return editarCantidadMutation.mutateAsync({
         pedidoId,
         productoId,

@@ -29,4 +29,4 @@ export const getVisiblePages = (totalPages: number, currentPage: number) => {
 
 export const itemsPerPage = process.env.NEXT_PUBLIC_CLIENTES_ITEMS_PER_PAGE
   ? +process.env.NEXT_PUBLIC_CLIENTES_ITEMS_PER_PAGE
-  : 10;
+  : 5;

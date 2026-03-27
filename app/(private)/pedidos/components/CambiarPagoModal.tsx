@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/select";
-import { Label } from "../../../components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { EnumEstadoPago } from "@prisma/client";
 
 interface CambiarPagoModalProps {

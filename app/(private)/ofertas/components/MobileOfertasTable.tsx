@@ -1,8 +1,8 @@
 "use client";
 
 import { OfertaConProducto } from "@/types/oferta";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-import { Badge } from "../../../components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface MobileOfertasTableProps {
   ofertas: OfertaConProducto[];
@@ -26,11 +26,11 @@ export function MobileOfertasTable({ ofertas, onCardClick }: MobileOfertasTableP
   };
 
   return (
-    <div className="overflow-x-auto grid gap-2">
-      {ofertas.map((oferta) => (
+    <div className="flex flex-col gap-3">
+      {(ofertas || []).map((oferta) => (
         <Card
           key={oferta.id}
-          className="hover:bg-red-50 cursor-pointer transition-colors duration-150"
+          className="hover:bg-accent cursor-pointer transition-colors duration-200 border-border/60 shadow-xs"
           onClick={() => {
             if (onCardClick) {
               onCardClick(oferta.id);
@@ -39,28 +39,31 @@ export function MobileOfertasTable({ ofertas, onCardClick }: MobileOfertasTableP
             }
           }}
         >
-          <CardHeader>
-            <CardTitle>{oferta.id} - {oferta.producto.nombre}</CardTitle>
-            <Badge
-              variant={oferta.activa ? "default" : "secondary"}
-              className={
-                oferta.activa
-                  ? "bg-green-100 text-green-800"
-                  : "bg-gray-100 text-gray-800"
-              }
-            >
-              {oferta.activa ? "Activa" : "Inactiva"}
-            </Badge>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-start gap-2">
+              <CardTitle className="text-base font-semibold">{oferta.id} - {oferta.producto.nombre}</CardTitle>
+              <Badge
+                variant={oferta.activa ? "default" : "secondary"}
+                className={
+                  oferta.activa
+                    ? "bg-primary hover:bg-primary/90 text-white"
+                    : "bg-muted text-muted-foreground"
+                }
+              >
+                {oferta.activa ? "Activa" : "Inactiva"}
+              </Badge>
+            </div>
           </CardHeader>
 
-          <CardContent >
-            <div className="text-neutral-600">Descuento: {oferta.tipo === "porcentaje"
+          <CardContent className="pt-0 text-sm flex flex-col gap-1 text-muted-foreground">
+            <div><strong className="font-medium text-foreground">Descuento:</strong> {oferta.tipo === "porcentaje"
               ? `${oferta.valor}%`
               : formatCurrency(oferta.valor)}
             </div>
-            <div className="text-neutral-600">Inicio: {formatDate(oferta.fecha_inicio)}</div>
-            <div className="text-neutral-600">Fin: {formatDate(oferta.fecha_fin)}</div>
-            <div className="text-neutral-600">Creada: {formatDate(oferta.fecha_creacion)}</div>
+            <div className="flex justify-between">
+              <div><strong className="font-medium text-foreground">Inicio:</strong> {formatDate(oferta.fecha_inicio)}</div>
+              <div><strong className="font-medium text-foreground">Fin:</strong> {formatDate(oferta.fecha_fin)}</div>
+            </div>
           </CardContent>
         </Card>
       ))}

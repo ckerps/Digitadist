@@ -2,13 +2,13 @@
 
 import React, { useState, Suspense } from 'react';
 import { ArrowLeft, Edit, RefreshCw, Trash2 } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { OfertaInfoCards } from '../components';
+import { OfertaInfoCards, DesactivarOfertaModal, EditarOfertaModal } from '../components';
 import LoadingPage from '../../../loading';
 import ErrorPage from '../../../error';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -16,18 +16,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../../components/ui/dialog';
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useOfertaDetail } from '../hooks/useOfertaDetail';
-import { EditarOfertaModal } from '../components/EditarOfertaModal';
 import { ActualizarOferta } from '@/types/oferta';
-import { DatePicker } from '../../../components/ui/datepicker';
+import { DatePicker } from '@/components/ui/datepicker';
 
 export default function OfertaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
   const [showRenovarDialog, setShowRenovarDialog] = useState(false);
   const [editarModalOpen, setEditarModalOpen] = useState(false);
+  const [desactivarModalOpen, setDesactivarModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -43,15 +43,14 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
   }
 
   const handleDelete = async () => {
-    if (window.confirm("¿Está seguro de que desea desactivar esta oferta?")) {
-      try {
-        await deleteOferta(+id);
-        toast.success('Oferta desactivada correctamente');
-        router.push('/ofertas');
-      } catch (error) {
-        toast.error(`Error al desactivar la oferta: ${(error as Error).message}`);
-        console.error('Error al desactivar la oferta:', error);
-      }
+    try {
+      await deleteOferta(+id);
+      setDesactivarModalOpen(false);
+      toast.success('Oferta desactivada correctamente');
+      router.push('/ofertas');
+    } catch (error) {
+      toast.error(`Error al desactivar la oferta: ${(error as Error).message}`);
+      console.error('Error al desactivar la oferta:', error);
     }
   };
 
@@ -90,23 +89,23 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
             variant="ghost"
             size="sm"
             onClick={() => router.push('/ofertas')}
-            className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <p className="text-sm text-neutral-600">Ofertas</p>
-            <h1 className="text-3xl md:text-4xl font-bold text-neutral-900">
+            <p className="text-sm text-muted-foreground">Ofertas</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Oferta #{oferta.id}
             </h1>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Dialog open={showRenovarDialog} onOpenChange={setShowRenovarDialog}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="border-neutral-200 gap-2">
+              <Button variant="outline" className="gap-2">
                 <RefreshCw className="h-4 w-4" />
                 <span className="hidden sm:inline">Renovar</span>
               </Button>
@@ -124,7 +123,7 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
 
           <Button
             variant="outline"
-            className="border-neutral-200 gap-2"
+            className="gap-2"
             onClick={() => setEditarModalOpen(true)}
           >
             <Edit className="h-4 w-4" />
@@ -133,8 +132,8 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
 
           <Button
             variant="outline"
-            className="border-red-200 text-red-600 hover:bg-red-50 gap-2"
-            onClick={handleDelete}
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
+            onClick={() => setDesactivarModalOpen(true)}
           >
             <Trash2 className="h-4 w-4" />
             <span className="hidden sm:inline">Desactivar</span>
@@ -152,6 +151,13 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
         open={editarModalOpen}
         onOpenChange={setEditarModalOpen}
         onSave={handleUpdateOferta}
+        oferta={oferta}
+      />
+      
+      <DesactivarOfertaModal
+        isOpen={desactivarModalOpen}
+        onClose={() => setDesactivarModalOpen(false)}
+        onConfirm={handleDelete}
         oferta={oferta}
       />
     </div>

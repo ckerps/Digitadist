@@ -12,7 +12,7 @@ export default function AppSidebar() {
   return (
     <Sidebar className="p-2">
       <SidebarHeader className="justify-center items-center ">
-        <Image src={'/digitadist.png'} alt="Digitadist logo" width={'200'} height={'100'} />
+        <img src={'/digitadist.png'} alt="Digitadist logo" width={200} height={100} />
       </SidebarHeader>
       <SidebarContent className="border-t-2 border-solid pt-2">
         <SidebarMenu className="gap-3">

@@ -47,13 +47,13 @@ export const PedidoRepository = {
   },
 
   async obtenerPorId(id: number): Promise<PedidoConProductos | null> {
-    const pedido = await prisma.pedido.findUnique({ 
-      where: { id }, 
-      include: { 
+    const pedido = await prisma.pedido.findUnique({
+      where: { id },
+      include: {
         detallePedidos: { include: { producto: true } },
         cliente: true,
         vendedor: true
-      } 
+      }
     }) as any;
     return pedido;
   },
@@ -80,6 +80,8 @@ export const PedidoRepository = {
   async crearConDetalle(pedido: NuevoPedido, detalle: NuevoDetallePedido[]) {
     return await prisma.pedido.create({
       data: {
+        cliente_id: pedido.cliente_id!,
+        vendedor_id: pedido.vendedor_id!,
         ...pedido,
         detallePedidos: {
           create: detalle.map(d => ({
@@ -113,9 +115,11 @@ export const PedidoRepository = {
   },
 
   async eliminar(id: number) {
-    const result = await prisma.pedido.update({ where: { id }, data: {
-      estado: EnumEstadoPedido.cancelado
-    } })
+    const result = await prisma.pedido.update({
+      where: { id }, data: {
+        estado: EnumEstadoPedido.cancelado
+      }
+    })
     return result;
   },
 

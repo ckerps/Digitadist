@@ -1,6 +1,6 @@
 'use client';
 
-import { Pagination as ShadcnPagination, PaginationContent, PaginationItem, PaginationEllipsis } from '../../components/ui/pagination';
+import { Pagination as ShadcnPagination, PaginationContent, PaginationItem, PaginationEllipsis } from '@/components/ui/pagination';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getVisiblePages } from '../utils';

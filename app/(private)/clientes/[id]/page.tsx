@@ -12,7 +12,7 @@ import {
 } from '../components';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card } from '../../../components/ui/card';
+import { Card } from '@/components/ui/card';
 import { useClienteDetail } from '../hooks/useClienteDetail';
 import { usePedidosByCliente } from '../hooks/usePedidosByCliente';
 import LoadingPage from '../../../loading';
@@ -67,28 +67,30 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
   };
 
   return (
-    <div className="min-h-screen overflow-hidden w-full">
-      <div className="mb-2">
-        <div className="flex items-start justify-end">
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => router.push('/clientes')}
-              className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver a Clientes
-            </Button>
-            <Button variant="outline" className="border-neutral-300 gap-1" onClick={() => setIsEditModalOpen(true)}>
-              <Edit className="h-4 w-4" />
-              <div className='hidden sm:block'>Editar</div>
-            </Button>
-            <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 gap-1" onClick={() => setIsDesactivarModalOpen(true)}>
-              <Trash2 className="h-4 w-4" />
-              <div className='hidden sm:block'>Desactivar</div>
-            </Button>
-          </div>
+    <div className="h-full w-full space-y-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <p className="text-muted-foreground text-sm mt-1">Clientes</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">{cliente.nombre}</h1>
         </div>
+        <Button
+          onClick={() => router.push('/clientes')}
+          size="lg"
+          variant="outline"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Volver
+        </Button>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        <Button variant="outline" className="gap-2" onClick={() => setIsEditModalOpen(true)}>
+          <Edit className="h-4 w-4" />
+          <span className="hidden sm:inline">Editar</span>
+        </Button>
+        <Button variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2" onClick={() => setIsDesactivarModalOpen(true)}>
+          <Trash2 className="h-4 w-4" />
+          <span className="hidden sm:inline">Desactivar</span>
+        </Button>
       </div>
 
       <Suspense fallback={<Skeleton className="h-32 w-full mb-6" />}>
@@ -96,17 +98,17 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
       </Suspense>
 
       <div className="mb-2">
-        <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 inline-flex items-center">
+        <h1 className="text-xl md:text-2xl font-bold text-neutral-900 inline-flex items-center">
           <Package className="h-6 w-6 mr-2" />
           Pedidos Relacionados
         </h1>
       </div>
 
-      <Card className='hidden sm:block p-0'>
+      <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hidden sm:block">
         <Suspense fallback={<Skeleton className="h-64 w-full" />}>
           <PedidosTable pedidos={pedidos?.pedidos} />
         </Suspense>
-      </Card>
+      </div>
 
       <div className='block sm:hidden'>
         <Suspense fallback={<Skeleton className="h-64 w-full" />}>
@@ -122,10 +124,10 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
         onPageChange={setCurrentPage}
       />
 
-<EditarClienteModal
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          onSave={handleUpdateCliente}
+      <EditarClienteModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        onSave={handleUpdateCliente}
         cliente={cliente}
       />
 

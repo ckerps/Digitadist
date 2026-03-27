@@ -4,22 +4,24 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useUsuariosComplete } from './hooks/useUsuariosComplete';
-import { DataTable, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/data-table';
+import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '../../components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Plus, LogOut, Loader2, AlertCircle, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../../components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import LoadingPage from '../../loading';
 import DebouncedInput from '../shared/DebouncedInput';
 
 const itemsPerPage = 15;
 
 export default function UsuariosPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,6 +34,15 @@ export default function UsuariosPage() {
     rol_id: '1',
     activo: true,
   });
+
+  // Mostrar loading mientras se obtiene la sesión
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
+      </div>
+    );
+  }
 
   // Solo admin puede acceder
   if ((session?.user as any)?.role !== 'admin') {
@@ -98,13 +109,13 @@ export default function UsuariosPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900">Usuarios</h1>
-          <p className="text-neutral-600 text-sm mt-1">Gestiona los usuarios del sistema</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">Usuarios</h1>
+          <p className="text-muted-foreground text-sm mt-1">Gestiona los usuarios del sistema</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
           size="lg"
-          className="w-full md:w-auto"
+          className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nuevo Usuario
@@ -112,13 +123,11 @@ export default function UsuariosPage() {
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white border border-neutral-200 rounded-lg p-4 md:p-6 shadow-sm">
-        <div>
-          <Label htmlFor="search" className="mb-2 block">Buscar</Label>
+      <div className="bg-white border border-neutral-200 rounded-lg p-2 md:p-4 shadow-sm">
+        <div className="w-full lg:w-1/3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-4 w-4" />
             <DebouncedInput
-              id="search"
               placeholder="Buscar por nombre, apellido o email..."
               value={searchTerm}
               onChange={setSearchTerm}
@@ -138,63 +147,67 @@ export default function UsuariosPage() {
         )}
 
         {isLoadingList ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 text-red-600 animate-spin" />
+          <div className="p-6 space-y-4">
+            <div className="flex justify-between items-center pb-4">
+              <Skeleton className="h-6 w-1/4" />
+              <Skeleton className="h-6 w-1/6" />
+            </div>
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
           </div>
         ) : usuarios?.usuarios && usuarios.usuarios.length > 0 ? (
-          <>
-            <DataTable>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre Completo</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Teléfono</TableHead>
-                  <TableHead>Rol</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {usuarios.usuarios.map((usuario) => (
-                  <TableRow key={usuario.id}>
-                    <TableCell className="font-medium text-neutral-900">
-                      {usuario.nombre} {usuario.apellido}
-                    </TableCell>
-                    <TableCell>{usuario.email}</TableCell>
-                    <TableCell>{usuario.telefono}</TableCell>
-                    <TableCell>
-                      <span className="capitalize text-sm bg-neutral-100 px-3 py-1 rounded text-neutral-700">
-                        {usuario.rol?.nombre || 'N/A'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          usuario.activo
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-neutral-100 text-neutral-800'
-                        }`}
-                      >
-                        {usuario.activo ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteUsuario(usuario.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <LogOut className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </DataTable>
-          </>
+          <DataTable
+            data={usuarios.usuarios}
+            columns={[
+              {
+                header: "Nombre Completo",
+                className: "font-medium text-neutral-900",
+                cell: (u) => `${u.nombre} ${u.apellido}`
+              },
+              { header: "Email", accessorKey: "email" },
+              { header: "Teléfono", accessorKey: "telefono" },
+              {
+                header: "Rol",
+                cell: (u) => (
+                  <span className="capitalize text-sm bg-neutral-100 px-3 py-1 rounded text-neutral-700">
+                    {u.rol?.nombre || 'N/A'}
+                  </span>
+                )
+              },
+              {
+                header: "Estado",
+                cell: (u) => (
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                      u.activo
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-neutral-100 text-neutral-800'
+                    }`}
+                  >
+                    {u.activo ? 'Activo' : 'Inactivo'}
+                  </span>
+                )
+              },
+              {
+                header: "Acciones",
+                className: "text-right",
+                cell: (u) => (
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteUsuario(u.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-destructive/10"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )
+              }
+            ]}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center py-12">
             <p className="text-neutral-500 mb-4">No hay usuarios para mostrar</p>

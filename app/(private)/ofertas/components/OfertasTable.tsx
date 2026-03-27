@@ -1,10 +1,9 @@
 "use client";
 
 import { OfertaConProducto } from "@/types/oferta";
-
-import Link from "next/link";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import { Badge } from "../../../components/ui/badge";
+import { DataTable, TableColumn } from "@/components/ui/data-table";
+import { Badge } from "@/components/ui/badge";
+import React from "react";
 
 interface OfertasTableProps {
   ofertas: OfertaConProducto[];
@@ -27,67 +26,72 @@ export function OfertasTable({ ofertas, onRowClick }: OfertasTableProps) {
     }).format(new Date(date));
   };
 
+  const columns: TableColumn<OfertaConProducto>[] = [
+    { header: "ID", accessorKey: "id", className: "w-[80px] font-medium" },
+    { 
+      header: "Producto", 
+      className: "font-semibold text-foreground",
+      cell: (oferta) => oferta.producto?.nombre 
+    },
+    { 
+      header: "Tipo", 
+      cell: (oferta) => (
+        <Badge 
+          variant={oferta.tipo === 'porcentaje' ? 'default' : 'secondary'}
+          className={oferta.tipo === 'porcentaje' ? 'bg-primary hover:bg-primary/90' : 'bg-muted text-muted-foreground'}
+        >
+          {oferta.tipo === "porcentaje" ? "%" : "$"}
+        </Badge>
+      )
+    },
+    { 
+      header: "Valor", 
+      cell: (oferta) => (
+        <span className="font-mono text-muted-foreground">
+          {oferta.tipo === "porcentaje" ? `${oferta.valor}%` : formatCurrency(oferta.valor)}
+        </span>
+      )
+    },
+    { 
+      header: "Creación", 
+      className: "text-muted-foreground",
+      cell: (oferta) => formatDate(oferta.fecha_creacion)
+    },
+    { 
+      header: "Inicio", 
+      className: "text-muted-foreground",
+      cell: (oferta) => formatDate(oferta.fecha_inicio)
+    },
+    { 
+      header: "Fin", 
+      className: "text-muted-foreground",
+      cell: (oferta) => formatDate(oferta.fecha_fin)
+    },
+    { 
+      header: "Estado", 
+      cell: (oferta) => (
+        <Badge
+          variant={oferta.activa ? "default" : "secondary"}
+          className={oferta.activa ? 'bg-primary hover:bg-primary/90' : 'bg-muted text-muted-foreground'}
+        >
+          {oferta.activa ? "Activa" : "Inactiva"}
+        </Badge>
+      )
+    }
+  ];
+
   return (
-    <div className="overflow-x-auto overflow-y-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-neutral-900 hover:bg-neutral-900">
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">ID</TableHead>
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">Producto</TableHead>
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">Tipo</TableHead>
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">Valor</TableHead>
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">Creación</TableHead>
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">Inicio</TableHead>
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">Fin</TableHead>
-            <TableHead className="px-6 py-2 text-left text-sm font-semibold text-white">Estado</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {ofertas.map((oferta) => (
-          <TableRow
-            key={oferta.id}
-            className="hover:bg-red-50 cursor-pointer transition-colors duration-150"
-            onClick={() => {
-              if (onRowClick) {
-                onRowClick(oferta.id);
-              } else {
-                window.location.href = `/ofertas/${oferta.id}`;
-              }
-            }}
-          >
-            <TableCell className="px-6 py-2 text-sm font-medium text-neutral-900">{oferta.id}</TableCell>
-            <TableCell className="px-6 py-2 text-sm font-medium text-neutral-900">{oferta.producto.nombre}</TableCell>
-            <TableCell className="px-6 py-2">
-                <Badge 
-                  variant={oferta.tipo === 'porcentaje' ? 'default' : 'secondary'}
-                  className={oferta.tipo === 'porcentaje' ? 'bg-red-600 hover:bg-red-700' : ''}
-                >
-                  {oferta.tipo === "porcentaje" ? "%" : "$"}
-                </Badge>
-            </TableCell>
-            <TableCell>
-              {oferta.tipo === "porcentaje"
-                ? `${oferta.valor}%`
-                : formatCurrency(oferta.valor)}
-            </TableCell>
-            <TableCell className="px-6 py-2 text-sm font-medium text-neutral-900">{formatDate(oferta.fecha_creacion)}</TableCell>
-            <TableCell className="px-6 py-2 text-sm font-medium text-neutral-900">{formatDate(oferta.fecha_inicio)}</TableCell>
-            <TableCell className="px-6 py-2 text-sm font-medium text-neutral-900">{formatDate(oferta.fecha_fin)}</TableCell>
-            <TableCell>
-              <Badge
-                variant={oferta.activa ? "default" : "secondary"}
-                className={
-                  oferta.activa
-                    ? 'bg-red-600 hover:bg-red-700' : ''
-                }
-              >
-                {oferta.activa ? "Activa" : "Inactiva"}
-              </Badge>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-    </div>
+    <DataTable 
+      data={ofertas || []} 
+      columns={columns} 
+      onRowClick={(o) => {
+        if (onRowClick) {
+          onRowClick(o.id);
+        } else {
+          window.location.href = `/ofertas/${o.id}`;
+        }
+      }} 
+      rowKey={(o) => o.id}
+    />
   );
 }

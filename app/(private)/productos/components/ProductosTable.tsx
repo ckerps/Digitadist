@@ -1,9 +1,9 @@
 'use client';
 
 import { Producto, EnumPresentacion } from "@prisma/client";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import { Badge } from "../../../components/ui/badge";
-import { Package } from "lucide-react";
+import { DataTable, TableColumn } from "@/components/ui/data-table";
+import { Badge } from "@/components/ui/badge";
+import React from "react";
 
 interface ProductosTableProps {
   productos: Producto[];
@@ -40,61 +40,65 @@ export function ProductosTable({ productos, onRowClick }: ProductosTableProps) {
     return costoNum * (1 + recargo / 100);
   };
 
+  const columns: TableColumn<Producto>[] = [
+    // { header: "ID", accessorKey: "id", className: "w-[80px] font-medium" },
+    { header: "Nombre", accessorKey: "nombre", className: "font-medium max-w-xs truncate" },
+    {
+      header: "Stock",
+      className: "text-center",
+      cell: (producto) => {
+        const hasStock = producto.stock_actual && producto.stock_minimo && producto.stock_actual > producto.stock_minimo;
+        return (
+          <Badge
+            variant={hasStock ? 'default' : 'destructive'}
+            className={hasStock ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-destructive hover:bg-destructive/90 text-white'}
+          >
+            {producto.stock_actual}
+          </Badge>
+        );
+      }
+    },
+    {
+      header: "Costo",
+      className: "text-right",
+      cell: (producto) => `$${formatCurrency(producto.costo)}`
+    },
+    {
+      header: "Precio unitario",
+      className: "text-center",
+      cell: (producto) => `$${formatCurrency(getPrecioLista(producto.costo, producto.porcentaje_recargo))}`
+    },
+    {
+      header: "Vencimiento",
+      className: "text-center",
+      cell: (producto) => formatDate(producto.fecha_vencimiento)
+    },
+    {
+      header: "Presentación",
+      className: "text-center",
+      cell: (producto) => (
+        <Badge variant="secondary" className="bg-muted text-muted-foreground">
+          {getPresentacionLabel(producto.presentacion)}
+        </Badge>
+      )
+    },
+    {
+      header: "Estado",
+      className: "text-center",
+      cell: (producto) => (
+        <Badge variant={producto.activo ? 'default' : 'secondary'} className={producto.activo ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-secondary hover:bg-secondary/90 text-white'}>
+          {producto.activo ? 'Activo' : 'Inactivo'}
+        </Badge>
+      )
+    }
+  ];
+
   return (
-    <div className="overflow-x-auto overflow-y-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-neutral-900 hover:bg-neutral-900">
-            <TableHead className="px-6 py-3 text-left text-sm font-semibold text-white">ID</TableHead>
-            <TableHead className="px-6 py-3 text-left text-sm font-semibold text-white">Nombre</TableHead>
-            <TableHead className="px-6 py-3 text-center text-sm font-semibold text-white">Stock</TableHead>
-            <TableHead className="px-6 py-3 text-right text-sm font-semibold text-white">Costo</TableHead>
-            <TableHead className="px-6 py-3 text-right text-sm font-semibold text-white">Precio lista</TableHead>
-            <TableHead className="px-6 py-3 text-center text-sm font-semibold text-white">Vencimiento</TableHead>
-            <TableHead className="px-6 py-3 text-center text-sm font-semibold text-white">Presentación</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {productos.map((producto) => (
-            <TableRow
-              key={producto.id}
-              onClick={() => onRowClick(producto.id)}
-              className="hover:bg-red-50 cursor-pointer transition-colors duration-150"
-            >
-              <TableCell className="px-6 py-3 text-sm font-medium text-neutral-900">{producto.id}</TableCell>
-              <TableCell className="px-6 py-3 text-sm text-neutral-900 font-medium max-w-xs truncate">
-                {producto.nombre}
-              </TableCell>
-              <TableCell className="px-6 py-3 text-sm text-center">
-                <Badge
-                  variant={producto.stock_actual && producto.stock_minimo && producto.stock_actual > producto.stock_minimo ? 'default' : 'destructive'}
-                  className={
-                    producto.stock_actual && producto.stock_minimo && producto.stock_actual > producto.stock_minimo
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : 'bg-red-600 hover:bg-red-700'
-                  }
-                >
-                  {producto.stock_actual}
-                </Badge>
-              </TableCell>
-              <TableCell className="px-6 py-3 text-sm text-right text-neutral-600 font-mono">
-                ${formatCurrency(producto.costo)}
-              </TableCell>
-              <TableCell className="px-6 py-3 text-sm text-right text-neutral-600 font-mono">
-                ${formatCurrency(getPrecioLista(producto.costo, producto.porcentaje_recargo))}
-              </TableCell>
-              <TableCell className="px-6 py-3 text-sm text-center text-neutral-600">
-                {formatDate(producto.fecha_vencimiento)}
-              </TableCell>
-              <TableCell className="px-6 py-3 text-center">
-                <Badge variant="secondary" className="bg-neutral-200 text-neutral-700">
-                  {getPresentacionLabel(producto.presentacion)}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable
+      data={productos || []}
+      columns={columns}
+      onRowClick={(p) => onRowClick(p.id)}
+      rowKey={(p) => p.id}
+    />
   );
 }
