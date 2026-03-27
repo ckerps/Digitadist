@@ -5,9 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  engineType = "library"
-  // output   = "../src/generated/prisma"
+  provider      = "prisma-client-js"
 }
 
 datasource db {
@@ -74,19 +72,59 @@ model Rol {
 }
 
 model Usuario {
-  id                  Int           @id @default(autoincrement())
+  id                  Int            @id @default(autoincrement())
   nombre              String
   apellido            String
   rol_id              Int
-  rol                 Rol           @relation(fields: [rol_id], references: [id])
-  email               String        @unique
+  rol                 Rol            @relation(fields: [rol_id], references: [id])
+  email               String         @unique
+  emailVerified       DateTime?
   telefono            String
-  password            String
-  fecha_creacion      DateTime      @default(now())
-  fecha_actualizacion DateTime?     @updatedAt
+  image               String?
+  password            String?
+  fecha_creacion      DateTime       @default(now())
+  fecha_actualizacion DateTime?      @updatedAt
   activo              Boolean
+  
+  accounts            Account[]
+  sessions            Session[]
   productoLogs        ProductoLog[]
   pedidos             Pedido[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             Int
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user Usuario @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Cliente {
@@ -114,7 +152,7 @@ model Producto {
   nombre              String
   presentacion        EnumPresentacion
   tam_pack            Int
-  costo               Decimal
+  costo               Float
   porcentaje_recargo  Float
   stock_actual        Int
   stock_minimo        Int?
@@ -156,7 +194,7 @@ model Oferta {
   producto_id         Int
   producto            Producto          @relation(fields: [producto_id], references: [id])
   tipo                EnumTipoDescuento
-  valor               Decimal
+  valor               Float
   fecha_inicio        DateTime
   fecha_fin           DateTime
   fecha_creacion      DateTime          @default(now())
@@ -171,9 +209,9 @@ model Pedido {
   vendedor_id            Int
   vendedor               Usuario            @relation(fields: [vendedor_id], references: [id])
   fecha_creacion         DateTime           @default(now())
-  total                  Decimal
-  costo                  Decimal
-  descuento              Decimal?
+  total                  Float
+  costo                  Float
+  descuento              Float?
   estado                 EnumEstadoPedido
   estado_pago            EnumEstadoPago
   direccion_entrega      String
@@ -189,9 +227,9 @@ model DetallePedido {
   pedido_id       Int
   pedido          Pedido   @relation(fields: [pedido_id], references: [id])
   cantidad        Int
-  precio_unitario Decimal
-  descuento       Decimal?
-  subtotal        Decimal
+  precio_unitario Float
+  descuento       Float?
+  subtotal        Float
 
   @@id([pedido_id, producto_id])
 }

@@ -1,9 +1,10 @@
-import { NuevoPedido, AgregarProducto } from "@/types/pedido";
+import { NuevoPedido} from "@/types/pedido";
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { Input } from "../../../components/ui/input";
+import { AgregarProducto } from "@/types/producto";
 
-export function ListaProductosSeleccionados({ productos, setFormData }: { productos: AgregarProducto[]; setFormData: Dispatch<SetStateAction<Partial<NuevoPedido>>> }) {
+export function ListaProductosSeleccionados({ productos, setFormData }: { productos: AgregarProducto[]; setFormData: Dispatch<SetStateAction<NuevoPedido>> }) {
     const suma = useMemo(() => {
         return productos.reduce((acc, producto) => {
             return acc + ((+producto.costo + +producto.recargo) * producto.cantidad);

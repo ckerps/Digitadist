@@ -1,9 +1,9 @@
 'use client';
 
-import { Pedido } from "@/types/pedido";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
 import { getEstadoBadge, getPagoBadge } from "./utils";
+import { Pedido } from "@/types/pedido";
 
 interface PedidosTableProps {
   pedidos: Pedido[];
@@ -25,14 +25,21 @@ export function PedidosTable({ pedidos, onRowClick }: PedidosTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {pedidos.map((pedido) => {
+          {pedidos?.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="px-4 lg:px-6 py-4 text-center text-sm text-neutral-600">
+                No se encontraron pedidos.
+              </TableCell>
+            </TableRow>
+          ) : 
+          pedidos.map((pedido) => {
             const estadoBadge = getEstadoBadge(pedido.estado);
-            const pagoBadge = getPagoBadge(pedido.pago);
+            const pagoBadge = getPagoBadge(pedido.estado_pago);
             return (
               <TableRow key={pedido.id} className="hover:bg-red-50 transition-colors duration-150" onClick={onRowClick ? () => onRowClick(pedido.id) : undefined}>
                 <TableCell className="px-4 lg:px-6 py-2 text-sm font-medium text-neutral-900">{pedido.id}</TableCell>
-                <TableCell className="px-4 lg:px-6 py-2 text-sm text-neutral-600">{pedido.direccionEntrega}</TableCell>
-                <TableCell className="px-4 lg:px-6 py-2 text-sm text-neutral-600">{pedido.fechaEstimada}</TableCell>
+                <TableCell className="px-4 lg:px-6 py-2 text-sm text-neutral-600">{pedido.direccion_entrega}</TableCell>
+                <TableCell className="px-4 lg:px-6 py-2 text-sm text-neutral-600">{pedido.fecha_entrega_estimada.toLocaleString()}</TableCell>
                 <TableCell className="px-4 lg:px-6 py-2">
                   <Badge className={estadoBadge.className}>
                     {estadoBadge.label}
@@ -44,7 +51,7 @@ export function PedidosTable({ pedidos, onRowClick }: PedidosTableProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="px-4 lg:px-6 py-2 text-sm font-semibold text-neutral-900 text-right">
-                  ${pedido.total.toFixed(2)}
+                  ${pedido.total}
                 </TableCell>
               </TableRow>
             );

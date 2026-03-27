@@ -1,7 +1,5 @@
-import { FiltrosProducto, NuevoProducto, ProductosPaginado, UpdateProducto } from "@/types/producto";
-import { FiltrosProductoSchema, NuevoProductoSchema, PaginacionSchema, UpdateProductoSchema } from "./zodSchemas";
+import { FiltrosProducto, NuevoProducto, Producto, ProductosPaginado, UpdateProducto } from "@/types/producto";
 import { prisma } from "@/lib/prisma";
-import { Producto } from "@prisma/client";
 
 export const ProductoRepository = {
   async obtenerTodos(itemsPerPage: number, currentPage: number, filtros?: FiltrosProducto): Promise<ProductosPaginado> {
@@ -9,8 +7,8 @@ export const ProductoRepository = {
 
     const productos = await prisma.producto.findMany({
       where: {
-        codigo: filtros?.codigo ?? undefined,
-        nombre: filtros?.nombre ?? undefined,
+        codigo: filtros?.codigo ? { contains: filtros.codigo, mode: 'insensitive' } : undefined,
+        nombre: filtros?.nombre ? { contains: filtros.nombre, mode: 'insensitive' } : undefined,
         presentacion: filtros?.presentacion ?? undefined,
         tam_pack: filtros?.tam_pack ?? undefined,
         stock_actual: filtros?.stock_actual ?? undefined,
@@ -24,7 +22,19 @@ export const ProductoRepository = {
       orderBy: { id: 'desc' }
     });
 
-    const totalCount = await prisma.pedido.count();
+    const totalCount = await prisma.producto.count({
+      where: {
+        codigo: filtros?.codigo ? { contains: filtros.codigo, mode: 'insensitive' } : undefined,
+        nombre: filtros?.nombre ? { contains: filtros.nombre, mode: 'insensitive' } : undefined,
+        presentacion: filtros?.presentacion ?? undefined,
+        tam_pack: filtros?.tam_pack ?? undefined,
+        stock_actual: filtros?.stock_actual ?? undefined,
+        stock_minimo: filtros?.stock_minimo ?? undefined,
+        activo: filtros?.activo ?? undefined,
+        categoria_id: filtros?.categoria_id ?? undefined,
+        fecha_vencimiento: filtros?.fecha_vencimiento ?? undefined
+      }
+    });
 
     return {
       productos,
@@ -35,7 +45,10 @@ export const ProductoRepository = {
   },
 
   async obtenerPorId(id: number): Promise<Producto | null> {
-    const producto = await prisma.producto.findUnique({ where: { id } });
+    const producto = await prisma.producto.findUnique({ 
+      where: { id },
+      include: { ofertas: true, categoria: true }
+    });
     return producto;
   },
 

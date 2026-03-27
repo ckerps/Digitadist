@@ -11,10 +11,21 @@ import * as z from 'zod';
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const itemsPerPage = parseInt(url.searchParams.get('items') || '10');
-    const currentPage = parseInt(url.searchParams.get('page') || '1');
+    const itemsPerPage = parseInt(url.searchParams.get('itemsPerPage') || '10');
+    const currentPage = parseInt(url.searchParams.get('currentPage') || '1');
 
-    const clientes = await ClienteService.obtenerTodos(itemsPerPage, currentPage)
+    // Extraer filtros de los query params
+    const filtros: any = {};
+    if (url.searchParams.has('id')) filtros.id = parseInt(url.searchParams.get('id') || '0');
+    if (url.searchParams.has('nombre')) filtros.nombre = url.searchParams.get('nombre');
+    if (url.searchParams.has('telefono')) filtros.telefono = url.searchParams.get('telefono');
+    if (url.searchParams.has('cuit')) filtros.cuit = url.searchParams.get('cuit');
+    if (url.searchParams.has('tipo')) filtros.tipo = url.searchParams.get('tipo');
+    if (url.searchParams.has('email')) filtros.email = url.searchParams.get('email');
+    if (url.searchParams.has('activo')) filtros.activo = url.searchParams.get('activo') === 'true';
+    if (url.searchParams.has('searchTerm')) filtros.searchTerm = url.searchParams.get('searchTerm');
+
+    const clientes = await ClienteService.obtenerTodos(itemsPerPage, currentPage, Object.keys(filtros).length > 0 ? filtros : undefined)
     return NextResponse.json(clientes, { status: 200 })
   } catch (error: any) {
     if (error instanceof z.ZodError) {

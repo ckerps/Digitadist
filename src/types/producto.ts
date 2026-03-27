@@ -1,5 +1,33 @@
-import { EnumAtributosLog, EnumPresentacion, EnumTipoDescuento, Producto } from "@prisma/client";
+import { Categoria, EnumAtributosLog, EnumPresentacion, EnumTipoDescuento, Oferta} from "@prisma/client";
 
+export interface Producto {
+  id: number;
+  codigo: string;
+  nombre: string;
+  presentacion: EnumPresentacion;
+  tam_pack: number;
+  costo: number;
+  porcentaje_recargo: number;
+  stock_actual: number;
+  stock_minimo?: number;
+  activo: boolean;
+  imagen?: string;
+  categoria_id: number;
+  categoria: Categoria;
+  fecha_vencimiento?: Date;
+  fecha_creacion: Date;
+  fecha_actualizacion?: Date;
+  ofertas?: Oferta[];
+}
+
+export interface AgregarProducto {
+  id: number;
+  codigo: string;
+  nombre: string;
+  costo: number;
+  recargo: number;
+  cantidad: number;
+}
 
 export interface NuevoProducto {
   codigo: string;

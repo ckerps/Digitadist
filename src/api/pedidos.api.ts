@@ -83,4 +83,50 @@ export const pedidosApi = {
     });
     await handleResponse(response);
   },
+
+  async agregarProducto(
+    pedidoId: number,
+    detalle: {
+      producto_id: number;
+      cantidad: number;
+      precio_unitario: number;
+      descuento?: number;
+      subtotal: number;
+    }
+  ): Promise<PedidoConProductos> {
+    const response = await fetch(`${BASE_URL}/${pedidoId}/detalles`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(detalle),
+      credentials: 'include',
+    });
+    return handleResponse<PedidoConProductos>(response);
+  },
+
+  async actualizarDetalle(
+    pedidoId: number,
+    productoId: number,
+    detalle: {
+      cantidad: number;
+      precio_unitario: number;
+      descuento?: number;
+      subtotal: number;
+    }
+  ): Promise<PedidoConProductos> {
+    const response = await fetch(`${BASE_URL}/${pedidoId}/detalles/${productoId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(detalle),
+      credentials: 'include',
+    });
+    return handleResponse<PedidoConProductos>(response);
+  },
+
+  async eliminarProducto(pedidoId: number, productoId: number): Promise<PedidoConProductos> {
+    const response = await fetch(`${BASE_URL}/${pedidoId}/detalles/${productoId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    return handleResponse<PedidoConProductos>(response);
+  },
 };

@@ -17,7 +17,7 @@ export function MobilePedidosTable({ pedidos, onRowClick }: PedidosTableProps) {
         <div className="overflow-x-auto flex flex-col gap-2">
             {pedidos.map((pedido) => {
                 const estadoBadge = getEstadoBadge(pedido?.estado);
-                const pagoBadge = getPagoBadge(pedido?.pago);
+                const pagoBadge = getPagoBadge(pedido?.estado_pago);
                 return (
                     <Card
                         key={pedido.id}
@@ -35,9 +35,9 @@ export function MobilePedidosTable({ pedidos, onRowClick }: PedidosTableProps) {
                         </CardHeader>
 
                         <CardContent className="space-y-1">
-                            <div className="text-neutral-600"><b>Dirección de entrega:</b> {pedido.direccionEntrega}</div>
-                            <div className=" text-neutral-600"><b>Fecha estimada:</b> {pedido.fechaEstimada}</div>
-                            <div className=" text-neutral-600"><b>TOTAL:</b> ${pedido.total.toFixed(2)}</div>
+                            <div className="text-neutral-600"><b>Dirección de entrega:</b> {pedido.direccion_entrega}</div>
+                            <div className=" text-neutral-600"><b>Fecha estimada:</b> {pedido.fecha_entrega_estimada.toLocaleString()}</div>
+                            <div className=" text-neutral-600"><b>TOTAL:</b> ${pedido.total}</div>
                         </CardContent>
                     </Card>
                 )

@@ -55,6 +55,7 @@ export const UpdatePedidoSchema = z.object({
 })
 
 export const FiltrosPedidoSchema = z.object({
+    searchTerm: z.string().optional().transform(v => v === "" ? undefined : v),
     cliente_id: z.coerce.number().gt(0).optional(),
     vendedor_id: z.coerce.number().gt(0).optional(),
     estado: z.enum(EnumEstadoPedido).optional(),
@@ -66,19 +67,16 @@ export const FiltrosPedidoSchema = z.object({
 
 export const NuevoDetallePedidoSchema = z.object({
     producto_id: z.number().gt(0),
-    pedido_id: z.number().gt(0),
     cantidad: z.number().gt(0),
     precio_unitario: z.number().gt(0),
-    descuento: z.number().gt(0),
+    descuento: z.number().gte(0).optional(),
     subtotal: z.number().gt(0)
 })
 
 export const UpdateDetallePedidoSchema = z.object({
-    producto_id: z.number().gt(0),
-    pedido_id: z.number().gt(0),
     cantidad: z.number().gt(0).optional(),
     precio_unitario: z.number().gt(0).optional(),
-    descuento: z.number().gt(0).optional(),
+    descuento: z.number().gte(0).optional(),
     subtotal: z.number().gt(0).optional()
 })
 
@@ -106,15 +104,43 @@ export const NuevoLogProductoSchema = z.object({
 });
 
 export const NuevaOfertaSchema = z.object({
-    producto_id: z.number().int().gt(0),
+    producto_id: z.number().int().gte(0, "Seleccione un producto para continuar"),
     tipo: z.enum(EnumTipoDescuento),
     valor: z.number().gt(0, "El valor del descuento debe ser mayor a 0"),
-    fecha_inicio: z.date(),
-    fecha_fin: z.date(),
+    fecha_inicio: z.coerce.date(),
+    fecha_fin: z.coerce.date(),
     activa: z.boolean().default(true),
 }).refine((data) => data.fecha_fin > data.fecha_inicio, {
     message: "La fecha de fin debe ser posterior a la de inicio",
     path: ["fecha_fin"],
+});
+
+export const ActualizarOfertaSchema = z.object({
+    tipo: z.enum(EnumTipoDescuento).optional(),
+    valor: z.number().gt(0, "El valor del descuento debe ser mayor a 0").optional(),
+    fecha_inicio: z.coerce.date().optional(),
+    fecha_fin: z.coerce.date().optional(),
+    activa: z.boolean().optional(),
+}).refine((data) => !data.fecha_fin || !data.fecha_inicio || data.fecha_fin > data.fecha_inicio, {
+    message: "La fecha de fin debe ser posterior a la de inicio",
+    path: ["fecha_fin"],
+});
+
+export const RenovarOfertaSchema = z.object({
+    nueva_fecha_fin: z.coerce.date(),
+});
+
+export const FiltrosOfertaSchema = z.object({
+    id: z.coerce.number().optional(),
+    producto_id: z.coerce.number().optional(),
+    tipo: z.enum(EnumTipoDescuento).optional(),
+    estado: z.enum(['activa', 'inactiva']).optional(),
+    fecha_inicio_desde: z.string().optional().transform(v => v === "" ? undefined : v),
+    fecha_inicio_hasta: z.string().optional().transform(v => v === "" ? undefined : v),
+    fecha_fin_desde: z.string().optional().transform(v => v === "" ? undefined : v),
+    fecha_fin_hasta: z.string().optional().transform(v => v === "" ? undefined : v),
+    fecha_creacion_desde: z.string().optional().transform(v => v === "" ? undefined : v),
+    fecha_creacion_hasta: z.string().optional().transform(v => v === "" ? undefined : v),
 });
 
 export const FiltrosProductoSchema = z.object({

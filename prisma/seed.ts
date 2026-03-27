@@ -1,14 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-
-const bcrypt = require('bcrypt');
-
-const prisma = new PrismaClient();
+import "dotenv/config";
+import bcrypt from 'bcrypt';
+import { prisma } from '@/lib/prisma';
 
 async function main() {
-  console.log('🌱 Iniciando seeder...');
-
-  // Limpiar datos existentes (en orden inverso de dependencias)
-  console.log('🗑️  Limpiando datos existentes...');
   await prisma.detallePedido.deleteMany();
   await prisma.pedido.deleteMany();
   await prisma.oferta.deleteMany();

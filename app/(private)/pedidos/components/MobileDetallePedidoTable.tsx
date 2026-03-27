@@ -2,16 +2,24 @@
 
 import { DetallePedido, Producto } from "@prisma/client";
 import { Card, CardHeader, CardTitle, CardContent } from "../../../components/ui/card";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit2 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 
 interface MobileDetallePedidoTableProps {
   productos: (DetallePedido & { producto: Producto })[];
+  onEditarCantidad?: (detalle: DetallePedido & { producto: Producto }) => void;
   onDeleteProducto?: (productoId: number, pedidoId: number) => Promise<void>;
   isDeleting?: boolean;
+  isUpdating?: boolean;
 }
 
-export function MobileDetallePedidoTable({ productos, onDeleteProducto, isDeleting }: MobileDetallePedidoTableProps) {
+export function MobileDetallePedidoTable({ 
+  productos, 
+  onEditarCantidad,
+  onDeleteProducto, 
+  isDeleting,
+  isUpdating
+}: MobileDetallePedidoTableProps) {
   const formatCurrency = (value: any) => {
     return parseFloat(value).toLocaleString('es-AR', {
       minimumFractionDigits: 2,
@@ -32,17 +40,32 @@ export function MobileDetallePedidoTable({ productos, onDeleteProducto, isDeleti
               <CardTitle className="text-base text-neutral-900">{item.producto.nombre}</CardTitle>
               <p className="text-xs text-neutral-500 mt-1">Código: {item.producto.codigo}</p>
             </div>
-            {onDeleteProducto && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onDeleteProducto(item.producto_id, item.pedido_id)}
-                disabled={isDeleting}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {onEditarCantidad && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditarCantidad(item)}
+                  disabled={isUpdating}
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  title="Editar cantidad"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              )}
+              {onDeleteProducto && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDeleteProducto(item.producto_id, item.pedido_id)}
+                  disabled={isDeleting || isUpdating}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  title="Eliminar producto"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">

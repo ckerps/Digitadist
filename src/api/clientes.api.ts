@@ -1,7 +1,6 @@
 // src/api/clientes.api.ts
 
-import { Cliente } from "@prisma/client";
-import { ClientePaginado, FiltrosCliente, NuevoCliente, UpdateCliente } from "@/types/cliente";
+import { Cliente, ClientePaginado, FiltrosCliente, NuevoCliente, UpdateCliente } from "@/types/cliente";
 
 const BASE_URL = '/api/clientes';
 

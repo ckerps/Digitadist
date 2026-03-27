@@ -8,4 +8,7 @@ export { MobileDetallePedidoTable } from "./MobileDetallePedidoTable";
 export { CambiarEstadoModal } from "./CambiarEstadoModal";
 export { CambiarPagoModal } from "./CambiarPagoModal";
 export { AgregarProductoModal } from "./AgregarProductoModal";
+export { EditarCantidadModal } from "./EditarCantidadModal";
 export { CancelarPedidoModal } from "./CancelarPedidoModal";
+export { PedidosTableSkeleton } from "./PedidosTableSkeleton";
+export { MobilePedidosTableSkeleton } from "./MobilePedidosTableSkeleton";

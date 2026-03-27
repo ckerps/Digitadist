@@ -1,6 +1,6 @@
 
 import { pedidosApi } from "@/api/pedidos.api";
-import { PedidosPaginado } from "@/types/pedido";
+import { FiltrosPedido, PedidosPaginado } from "@/types/pedido";
 import { QueryObserverResult, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
@@ -12,12 +12,12 @@ interface UsePedidosReturn {
   refetchList: () => Promise<QueryObserverResult<PedidosPaginado, Error>>;
 }
 
-export function usePedidos({itemsPerPage, currentPage}: { itemsPerPage: number, currentPage: number }): UsePedidosReturn {
+export function usePedidos({itemsPerPage, currentPage, filters}: { itemsPerPage: number, currentPage: number, filters?: FiltrosPedido }): UsePedidosReturn {
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({
-    queryKey: ['pedidos:list', currentPage],
-    queryFn: () => pedidosApi.getAll({ itemsPerPage, currentPage }),
+    queryKey: ['pedidos:list', currentPage, itemsPerPage, filters],
+    queryFn: () => pedidosApi.getAll({ itemsPerPage, currentPage, filters }),
     staleTime: 1000 * 60 * 5,
   });
 

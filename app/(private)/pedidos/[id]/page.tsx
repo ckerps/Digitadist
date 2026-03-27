@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, Suspense } from 'react';
-import { ArrowLeft, Plus, Trash2, Package, Clock, CreditCard } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Package, Clock, CreditCard, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { usePedidoDetail } from '../hooks/usePedidoDetail';
 import LoadingPage from '../../../loading';
 import ErrorPage from '../../../error';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card } from '../../../components/ui/card';
 import { Pagination } from '../../shared/Pagination';
 import { itemsPerPage } from '../../utils';
 import {
@@ -18,9 +18,18 @@ import {
   CambiarEstadoModal,
   CambiarPagoModal,
   AgregarProductoModal,
+  EditarCantidadModal,
   CancelarPedidoModal
 } from '../components';
-import { EnumEstadoPedido, EnumEstadoPago } from '@prisma/client';
+import { EnumEstadoPedido, EnumEstadoPago, Producto, DetallePedido } from '@prisma/client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Card } from '../../../components/ui/card';
 
 export default function PedidoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -28,10 +37,23 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
   const [isCambiarEstadoOpen, setIsCambiarEstadoOpen] = useState(false);
   const [isCambiarPagoOpen, setIsCambiarPagoOpen] = useState(false);
   const [isAgregarProductoOpen, setIsAgregarProductoOpen] = useState(false);
+  const [isEditarCantidadOpen, setIsEditarCantidadOpen] = useState(false);
   const [isCancelarOpen, setIsCancelarOpen] = useState(false);
+  const [detalleSeleccionado, setDetalleSeleccionado] = useState<(DetallePedido & { producto: Producto }) | null>(null);
   const router = useRouter();
 
-  const { pedido, deletePedido, updatePedido, isLoadingDetail, errorDetail, isUpdating, isDeleting } = usePedidoDetail({ pedidoId: +id });
+  const { 
+    pedido, 
+    deletePedido, 
+    updatePedido, 
+    agregarProducto,
+    editarCantidad,
+    eliminarProducto,
+    isLoadingDetail, 
+    errorDetail, 
+    isUpdating, 
+    isDeleting 
+  } = usePedidoDetail({ pedidoId: +id });
 
   if (isLoadingDetail) {
     return <LoadingPage />;
@@ -45,9 +67,9 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
   const handleCambiarEstado = async (nuevoEstado: EnumEstadoPedido) => {
     try {
       await updatePedido(+id, { estado: nuevoEstado });
-      //@TODO: toast
+      toast.success('Estado del pedido actualizado correctamente');
     } catch (error) {
-      //@TODO: toast
+      toast.error(`Error al cambiar estado del pedido: ${(error as Error).message}`);
       console.error('Error al cambiar estado del pedido:', error);
     }
   };
@@ -55,9 +77,9 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
   const handleCambiarPago = async (nuevoPago: EnumEstadoPago) => {
     try {
       await updatePedido(+id, { estado_pago: nuevoPago });
-      //@TODO: toast
+      toast.success('Estado de pago actualizado correctamente');
     } catch (error) {
-      //@TODO: toast
+      toast.error(`Error al cambiar pago del pedido: ${(error as Error).message}`);
       console.error('Error al cambiar pago del pedido:', error);
     }
   };
@@ -70,11 +92,45 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
     subtotal: number;
   }) => {
     try {
-      // TODO: Implementar endpoint para agregar detalle a pedido existente
-      //@TODO: toast
+      await agregarProducto(+id, productoData);
+      setIsAgregarProductoOpen(false);
+      toast.success('Producto agregado al pedido correctamente');
     } catch (error) {
-      //@TODO: toast
+      toast.error(`Error al agregar producto: ${(error as Error).message}`);
       console.error('Error al agregar producto:', error);
+    }
+  };
+
+  const handleEditarCantidad = (detalle: DetallePedido & { producto: Producto }) => {
+    setDetalleSeleccionado(detalle);
+    setIsEditarCantidadOpen(true);
+  };
+
+  const handleConfirmarEditarCantidad = async (cantidad: number, subtotal: number) => {
+    if (!detalleSeleccionado) return;
+
+    try {
+      await editarCantidad(+id, detalleSeleccionado.producto_id, cantidad, subtotal, detalleSeleccionado.precio_unitario, parseFloat(detalleSeleccionado.descuento as any) || 0);
+      setIsEditarCantidadOpen(false);
+      setDetalleSeleccionado(null);
+      toast.success('Cantidad actualizada correctamente');
+    } catch (error) {
+      toast.error(`Error al editar cantidad: ${(error as Error).message}`);
+      console.error('Error al editar cantidad:', error);
+    }
+  };
+
+  const handleEliminarProducto = async (productoId: number, pedidoId: number) => {
+    if (!window.confirm('¿Está seguro de que desea eliminar este producto del pedido?')) {
+      return;
+    }
+    
+    try {
+      await eliminarProducto(pedidoId, productoId);
+      toast.success('Producto eliminado del pedido correctamente');
+    } catch (error) {
+      toast.error(`Error al eliminar producto: ${(error as Error).message}`);
+      console.error('Error al eliminar producto:', error);
     }
   };
 
@@ -82,13 +138,15 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
     try {
       await deletePedido(+id);
       setIsCancelarOpen(false);
-      //@TODO: toast
+      toast.success('Pedido cancelado correctamente');
       router.push('/pedidos');
     } catch (error) {
-      //@TODO: toast
+      toast.error(`Error al cancelar el pedido: ${(error as Error).message}`);
       console.error('Error al cancelar el pedido:', error);
     }
   };
+
+  const isDisabled = pedido.estado === 'cancelado';
 
   return (
     <div className="min-h-screen overflow-hidden w-full">
@@ -98,7 +156,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
           <Button
             variant="ghost"
             onClick={() => router.push('/pedidos')}
-            className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200 self-start sm:self-auto"
+            className="text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver a Pedidos
@@ -194,6 +252,18 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
         onConfirm={handleAgregarProducto}
         isLoading={isUpdating}
       />
+
+      {detalleSeleccionado && (
+        <EditarCantidadModal
+          open={isEditarCantidadOpen}
+          onOpenChange={setIsEditarCantidadOpen}
+          onConfirm={handleConfirmarEditarCantidad}
+          cantidadActual={detalleSeleccionado.cantidad}
+          precioUnitario={parseFloat(detalleSeleccionado.precio_unitario as any)}
+          descuentoActual={detalleSeleccionado.descuento ? parseFloat(detalleSeleccionado.descuento as any) : 0}
+          isLoading={isUpdating}
+        />
+      )}
 
       <CancelarPedidoModal
         open={isCancelarOpen}

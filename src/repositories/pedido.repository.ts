@@ -1,32 +1,45 @@
-import { FiltrosPedido, NuevoDetallePedido, NuevoPedido, PedidoConProductos, PedidosPaginado, UpdateDetallePedido, UpdatePedido } from "@/types/pedido";
-import { FiltrosPedidoSchema, NuevoDetallePedidoSchema, NuevoPedidoSchema, PaginacionSchema, UpdateDetallePedidoSchema, UpdatePedidoSchema } from "./zodSchemas";
+import { Pedido, FiltrosPedido, NuevoDetallePedido, NuevoPedido, PedidoConProductos, PedidosPaginado, UpdateDetallePedido, UpdatePedido } from "@/types/pedido";
 import { prisma } from "@/lib/prisma";
-import { EnumEstadoPedido, Pedido } from "@prisma/client";
+import { EnumEstadoPedido } from "@prisma/client";
 
 
 export const PedidoRepository = {
   async obtenerTodos(itemsPerPage: number, currentPage: number, filtros?: FiltrosPedido): Promise<PedidosPaginado> {
     const skip = (currentPage - 1) * itemsPerPage;
 
+    // Construir condiciones WHERE dinámicamente basadas en los filtros
+    const where: any = {};
+
+    if (filtros) {
+      if (filtros.searchTerm) {
+        where.OR = [
+          { cliente: { nombre: { contains: filtros.searchTerm, mode: 'insensitive' } } },
+          { id: isNaN(Number(filtros.searchTerm)) ? undefined : Number(filtros.searchTerm) },
+          { cliente: { email: { contains: filtros.searchTerm, mode: 'insensitive' } } },
+          { direccion_entrega: { contains: filtros.searchTerm, mode: 'insensitive' } },
+        ].filter(condition => Object.values(condition)[0] !== undefined);
+      }
+      // Filtros específicos
+      if (filtros.cliente_id !== undefined) where.cliente_id = filtros.cliente_id;
+      if (filtros.vendedor_id !== undefined) where.vendedor_id = filtros.vendedor_id;
+      if (filtros.estado !== undefined) where.estado = filtros.estado;
+      if (filtros.estado_pago !== undefined) where.estado_pago = filtros.estado_pago;
+      if (filtros.direccion_entrega) where.direccion_entrega = { contains: filtros.direccion_entrega, mode: 'insensitive' };
+      if (filtros.fecha_entrega_estimada) where.fecha_entrega_estimada = filtros.fecha_entrega_estimada;
+      if (filtros.condicion_venta) where.condicion_venta = filtros.condicion_venta;
+    }
+
     const pedidos = await prisma.pedido.findMany({
-      where: {
-        cliente_id: filtros?.cliente_id ? +filtros?.cliente_id : undefined,
-        vendedor_id: filtros?.vendedor_id ? +filtros?.vendedor_id : undefined,
-        estado: filtros?.estado ?? undefined,
-        estado_pago: filtros?.estado_pago ?? undefined,
-        direccion_entrega: filtros?.direccion_entrega ?? undefined,
-        fecha_entrega_estimada: filtros?.fecha_entrega_estimada ?? undefined,
-        condicion_venta: filtros?.condicion_venta ?? undefined
-      },
+      where,
       skip,
       take: itemsPerPage,
       orderBy: { id: 'desc' }
-    });
+    }) as any;
 
-    const totalCount = await prisma.pedido.count();
+    const totalCount = await prisma.pedido.count({ where });
 
     return {
-      pedidos,
+      pedidos: pedidos,
       totalItems: totalCount,
       totalPages: Math.ceil(totalCount / itemsPerPage),
       currentPage: currentPage
@@ -41,7 +54,7 @@ export const PedidoRepository = {
         cliente: true,
         vendedor: true
       } 
-    });
+    }) as any;
     return pedido;
   },
 
@@ -51,15 +64,18 @@ export const PedidoRepository = {
   //   return result;
   // },
 
-  // async crearDetallePedido(data: NuevoDetallePedido[]) {
-  //   const result = await Promise.all([
-  //     data?.forEach(async (dat) => {
-  //       const detalle = await NuevoDetallePedidoSchema.parse(dat);
-  //       return await prisma.detallePedido.create({ data: detalle });
-  //     })
-  //   ])
-  //   return result;
-  // },
+  async crearDetallePedido(data: any) {
+    return await prisma.detallePedido.create({
+      data: {
+        producto_id: data.producto_id,
+        pedido_id: data.pedido_id,
+        cantidad: data.cantidad,
+        precio_unitario: data.precio_unitario,
+        descuento: data.descuento,
+        subtotal: data.subtotal,
+      }
+    });
+  },
 
   async crearConDetalle(pedido: NuevoPedido, detalle: NuevoDetallePedido[]) {
     return await prisma.pedido.create({

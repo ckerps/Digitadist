@@ -1,0 +1,10 @@
+export { ProductosTable } from "./ProductosTable";
+export { MobileProductosTable } from "./MobileProductosTable";
+export { ProductoFilters } from "./ProductoFilters";
+export { ProductoInfo } from './ProductoInfo';
+export { OfertasTable } from './OfertasTable';
+export { MobileOfertasTable } from './MobileOfertasTable';
+export { EditarProductoModal } from './EditarProductoModal';
+export { DesactivarProductoModal } from './DesactivarProductoModal';
+export { ProductosTableSkeleton } from './ProductosTableSkeleton';
+export { MobileProductosTableSkeleton } from './MobileProductosTableSkeleton';

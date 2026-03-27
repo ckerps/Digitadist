@@ -13,11 +13,26 @@ import {
 } from "@/components/ui/popover"
 
 export function DatePicker({props, fecha, onChange}: {props?: React.HTMLAttributes<HTMLDivElement>, fecha?: string, onChange?: (date: string | undefined) => void}) {
-  const selectedDate = fecha ? new Date(fecha) : undefined;
+  // Parsear fecha correctamente sin desfase de zona horaria
+  const selectedDate = fecha ? parseDateString(fecha) : undefined;
 
   const handleSelect = (date: Date | undefined) => {
-    onChange?.(date ? date.toISOString().split('T')[0] : undefined); // Formato YYYY-MM-DD
+    onChange?.(date ? formatDateToISO(date) : undefined); // Formato YYYY-MM-DD
   };
+
+  // Función para parsear string YYYY-MM-DD sin desfase de zona horaria
+  function parseDateString(dateStr: string): Date {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  // Función para formatear Date a ISO sin desfase
+  function formatDateToISO(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
   return (
     <Popover {...props}>

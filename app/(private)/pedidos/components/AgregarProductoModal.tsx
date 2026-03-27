@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import { Producto } from "@prisma/client";
 import { useProductos } from "../../productos/hooks/useProductos";
-import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "../../../components/ui/combobox";
+import { Check } from "lucide-react";
+import SelectProducto from "../../shared/SelectProducto";
+import { Producto } from "@/types/producto";
 
 interface AgregarProductoModalProps {
   open: boolean;
@@ -28,28 +29,27 @@ export function AgregarProductoModal({
   onConfirm,
   isLoading
 }: AgregarProductoModalProps) {
-  const [searchValue, setSearchValue] = useState('');
   const [selectedProducto, setSelectedProducto] = useState<Producto | null>(null);
   const [cantidad, setCantidad] = useState<number>(1);
-  const [precioUnitario, setPrecioUnitario] = useState<number | ''>('');
   const [descuento, setDescuento] = useState<number>(0);
   const [error, setError] = useState<string>('');
+  const [searchValue, setSearchValue] = useState('');
 
-  const { productos } = useProductos({
-    itemsPerPage: 10,
-    currentPage: 1,
-    filters: { activo: true, nombre: searchValue.length > 0 ? searchValue : undefined }
-  });
-
-  const filteredProductos = productos?.productos || [];
-
-  const handleSelectProduct = (producto: Producto) => {
+  const handleSelectProduct = (producto: Producto | null) => {
     setSelectedProducto(producto);
-    const precioTotal = parseFloat(producto.costo as any) + producto.porcentaje_recargo;
-    setPrecioUnitario(precioTotal);
     setSearchValue('');
     setError('');
   };
+
+  const calcularPrecioUnitario = (producto: Producto): number => {
+    // Precio unitario = costo * (1 + porcentaje_recargo / 100)
+    const costo = parseFloat(producto.costo as any);
+    const recargo = producto.porcentaje_recargo || 0;
+    return costo * (1 + recargo / 100);
+  };
+
+  const precioUnitario = selectedProducto ? calcularPrecioUnitario(selectedProducto) : 0;
+  const subtotalCalculado = (precioUnitario * cantidad) - descuento;
 
   const handleConfirm = async () => {
     setError('');
@@ -64,15 +64,7 @@ export function AgregarProductoModal({
       return;
     }
 
-    if (precioUnitario === '' || precioUnitario <= 0) {
-      setError('El precio unitario debe ser mayor a 0');
-      return;
-    }
-
-    const precioNum = typeof precioUnitario === 'string' ? parseFloat(precioUnitario) : precioUnitario;
-    const subtotal = (precioNum * cantidad) - (descuento || 0);
-
-    if (subtotal <= 0) {
+    if (subtotalCalculado <= 0) {
       setError('El subtotal no puede ser menor o igual a 0');
       return;
     }
@@ -81,15 +73,14 @@ export function AgregarProductoModal({
       await onConfirm({
         producto_id: selectedProducto.id,
         cantidad,
-        precio_unitario: precioNum,
-        descuento: descuento || undefined,
-        subtotal
+        precio_unitario: precioUnitario,
+        descuento: descuento > 0 ? descuento : undefined,
+        subtotal: subtotalCalculado
       });
 
       // Reset form
       setSelectedProducto(null);
       setCantidad(1);
-      setPrecioUnitario('');
       setDescuento(0);
       setSearchValue('');
       onOpenChange(false);
@@ -98,12 +89,8 @@ export function AgregarProductoModal({
     }
   };
 
-  const subtotalCalculado = selectedProducto && precioUnitario !== ''
-    ? ((typeof precioUnitario === 'string' ? parseFloat(precioUnitario) : precioUnitario) * cantidad) - (descuento || 0)
-    : 0;
-
-  const formatCurrency = (value: number | string) => {
-    return parseFloat(value as any).toLocaleString('es-AR', {
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('es-AR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
@@ -116,42 +103,7 @@ export function AgregarProductoModal({
           <DialogTitle className="text-2xl font-bold text-neutral-900">Agregar Producto</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          {/* Product Selection */}
-          <div className="space-y-2">
-            <Label className="text-neutral-700 font-medium">Producto</Label>
-            {selectedProducto ? (
-              <div className="bg-neutral-50 border border-neutral-300 rounded-lg p-3">
-                <p className="font-medium text-neutral-900">{selectedProducto.nombre}</p>
-                <p className="text-sm text-neutral-600">Código: {selectedProducto.codigo}</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedProducto(null)}
-                  className="mt-2 border-neutral-300"
-                >
-                  Cambiar
-                </Button>
-              </div>
-            ) : (
-              <Combobox
-                items={filteredProductos}
-                value={searchValue}
-                onValueChange={(value) => setSearchValue(value ?? '')}
-              >
-                <ComboboxInput placeholder="Buscar producto..." className="h-10 w-full" />
-                <ComboboxContent>
-                  <ComboboxEmpty>Producto no encontrado.</ComboboxEmpty>
-                  <ComboboxList>
-                    {(item: Producto) => (
-                      <ComboboxItem key={item?.id} onClick={() => handleSelectProduct(item)}>
-                        {item?.nombre} - {item?.codigo} - Stock: {item?.stock_actual}
-                      </ComboboxItem>
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-            )}
-          </div>
+          <SelectProducto selectedProducto={selectedProducto} handleSelectProduct={handleSelectProduct} searchValue={searchValue} setSearchValue={setSearchValue}/>
 
           {selectedProducto && (
             <>
@@ -166,22 +118,6 @@ export function AgregarProductoModal({
                   min="1"
                   value={cantidad}
                   onChange={(e) => setCantidad(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="border-neutral-300"
-                />
-              </div>
-
-              {/* Precio Unitario */}
-              <div className="space-y-2">
-                <Label htmlFor="precio" className="text-neutral-700 font-medium">
-                  Precio Unitario ($)
-                </Label>
-                <Input
-                  id="precio"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={precioUnitario}
-                  onChange={(e) => setPrecioUnitario(e.target.value === '' ? '' : parseFloat(e.target.value))}
                   className="border-neutral-300"
                 />
               </div>
@@ -202,15 +138,17 @@ export function AgregarProductoModal({
                 />
               </div>
 
-              {/* Subtotal Preview */}
-              {precioUnitario !== '' && (
-                <div className="bg-neutral-100 rounded-lg p-3">
-                  <div className="flex justify-between">
-                    <span className="text-neutral-700">Subtotal:</span>
-                    <span className="font-bold text-neutral-900">${formatCurrency(subtotalCalculado)}</span>
-                  </div>
+              {/* Información de precios */}
+              <div className="bg-neutral-100 rounded-lg p-3 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-neutral-600">Precio Unitario:</span>
+                  <span className="font-semibold text-neutral-900">${formatCurrency(precioUnitario)}</span>
                 </div>
-              )}
+                <div className="flex justify-between border-t border-neutral-300 pt-2">
+                  <span className="text-neutral-700 font-medium">Subtotal:</span>
+                  <span className="font-bold text-neutral-900">${formatCurrency(subtotalCalculado)}</span>
+                </div>
+              </div>
             </>
           )}
 
@@ -229,8 +167,8 @@ export function AgregarProductoModal({
               onOpenChange(false);
               setSelectedProducto(null);
               setCantidad(1);
-              setPrecioUnitario('');
               setDescuento(0);
+              setSearchValue('');
               setError('');
             }}
             className="border-neutral-300"
@@ -241,7 +179,7 @@ export function AgregarProductoModal({
           <Button
             onClick={handleConfirm}
             disabled={isLoading || !selectedProducto}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-blue-600 hover:bg-blue-700"
           >
             {isLoading ? 'Agregando...' : 'Agregar Producto'}
           </Button>

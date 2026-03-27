@@ -5,7 +5,7 @@ import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/select";
-import { EnumCondicionVenta, NuevoPedido } from "@/types/pedido";
+import { NuevoPedido } from "@/types/pedido";
 import { Card, CardContent, CardFooter } from "../../../components/ui/card";
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "../../../components/ui/combobox";
 import { useClientes } from "../../clientes/hooks/useClientes";
@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { ListaProductosSeleccionados } from "../components/ListaProductosSeleccionados";
 import { toast } from "sonner";
+import { EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido } from "@prisma/client";
 
 export default function NuevoPedidoPage() {
     const [searchValue, setSearchValue] = useState('');
@@ -27,20 +28,24 @@ export default function NuevoPedidoPage() {
         toast.success("El pedido fue creado correctamente");
     }
 
-    const [formData, setFormData] = useState<Partial<NuevoPedido>>({
-        direccionEntrega: '',
-        fechaEstimada: '',
+    const [formData, setFormData] = useState<NuevoPedido>({
+        direccion_entrega: '',
+        fecha_entrega_estimada: new Date(),
         total: 0,
-        clienteId: undefined,
-        condicionVenta: EnumCondicionVenta.contado,
-        productos: []
+        cliente_id: undefined,
+        vendedor_id: undefined,
+        condicion_venta: EnumCondicionVenta.contado,
+        productos: [],
+        costo: 0,
+        estado: EnumEstadoPedido.registrado,
+        estado_pago: EnumEstadoPago.en_deuda
     });
 
     const filteredClientes = useMemo(() => {
         if (!searchValue || searchValue.length === 0) return clientes?.clientes || [];
+        console.log(searchValue);
         return clientes?.clientes?.filter(c =>
-            c?.nombre?.toLowerCase().includes(searchValue.toLowerCase()) ||
-            c?.apellido?.toLowerCase().includes(searchValue.toLowerCase())
+            c?.nombre?.toLowerCase().includes(searchValue?.toLowerCase())
         ) || [];
     }, [clientes?.clientes, searchValue]);
 
@@ -74,15 +79,16 @@ export default function NuevoPedidoPage() {
                             <div className="gap-2">
                                 <Label htmlFor="clienteLabel">Cliente</Label>
                                 <Combobox items={filteredClientes} value={searchValue} onValueChange={(value) => setSearchValue(value ?? '')}>
-                                    <ComboboxInput placeholder="Seleccionar cliente" className=" h-10 w-full" />
+                                    <ComboboxInput placeholder="Seleccionar cliente" className=" h-10 w-full" value={searchValue}/>
                                     <ComboboxContent>
                                         <ComboboxEmpty>Cliente no encontrado.</ComboboxEmpty>
                                         <ComboboxList>
                                             {(item: Cliente) => (
-                                                <ComboboxItem key={item?.id} value={item} onSelect={() => {
-                                                    setFormData({ ...formData, clienteId: item?.id });
+                                                <ComboboxItem key={item?.id} value={item?.nombre || ''} onSelect={() => {
+                                                    setFormData({ ...formData, cliente_id: item?.id });
+                                                    setSearchValue(item?.nombre || '');
                                                 }}>
-                                                    {item?.nombre} {item?.apellido}
+                                                    {item?.nombre}
                                                 </ComboboxItem>
                                             )}
                                         </ComboboxList>
@@ -93,9 +99,9 @@ export default function NuevoPedidoPage() {
                                 <Label htmlFor="direccionEntrega">Dirección de entrega</Label>
                                 <Input
                                     id="direccionEntrega"
-                                    value={formData.direccionEntrega}
+                                    value={formData.direccion_entrega}
                                     placeholder="Ingrese la dirección de entrega"
-                                    onChange={(e) => setFormData({ ...formData, direccionEntrega: e.target.value })}
+                                    onChange={(e) => setFormData({ ...formData, direccion_entrega: e.target.value })}
                                 />
                             </div>
                         </div>
@@ -103,13 +109,13 @@ export default function NuevoPedidoPage() {
                             <div className="gap-2">
                                 <Label htmlFor="fechaEstimada">Fecha Estimada</Label>
                                 <DatePicker
-                                    fecha={formData.fechaEstimada}
-                                    onChange={(date) => setFormData({ ...formData, fechaEstimada: date || '' })}
+                                    fecha={formData.fecha_entrega_estimada.toISOString().split('T')[0]}
+                                    onChange={(date) => setFormData({ ...formData, fecha_entrega_estimada: new Date(date!)})}
                                 />
                             </div>
                             <div className="gap-2">
                                 <Label htmlFor="condicionVenta">Condicion de venta</Label>
-                                <Select value={formData.condicionVenta} onValueChange={(value)=>setFormData({...formData, condicionVenta: value as EnumCondicionVenta})}>
+                                <Select value={formData.condicion_venta} onValueChange={(value)=>setFormData({...formData, condicion_venta: value as EnumCondicionVenta})}>
                                     <SelectTrigger className="h-10 w-full">
                                         <SelectValue placeholder="Selecciona una condicion de venta" />
                                     </SelectTrigger>

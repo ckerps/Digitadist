@@ -1,14 +1,8 @@
 'use client';
 
-import { Cliente, NuevoCliente, TipoCliente } from "@/types/cliente";
-import { useState } from "react";
+import { Cliente } from "@/types/cliente";
 import { Button } from "../../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/select";
-
-
 
 interface ClienteFormProps {
   open: boolean;

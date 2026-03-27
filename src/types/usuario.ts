@@ -1,4 +1,4 @@
-import { Usuario } from "@prisma/client";
+import Prisma from "@prisma/client";
 
 export interface NuevoUsuario {
     nombre: string;
@@ -19,6 +19,14 @@ export interface UpdateUsuario {
     password?: string;
     activo?: boolean;
 }
+
+export interface Usuario extends Prisma.Usuario {
+    rol?: {
+        id: number;
+        nombre: string;
+    };
+}
+
 
 export interface UsuarioPaginado {
   usuarios: Usuario[];

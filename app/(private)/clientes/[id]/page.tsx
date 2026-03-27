@@ -3,6 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { ArrowLeft, Edit, Trash2, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 import {
   ClienteInfoCards,
@@ -45,9 +46,9 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
       await updateCliente(+id, data);
       setIsEditModalOpen(false);
       setCurrentPage(1);
-      //@TODO: toast
+      toast.success('Cliente actualizado correctamente');
     } catch (error) {
-      //@TODO: toast
+      toast.error(`Error al actualizar el cliente: ${(error as Error).message}`);
       console.error('Error al actualizar el cliente:', error);
     }
   };
@@ -57,10 +58,10 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
       await deleteCliente(+id);
       setIsDesactivarModalOpen(false);
       setCurrentPage(1);
-      //@TODO: toast
+      toast.success('Cliente desactivado correctamente');
       router.push('/clientes');
     } catch (error) {
-      //@TODO: toast
+      toast.error(`Error al desactivar el cliente: ${(error as Error).message}`);
       console.error('Error al desactivar el cliente:', error);
     }
   };

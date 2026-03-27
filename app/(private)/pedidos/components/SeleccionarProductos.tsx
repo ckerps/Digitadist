@@ -32,10 +32,10 @@ export function SeleccionarProductos({ productosSeleccionados, agregarProducto }
                     <ComboboxList>
                         {(item: Producto) => (
                             <ComboboxItem key={item?.id} onClick={() => {
-                                handleAgregarProducto(item?.id, item?.codigo, item?.nombre, item?.costo, item?.recargo);
+                                handleAgregarProducto(item?.id, item?.codigo, item?.nombre, item?.costo, item?.porcentaje_recargo);
                                 setSearchValue('');
                             }}>
-                                {item?.nombre} - {item?.codigo} - Stock: {item?.stock_actual} - ${+item?.costo + +item?.recargo}
+                                {item?.nombre} - {item?.codigo} - Stock: {item?.stock_actual} - ${+item?.costo + +item?.porcentaje_recargo}
                             </ComboboxItem>
                         )}
                     </ComboboxList>

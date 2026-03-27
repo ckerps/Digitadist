@@ -1,9 +1,9 @@
 'use client';
 
 import { Filter, Plus, Search } from "lucide-react";
-import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
+import DebouncedInput from "../../shared/DebouncedInput";
 
 interface PedidoFiltersProps {
   searchTerm: string;
@@ -30,11 +30,10 @@ export function PedidoFilters({
         <div className="flex-1 flex flex-col sm:flex-row gap-2 md:gap-3 w-full lg:w-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar por nombre de cliente o ID"
+            <DebouncedInput
+              placeholder="Buscar por nombre de cliente, ID o email..."
               value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 border-neutral-300 focus:border-red-500 focus:ring-red-500"
+              onChange={(value) => onSearchChange(value)}
             />
           </div>
           <Select value={estadoFilter} onValueChange={onEstadoFilterChange}>
@@ -48,6 +47,7 @@ export function PedidoFilters({
               <SelectItem value="registrado">Registrado</SelectItem>
               <SelectItem value="finalizado">Finalizado</SelectItem>
               <SelectItem value="en_preparacion">En Preparación</SelectItem>
+              <SelectItem value="cancelado">Cancelado</SelectItem>
             </SelectContent>
           </Select>
           <Select value={pagoFilter} onValueChange={onPagoFilterChange}>
@@ -74,3 +74,4 @@ export function PedidoFilters({
     </div>
   );
 }
+

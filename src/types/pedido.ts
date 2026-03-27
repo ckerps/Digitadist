@@ -1,11 +1,27 @@
-import { DetallePedido, EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, Pedido, Producto, Cliente, Usuario } from "@prisma/client";
+import { DetallePedido, EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, Producto, Cliente, Usuario } from "@prisma/client";
+import { AgregarProducto } from "./producto";
 
 export interface NuevoPedido {
+  cliente_id?: number;
+  vendedor_id?: number;
+  total: number;
+  costo: number;
+  descuento?: number;
+  estado: EnumEstadoPedido;
+  estado_pago: EnumEstadoPago;
+  direccion_entrega: string;
+  fecha_entrega_estimada: Date;
+  condicion_venta: EnumCondicionVenta;
+  productos?: AgregarProducto[];
+}
+
+export interface Pedido {
+  id: number;
   cliente_id: number;
   vendedor_id: number;
   total: number;
   costo: number;
-  descuento?: number;
+  descuento?: number | null;
   estado: EnumEstadoPedido;
   estado_pago: EnumEstadoPago;
   direccion_entrega: string;
@@ -35,7 +51,7 @@ export interface NuevoDetallePedido {
   producto_id: number;
   cantidad: number;
   precio_unitario: number;
-  descuento: number;
+  descuento?: number;
   subtotal: number;
 }
 
@@ -49,6 +65,7 @@ export interface UpdateDetallePedido {
 }
 
 export interface FiltrosPedido {
+  searchTerm?: string;
   cliente_id?: number;
   vendedor_id?: number;
   estado?: EnumEstadoPedido;
@@ -60,6 +77,6 @@ export interface FiltrosPedido {
 
 export interface PedidoConProductos extends Pedido {
   detallePedidos: (DetallePedido & { producto: Producto})[];
-  cliente?: Cliente;
-  vendedor?: Usuario;
+  cliente: Cliente;
+  vendedor: Usuario;
 }

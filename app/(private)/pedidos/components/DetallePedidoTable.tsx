@@ -2,16 +2,24 @@
 
 import { DetallePedido, Producto } from "@prisma/client";
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit2 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 
 interface DetallePedidoTableProps {
   productos: (DetallePedido & { producto: Producto })[];
+  onEditarCantidad?: (detalle: DetallePedido & { producto: Producto }) => void;
   onDeleteProducto?: (productoId: number, pedidoId: number) => Promise<void>;
   isDeleting?: boolean;
+  isUpdating?: boolean;
 }
 
-export function DetallePedidoTable({ productos, onDeleteProducto, isDeleting }: DetallePedidoTableProps) {
+export function DetallePedidoTable({ 
+  productos, 
+  onEditarCantidad,
+  onDeleteProducto, 
+  isDeleting,
+  isUpdating
+}: DetallePedidoTableProps) {
   const formatCurrency = (value: any) => {
     return parseFloat(value).toLocaleString('es-AR', {
       minimumFractionDigits: 2,
@@ -22,6 +30,8 @@ export function DetallePedidoTable({ productos, onDeleteProducto, isDeleting }: 
   const totalSubtotal = productos.reduce((acc, item) => {
     return acc + parseFloat(item.subtotal as any);
   }, 0);
+
+  const hasActions = onEditarCantidad || onDeleteProducto;
 
   return (
     <div className="w-full">
@@ -35,7 +45,7 @@ export function DetallePedidoTable({ productos, onDeleteProducto, isDeleting }: 
             <TableHead className="px-4 lg:px-6 py-3 text-right text-sm font-semibold text-neutral-900">Precio Unitario</TableHead>
             <TableHead className="px-4 lg:px-6 py-3 text-right text-sm font-semibold text-neutral-900">Descuento</TableHead>
             <TableHead className="px-4 lg:px-6 py-3 text-right text-sm font-semibold text-neutral-900">Subtotal</TableHead>
-            {onDeleteProducto && <TableHead className="px-4 lg:px-6 py-3 text-center text-sm font-semibold text-neutral-900">Acción</TableHead>}
+            {hasActions && <TableHead className="px-4 lg:px-6 py-3 text-center text-sm font-semibold text-neutral-900">Acciones</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -49,17 +59,32 @@ export function DetallePedidoTable({ productos, onDeleteProducto, isDeleting }: 
                 {item.descuento ? `-$${formatCurrency(item.descuento)}` : '-'}
               </TableCell>
               <TableCell className="px-4 lg:px-6 py-3 text-sm font-semibold text-right text-neutral-900">${formatCurrency(item.subtotal)}</TableCell>
-              {onDeleteProducto && (
-                <TableCell className="px-4 lg:px-6 py-3 text-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDeleteProducto(item.producto_id, item.pedido_id)}
-                    disabled={isDeleting}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+              {hasActions && (
+                <TableCell className="px-4 lg:px-6 py-3 text-center flex gap-2 justify-center">
+                  {onEditarCantidad && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEditarCantidad(item)}
+                      disabled={isUpdating}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      title="Editar cantidad"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {onDeleteProducto && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDeleteProducto(item.producto_id, item.pedido_id)}
+                      disabled={isDeleting || isUpdating}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      title="Eliminar producto"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </TableCell>
               )}
             </TableRow>
@@ -67,9 +92,8 @@ export function DetallePedidoTable({ productos, onDeleteProducto, isDeleting }: 
         </TableBody>
         <TableFooter>
           <TableRow className="bg-neutral-100">
-            <TableCell colSpan={onDeleteProducto ? 5 : 5} className="px-4 lg:px-6 py-3 text-right font-semibold text-neutral-900">Total</TableCell>
+            <TableCell colSpan={hasActions ? 6 : 5} className="px-4 lg:px-6 py-3 text-right font-semibold text-neutral-900">Total</TableCell>
             <TableCell className="px-4 lg:px-6 py-3 text-right font-bold text-neutral-900">${formatCurrency(totalSubtotal)}</TableCell>
-            {onDeleteProducto && <TableCell></TableCell>}
           </TableRow>
         </TableFooter>
       </Table>

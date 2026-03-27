@@ -20,7 +20,6 @@ const estadoOptions = [
   { value: 'en_preparacion', label: 'En Preparación' },
   { value: 'entregado', label: 'Entregado' },
   { value: 'finalizado', label: 'Finalizado' },
-  { value: 'cancelado', label: 'Cancelado' },
 ];
 
 export function CambiarEstadoModal({

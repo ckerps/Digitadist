@@ -6,6 +6,7 @@ export const getEstadoBadge = (estado: EnumEstadoPedido) => {
     registrado: { label: 'Registrado', className: 'bg-blue-600 hover:bg-blue-700' },
     finalizado: { label: 'Finalizado', className: 'bg-neutral-600 hover:bg-neutral-700' },
     en_preparacion: { label: 'En Preparación', className: 'bg-amber-600 hover:bg-amber-700' },
+    cancelado: { label: 'Cancelado', className: 'bg-red-600 hover:bg-red-700' },
   };
   return variants[estado] || variants.registrado;
 };
