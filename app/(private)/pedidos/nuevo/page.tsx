@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { ListaProductosSeleccionados } from "../components/ListaProductosSeleccionados";
 import { toast } from "sonner";
-import { EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido } from "@prisma/client";
+import { EnumCondicionVenta, EnumEstadoPago, EnumEstadoPedido, Oferta } from "@prisma/client";
 import { usePedidosComplete } from "../hooks/usePedidosComplete";
 import { useSession } from "next-auth/react";
 
@@ -56,16 +56,33 @@ export default function NuevoPedidoPage() {
         try {
             const { productos, ...pedido } = formData;
             pedido.vendedor_id = Number(session.user.id);
-            const detalle: NuevoDetallePedido[] = productos.map(p => ({
-                producto_id: p.id,
-                cantidad: p.cantidad,
-                precio_unitario: (p.costo + (p.costo * p.recargo / 100)),
-                descuento: 0,
-                subtotal: (p.costo + (p.costo * p.recargo / 100)) * p.cantidad
-            }));
+            const detalle: NuevoDetallePedido[] = productos.map(p => {
+                const precioBase = p.costo + (p.costo * p.recargo / 100);
+                let precioFinal = precioBase;
+                let descuentoMonto = 0;
 
-            pedido.costo = detalle.reduce((acc, item) => acc + item.precio_unitario, 0);
+                if (p.oferta && p.usar_oferta !== false) {
+                    if (p.oferta.tipo === 'porcentaje') {
+                        descuentoMonto = precioBase * (p.oferta.valor / 100);
+                        precioFinal = precioBase - descuentoMonto;
+                    } else {
+                        descuentoMonto = p.oferta.valor;
+                        precioFinal = Math.max(0, precioBase - descuentoMonto);
+                    }
+                }
+
+                return {
+                    producto_id: p.id,
+                    cantidad: p.cantidad,
+                    precio_unitario: precioFinal,
+                    descuento: descuentoMonto,
+                    subtotal: precioFinal * p.cantidad
+                };
+            });
+
+            pedido.costo = detalle.reduce((acc, item) => acc + (productos.find(p => p.id === item.producto_id)?.costo || 0) * item.cantidad, 0);
             pedido.total = detalle.reduce((acc, item) => acc + item.subtotal, 0);
+            pedido.descuento = detalle.reduce((acc, item) => acc + (item.descuento || 0) * item.cantidad, 0);
             await createPedido(pedido, detalle);
             toast.success("El pedido fue creado correctamente");
             router.push('/pedidos');
@@ -94,8 +111,14 @@ export default function NuevoPedidoPage() {
         ) || [];
     }, [clientes?.clientes, searchValue]);
 
-    const handleAgregarProducto = (id: number, codigo: string, nombre: string, costo: number, recargo: number) => {
-        setFormData({ ...formData, productos: [...(formData.productos || []), { id, codigo, nombre, cantidad: 0, costo, recargo }] });
+    const handleAgregarProducto = (id: number, codigo: string, nombre: string, costo: number, recargo: number, oferta?: Oferta | null) => {
+        setFormData({ 
+            ...formData, 
+            productos: [
+                ...(formData.productos || []), 
+                { id, codigo, nombre, cantidad: 1, costo, recargo, oferta, usar_oferta: !!oferta }
+            ] 
+        });
     };
 
     const handleQuitarProducto = (id: number) => {

@@ -15,8 +15,12 @@ export interface OfertaConProducto extends Oferta {
     id: number;
     nombre: string;
     codigo: string;
+    imagen?: string | null;
+    costo: number;
+    porcentaje_recargo: number;
   };
 }
+
 
 export interface NuevaOferta {
   producto_id: number;
@@ -47,10 +51,10 @@ export interface OfertaPaginada {
 }
 
 export interface FiltrosOferta {
-  id?: number;
-  producto_id?: number;
-  tipo?: 'monto' | 'porcentaje';
-  estado?: 'activa' | 'inactiva';
+  id?: number | string;
+  producto_id?: number | string;
+  tipo?: 'monto' | 'porcentaje' | string;
+  estado?: 'activa' | 'inactiva' | string;
   fecha_inicio_desde?: string;
   fecha_inicio_hasta?: string;
   fecha_fin_desde?: string;

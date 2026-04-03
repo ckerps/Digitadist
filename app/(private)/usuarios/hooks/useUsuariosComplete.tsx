@@ -10,22 +10,22 @@ interface UseUsuariosCompleteReturn {
   usuarios: UsuarioPaginado | undefined;
   isLoadingList: boolean;
   errorList: Error | null;
-  
+
   createUsuario: (usuario: NuevoUsuario) => Promise<Usuario>;
   isCreating: boolean;
-  
+
   updateUsuario: (id: number, usuario: UpdateUsuario) => Promise<Usuario>;
   isUpdating: boolean;
-  
+
   deleteUsuario: (id: number) => Promise<void>;
   isDeleting: boolean;
-  
+
   refetchList: () => Promise<QueryObserverResult<UsuarioPaginado, Error>>;
 }
 
 export function useUsuariosComplete(
-  { itemsPerPage = 15, currentPage = 1, filters }: 
-  { itemsPerPage?: number; currentPage?: number; filters?: FiltrosUsuario } = {}
+  { itemsPerPage = 15, currentPage = 1, filters }:
+    { itemsPerPage?: number; currentPage?: number; filters?: FiltrosUsuario } = {}
 ): UseUsuariosCompleteReturn {
   const queryClient = useQueryClient();
 
@@ -38,7 +38,7 @@ export function useUsuariosComplete(
   const createMutation = useMutation({
     mutationFn: (usuario: NuevoUsuario) => usuariosApi.create(usuario),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['usuarios:list'] });
+      queryClient.invalidateQueries({ queryKey: ['usuarios:list', currentPage, itemsPerPage, filters] });
       toast.success('Usuario creado correctamente');
     },
     onError: (error: Error) => {
@@ -50,7 +50,7 @@ export function useUsuariosComplete(
     mutationFn: ({ id, data }: { id: number; data: UpdateUsuario }) =>
       usuariosApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['usuarios:list'] });
+      queryClient.invalidateQueries({ queryKey: ['usuarios:list', currentPage, itemsPerPage, filters] });
       toast.success('Usuario actualizado correctamente');
     },
     onError: (error: Error) => {
@@ -61,7 +61,7 @@ export function useUsuariosComplete(
   const deleteMutation = useMutation({
     mutationFn: (id: number) => usuariosApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['usuarios:list'] });
+      queryClient.invalidateQueries({ queryKey: ['usuarios:list', currentPage, itemsPerPage, filters] });
       toast.success('Usuario desactivado correctamente');
     },
     onError: (error: Error) => {
@@ -99,16 +99,16 @@ export function useUsuariosComplete(
     usuarios: listQuery.data,
     isLoadingList: listQuery.isLoading,
     errorList: listQuery.error as Error | null,
-    
+
     createUsuario,
     isCreating: createMutation.isPending,
-    
+
     updateUsuario,
     isUpdating: updateMutation.isPending,
-    
+
     deleteUsuario,
     isDeleting: deleteMutation.isPending,
-    
+
     refetchList,
   };
 }

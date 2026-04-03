@@ -90,10 +90,11 @@ export const NuevoProductoSchema = z.object({
     stock_actual: z.number().int().nonnegative("El stock no puede ser negativo"),
     stock_minimo: z.number().int().nonnegative().optional(),
     activo: z.boolean().default(true),
-    imagen: z.string().url("Debe ser una URL válida").optional().or(z.literal("").transform(() => undefined)),
+    imagen: z.string().optional().or(z.literal("").transform(() => undefined)),
     categoria_id: z.number().int().gt(0, "ID de categoría inválido"),
     fecha_vencimiento: z.date().optional(),
 });
+
 
 export const NuevoLogProductoSchema = z.object({
     usuario_id: z.number().int().gt(0),
@@ -165,10 +166,11 @@ export const UpdateProductoSchema = z.object({
     stock_actual: z.coerce.number().int().nonnegative().optional(),
     stock_minimo: z.coerce.number().int().nonnegative().optional(),
     activo: z.boolean().optional(),
-    imagen: z.string().url().optional().or(z.literal("").transform(() => undefined)),
+    imagen: z.string().optional().or(z.literal("").transform(() => undefined)),
     categoria_id: z.coerce.number().int().gt(0).optional(),
     fecha_vencimiento: z.coerce.date().optional(),
 });
+
 
 export const NuevoUsuarioSchema = z.object({
     nombre: z.string().min(2, "El nombre es muy corto"),
@@ -195,5 +197,5 @@ export const FiltrosUsuarioSchema = z.object({
     apellido: z.string().optional().transform(v => v === "" ? undefined : v),
     rol_id: z.coerce.number().optional(),
     email: z.string().optional().transform(v => v === "" ? undefined : v),
-    activo: z.boolean()
+    activo: z.boolean().optional()
 });

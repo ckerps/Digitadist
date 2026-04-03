@@ -19,21 +19,16 @@ import {
   CambiarPagoModal,
   AgregarProductoModal,
   EditarCantidadModal,
-  CancelarPedidoModal
+  CancelarPedidoModal,
+  PedidoTimeline
 } from '../components';
+
 import { EnumEstadoPedido, EnumEstadoPago, Producto, DetallePedido } from '@prisma/client';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Card } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 export default function PedidoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
-  const [currentPage, setCurrentPage] = useState(1);
   const [isCambiarEstadoOpen, setIsCambiarEstadoOpen] = useState(false);
   const [isCambiarPagoOpen, setIsCambiarPagoOpen] = useState(false);
   const [isAgregarProductoOpen, setIsAgregarProductoOpen] = useState(false);
@@ -157,24 +152,45 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
     }
   };
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+    }).format(value);
+  };
+
   const isDisabled = pedido.estado === 'cancelado';
   const puedeEditar = (pedido.estado == "registrado" || pedido.estado == "en_preparacion") && (pedido.estado_pago == "en_deuda");
 
   return (
-    <div className="h-full w-full space-y-4">
+    <div className="h-full w-full space-y-6">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <p className="text-muted-foreground text-sm mt-1">Pedidos</p>
+          <p className="text-muted-foreground text-sm mt-1">Detalle</p>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">Pedido #{pedido.id}</h1>
         </div>
-        <Button
-          onClick={() => router.push('/pedidos')}
-          size="lg"
-          variant="outline"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => router.push('/pedidos')}
+            size="lg"
+            variant="outline"
+            className="hidden sm:flex"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
+            onClick={() => setIsCancelarOpen(true)}
+            disabled={pedido.estado === 'cancelado'}
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Cancelar Pedido</span>
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2 flex-wrap">
@@ -185,7 +201,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
           disabled={pedido.estado === 'cancelado'}
         >
           <Clock className="h-4 w-4" />
-          <span className="hidden sm:inline">Cambiar estado</span>
+          Cambiar estado
         </Button>
         <Button
           variant="outline"
@@ -194,54 +210,96 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
           disabled={pedido.estado === 'cancelado'}
         >
           <CreditCard className="h-4 w-4" />
-          <span className="hidden sm:inline">Actualizar pago</span>
+          Actualizar pago
         </Button>
         <Button
-          variant="outline"
-          className="gap-2"
+          variant="default"
+          className="gap-2 bg-red-600 hover:bg-red-700"
           onClick={() => setIsAgregarProductoOpen(true)}
-          disabled={pedido.estado === 'cancelado'}
+          disabled={pedido.estado === 'cancelado' || pedido.estado_pago === 'pagado' || pedido.estado === 'entregado' || pedido.estado === 'finalizado'}
         >
           <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Agregar producto</span>
-        </Button>
-        <Button
-          variant="outline"
-          className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
-          onClick={() => setIsCancelarOpen(true)}
-          disabled={pedido.estado === 'cancelado'}
-        >
-          <Trash2 className="h-4 w-4" />
-          <span className="hidden sm:inline">Cancelar</span>
+          Agregar producto
         </Button>
       </div>
 
-      {/* Pedido Info */}
-      <Suspense fallback={<Skeleton className="h-32 w-full mb-6" />}>
-        <PedidoInfo pedido={pedido} />
-      </Suspense>
+      {/* Timeline Section */}
+      <Card>
+        <CardContent className="p-2 px-4">
+          <PedidoTimeline estado={pedido.estado} />
+        </CardContent>
+      </Card>
 
-      {/* Detalle Pedido Section */}
-      <div className="mb-4">
-        <h1 className="text-xl md:text-2xl font-bold text-neutral-900 inline-flex items-center">
-          <Package className="h-6 w-6 mr-2" />
-          Productos del Pedido
-        </h1>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content: Info & Item Table */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Action Buttons */}
+
+          <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+            <PedidoInfo pedido={pedido} />
+          </Suspense>
+
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
+              <Package className="h-6 w-6" />
+              Productos del Pedido
+            </h2>
+            <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm">
+              {/* Desktop Table */}
+              <div className="hidden sm:block">
+                <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                  <DetallePedidoTable productos={pedido?.detallePedidos ?? []} onEditarCantidad={handleEditarCantidad} onDeleteProducto={handleEliminarProducto} />
+                </Suspense>
+              </div>
+
+              {/* Mobile View */}
+              <div className='block sm:hidden'>
+                <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                  <MobileDetallePedidoTable productos={pedido?.detallePedidos ?? []} />
+                </Suspense>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar: Order Summary */}
+        <div className="lg:col-span-1">
+          <Card className="sticky top-6 border-neutral-200 overflow-hidden">
+            <CardHeader className="bg-neutral-50/50 border-b py-4">
+              <CardTitle className="text-lg font-bold text-foreground">Resumen del Pedido</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-medium">{formatCurrency(pedido.total + (pedido.descuento || 0))}</span>
+              </div>
+              {pedido.descuento ? (
+                <div className="flex justify-between items-center text-sm text-green-600">
+                  <span>Descuento Aplicado</span>
+                  <span className="font-medium">-{formatCurrency(pedido.descuento)}</span>
+                </div>
+              ) : null}
+              <Separator />
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-bold">Total Final</span>
+                <span className="text-2xl font-black text-red-600">
+                  {formatCurrency(pedido.total)}
+                </span>
+              </div>
+
+              <div className="pt-4 flex flex-col gap-2">
+                <div className={`p-3 rounded-lg flex items-center justify-between ${pedido.estado_pago === 'pagado' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                  <span className="text-xs font-bold uppercase tracking-wider">Estado de Pago</span>
+                  <span className="text-sm font-bold uppercase">{pedido.estado_pago.replace('_', ' ')}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* Desktop Table */}
-      <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm hidden sm:block mb-6">
-        <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-          <DetallePedidoTable productos={pedido?.detallePedidos ?? []} onEditarCantidad={handleEditarCantidad} onDeleteProducto={handleEliminarProducto} />
-        </Suspense>
-      </div>
 
-      {/* Mobile View */}
-      <div className='block sm:hidden mb-6'>
-        <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-          <MobileDetallePedidoTable productos={pedido?.detallePedidos ?? []} />
-        </Suspense>
-      </div>
+
 
       {/* Modals */}
       <CambiarEstadoModal

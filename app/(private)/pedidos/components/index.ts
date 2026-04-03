@@ -12,3 +12,4 @@ export { EditarCantidadModal } from "./EditarCantidadModal";
 export { CancelarPedidoModal } from "./CancelarPedidoModal";
 export { PedidosTableSkeleton } from "./PedidosTableSkeleton";
 export { MobilePedidosTableSkeleton } from "./MobilePedidosTableSkeleton";
+export { PedidoTimeline } from "./PedidoTimeline";

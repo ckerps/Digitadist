@@ -2,7 +2,7 @@
 import { pedidosApi } from "@/api/pedidos.api";
 import { productosApi } from "@/api/productos.api";
 import { NuevoPedido, Pedido, PedidosPaginado } from "@/types/pedido";
-import { Producto, ProductosPaginado } from "@/types/producto";
+import { FiltrosProducto, Producto, ProductosPaginado } from "@/types/producto";
 import { QueryObserverResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ interface UseProductosReturn {
   refetchList: () => Promise<QueryObserverResult<ProductosPaginado, Error>>;
 }
 
-export function useProductos({filters, itemsPerPage, currentPage}: { filters?: Partial<Producto>, itemsPerPage: number, currentPage: number }): UseProductosReturn {
+export function useProductos({filters, itemsPerPage, currentPage}: { filters?: FiltrosProducto, itemsPerPage: number, currentPage: number }): UseProductosReturn {
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({

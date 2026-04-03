@@ -42,6 +42,7 @@ export function EditarProductoModal({
     costo: producto.costo as any,
     porcentaje_recargo: producto.porcentaje_recargo,
     imagen: producto.imagen || '',
+    stock_minimo: producto.stock_minimo ?? 0
   });
 
   const handleChange = (field: string, value: any) => {
@@ -62,7 +63,7 @@ export function EditarProductoModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md overflow-auto">
         <DialogHeader>
           <DialogTitle>Editar Producto</DialogTitle>
           <DialogDescription>
@@ -70,82 +71,84 @@ export function EditarProductoModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4 text-sm">
-          <div className="grid gap-2">
-            <Label htmlFor="stock_actual" className="text-neutral-700 font-medium">
-              Stock Actual
-            </Label>
-            <Input
-              id="stock_actual"
-              type="number"
-              value={formData.stock_actual ?? ''}
-              onChange={(e) => handleChange('stock_actual', parseInt(e.target.value))}
-              placeholder="0"
-              className="border-neutral-300"
-            />
-          </div>
+        <div className="grid grid-cols-2 gap-4 py-4 text-sm">
+          <div>
+            <div className="grid gap-2">
+              <Label htmlFor="stock_actual" className="text-neutral-700 font-medium">
+                Stock Actual
+              </Label>
+              <Input
+                id="stock_actual"
+                type="number"
+                value={formData.stock_actual ?? ''}
+                onChange={(e) => handleChange('stock_actual', parseInt(e.target.value))}
+                placeholder="0"
+                className="border-neutral-300"
+              />
+            </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="stock_minimo" className="text-neutral-700 font-medium">
-              Stock Mínimo
-            </Label>
-            <Input
-              id="stock_minimo"
-              type="number"
-              value={formData.stock_minimo ?? ''}
-              onChange={(e) => handleChange('stock_minimo', parseInt(e.target.value))}
-              placeholder="0"
-              className="border-neutral-300"
-            />
-          </div>
+            <div className="grid gap-2">
+              <Label htmlFor="stock_minimo" className="text-neutral-700 font-medium">
+                Stock Mínimo
+              </Label>
+              <Input
+                id="stock_minimo"
+                type="number"
+                value={formData.stock_minimo ?? ''}
+                onChange={(e) => handleChange('stock_minimo', parseInt(e.target.value))}
+                placeholder="0"
+                className="border-neutral-300"
+              />
+            </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="costo" className="text-neutral-700 font-medium">
-              Costo
-            </Label>
-            <Input
-              id="costo"
-              type="number"
-              step="0.01"
-              value={formData.costo ?? ''}
-              onChange={(e) => handleChange('costo', parseFloat(e.target.value))}
-              placeholder="0.00"
-              className="border-neutral-300"
-            />
-          </div>
+            <div className="grid gap-2">
+              <Label htmlFor="costo" className="text-neutral-700 font-medium">
+                Costo
+              </Label>
+              <Input
+                id="costo"
+                type="number"
+                step="0.01"
+                value={formData.costo ?? ''}
+                onChange={(e) => handleChange('costo', parseFloat(e.target.value))}
+                placeholder="0.00"
+                className="border-neutral-300"
+              />
+            </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="porcentaje_recargo" className="text-neutral-700 font-medium">
-              % Recargo
-            </Label>
-            <Input
-              id="porcentaje_recargo"
-              type="number"
-              step="0.1"
-              value={formData.porcentaje_recargo ?? ''}
-              onChange={(e) => handleChange('porcentaje_recargo', parseFloat(e.target.value))}
-              placeholder="0.0"
-              className="border-neutral-300"
-            />
-          </div>
+            <div className="grid gap-2">
+              <Label htmlFor="porcentaje_recargo" className="text-neutral-700 font-medium">
+                % Recargo
+              </Label>
+              <Input
+                id="porcentaje_recargo"
+                type="number"
+                step="0.1"
+                value={formData.porcentaje_recargo ?? ''}
+                onChange={(e) => handleChange('porcentaje_recargo', parseFloat(e.target.value))}
+                placeholder="0.0"
+                className="border-neutral-300"
+              />
+            </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="fecha_vencimiento" className="text-neutral-700 font-medium">
-              Fecha Vencimiento
-            </Label>
-            <Input
-              id="fecha_vencimiento"
-              type="date"
-              value={
-                formData.fecha_vencimiento
-                  ? new Date(formData.fecha_vencimiento).toISOString().split('T')[0]
-                  : ''
-              }
-              onChange={(e) =>
-                handleChange('fecha_vencimiento', e.target.value ? new Date(e.target.value) : null)
-              }
-              className="border-neutral-300"
-            />
+            <div className="grid gap-2">
+              <Label htmlFor="fecha_vencimiento" className="text-neutral-700 font-medium">
+                Fecha Vencimiento
+              </Label>
+              <Input
+                id="fecha_vencimiento"
+                type="date"
+                value={
+                  formData.fecha_vencimiento
+                    ? new Date(formData.fecha_vencimiento).toISOString().split('T')[0]
+                    : ''
+                }
+                onChange={(e) =>
+                  handleChange('fecha_vencimiento', e.target.value ? new Date(e.target.value) : null)
+                }
+                className="border-neutral-300"
+              />
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="imagen" className="text-neutral-700 font-medium">

@@ -16,7 +16,7 @@ import { NuevaOfertaModal } from "./components/NuevaOfertaModal";
 export default function OfertasPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
-  const [filtros, setFiltros] = useState<FiltrosOferta | undefined>();
+  const [filtros, setFiltros] = useState<FiltrosOferta | undefined>({});
   const [nuevaOfertaModalOpen, setNuevaOfertaModalOpen] = useState(false);
 
   const { ofertas, isLoadingList, paginacion, createOferta } = useOfertas({

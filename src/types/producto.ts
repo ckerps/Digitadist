@@ -9,14 +9,14 @@ export interface Producto {
   costo: number;
   porcentaje_recargo: number;
   stock_actual: number;
-  stock_minimo?: number;
+  stock_minimo: number | null;
   activo: boolean;
-  imagen?: string;
+  imagen: string | null;
   categoria_id: number;
-  categoria: Categoria;
-  fecha_vencimiento?: Date;
+  categoria?: Categoria;
+  fecha_vencimiento: Date | null;
   fecha_creacion: Date;
-  fecha_actualizacion?: Date;
+  fecha_actualizacion: Date | null;
   ofertas?: Oferta[];
 }
 
@@ -27,6 +27,8 @@ export interface AgregarProducto {
   costo: number;
   recargo: number;
   cantidad: number;
+  oferta?: Oferta | null;
+  usar_oferta?: boolean;
 }
 
 export interface NuevoProducto {
@@ -94,4 +96,5 @@ export interface FiltrosProducto {
   activo?: boolean;
   categoria_id?: number;
   fecha_vencimiento?: Date;
+  pedido_id?: number;
 }

@@ -20,8 +20,12 @@ import {
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useOfertaDetail } from '../hooks/useOfertaDetail';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Package, Percent, DollarSign, Calendar, TrendingDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { ActualizarOferta } from '@/types/oferta';
 import { DatePicker } from '@/components/ui/datepicker';
+
 
 export default function OfertaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -80,58 +84,53 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
     }
   };
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+    }).format(value);
+  };
+
+  // Cálculo de precios
+  const costo = Number(oferta.producto.costo);
+  const recargo = Number(oferta.producto.porcentaje_recargo);
+  const precioOriginal = costo * (1 + recargo / 100);
+
+  const precioOferta = oferta.tipo === 'porcentaje'
+    ? precioOriginal * (1 - oferta.valor / 100)
+    : precioOriginal - oferta.valor;
+
+  const ahorro = precioOriginal - precioOferta;
+
   return (
-    <div className="full w-full space-y-6">
-      {/* Header Section */}
+    <div className="h-full w-full space-y-6">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push('/ofertas')}
-            className="text-muted-foreground hover:text-foreground hover:bg-accent"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <p className="text-sm text-muted-foreground">Ofertas</p>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              Oferta #{oferta.id}
-            </h1>
+        <div>
+          <p className="text-muted-foreground text-sm mt-1">Ofertas / Detalle</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">Oferta #{oferta.id}</h1>
+            <Badge
+              variant="outline"
+              className={oferta.activa ? 'bg-green-50 border-green-300 text-green-700' : 'bg-neutral-100 border-neutral-300 text-neutral-600'}
+            >
+              {oferta.activa ? 'Activa' : 'Inactiva'}
+            </Badge>
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2 flex-wrap">
-          <Dialog open={showRenovarDialog} onOpenChange={setShowRenovarDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <RefreshCw className="h-4 w-4" />
-                <span className="hidden sm:inline">Renovar</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Renovar Oferta</DialogTitle>
-                <DialogDescription>
-                  Selecciona la nueva fecha de vencimiento
-                </DialogDescription>
-              </DialogHeader>
-              <RenovarOfertaForm onRenovar={handleRenovar} onCancel={() => setShowRenovarDialog(false)} />
-            </DialogContent>
-          </Dialog>
-
+        <div className="flex gap-2">
           <Button
+            onClick={() => router.push('/ofertas')}
+            size="lg"
             variant="outline"
-            className="gap-2"
-            onClick={() => setEditarModalOpen(true)}
+            className="hidden sm:flex"
           >
-            <Edit className="h-4 w-4" />
-            <span className="hidden sm:inline">Editar</span>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver
           </Button>
-
           <Button
             variant="outline"
+            size="lg"
             className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
             onClick={() => setDesactivarModalOpen(true)}
           >
@@ -141,10 +140,128 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
         </div>
       </div>
 
-      {/* Info Cards Section */}
-      <Suspense fallback={<Skeleton className="h-32 w-full" />}>
-        <OfertaInfoCards oferta={oferta!} />
-      </Suspense>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Producto Card */}
+        <Card className="md:col-span-1 border-neutral-200">
+          <CardHeader className="bg-neutral-50/50 border-b py-4">
+            <CardTitle className="text-sm font-semibold text-neutral-500 uppercase flex items-center gap-2">
+              <Package className="h-4 w-4" /> Producto Asociado
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-full aspect-square max-w-[200px] bg-neutral-100 rounded-lg flex items-center justify-center overflow-hidden border">
+                {oferta.producto.imagen ? (
+                  <img src={oferta.producto.imagen} alt={oferta.producto.nombre} className="object-contain w-full h-full" />
+                ) : (
+                  <Package className="h-10 w-20 text-neutral-300" />
+                )}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-foreground">{oferta.producto.nombre}</h2>
+                <p className="text-sm text-muted-foreground font-mono">{oferta.producto.codigo}</p>
+                <Button
+                  variant="link"
+                  className="text-red-600 p-0 h-auto text-sm mt-2"
+                  onClick={() => router.push(`/productos/${oferta.producto.id}`)}
+                >
+                  Ver detalle del producto
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Detalle de Oferta Card */}
+        <div className="md:col-span-1 lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Precio Original */}
+            <Card className="border-neutral-200 shadow-sm overflow-hidden">
+              <div className="p-4 flex items-center gap-4">
+                <div className="p-2 bg-neutral-100 rounded-lg">
+                  <DollarSign className="h-5 w-5 text-neutral-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Precio Original</p>
+                  <p className="text-lg font-semibold line-through text-neutral-400">{formatCurrency(precioOriginal)}</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Precio con Oferta */}
+            <Card className="border-red-200 bg-red-50/30 shadow-sm overflow-hidden">
+              <div className="p-4 flex items-center gap-4">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <TrendingDown className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-red-600 font-bold uppercase">Precio Especial</p>
+                  <p className="text-2xl font-black text-red-600">{formatCurrency(precioOferta)}</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Descuento Aplicado */}
+            <Card className="border-neutral-200 shadow-sm overflow-hidden">
+              <div className="p-4 flex items-center gap-4">
+                <div className="p-2 bg-neutral-100 rounded-lg">
+                  <Percent className="h-5 w-5 text-neutral-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Ahorro total</p>
+                  <p className="text-lg font-bold text-green-600">
+                    {formatCurrency(ahorro)} ({oferta.tipo === 'porcentaje' ? `${oferta.valor}% OFF` : `Monto fijo`})
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Vigencia */}
+            <Card className="border-neutral-200 shadow-sm overflow-hidden">
+              <div className="p-4 flex items-center gap-4">
+                <div className="p-2 bg-neutral-100 rounded-lg">
+                  <Calendar className="h-5 w-5 text-neutral-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-muted-foreground font-medium uppercase">Vigencia</p>
+                  <p className="text-sm font-medium">
+                    {new Intl.DateTimeFormat('es-AR').format(new Date(oferta.fecha_inicio))} al {new Intl.DateTimeFormat('es-AR').format(new Date(oferta.fecha_fin))}
+                  </p>
+                </div>
+                <Dialog open={showRenovarDialog} onOpenChange={setShowRenovarDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="text-red-600 h-8 px-2 hover:bg-red-50">
+                      <RefreshCw className="h-3 w-3 mr-1" /> Renovar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Renovar Oferta</DialogTitle>
+                      <DialogDescription>
+                        Selecciona la nueva fecha de vencimiento
+                      </DialogDescription>
+                    </DialogHeader>
+                    <RenovarOfertaForm onRenovar={handleRenovar} onCancel={() => setShowRenovarDialog(false)} />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </Card>
+          </div>
+
+          {/* Action Footer */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-neutral-100">
+            <Button
+              variant="outline"
+              size="lg"
+              className="gap-2"
+              onClick={() => setEditarModalOpen(true)}
+            >
+              <Edit className="h-4 w-4" />
+              Editar Oferta
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* Modals */}
       <EditarOfertaModal
@@ -153,7 +270,7 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
         onSave={handleUpdateOferta}
         oferta={oferta}
       />
-      
+
       <DesactivarOfertaModal
         isOpen={desactivarModalOpen}
         onClose={() => setDesactivarModalOpen(false)}
@@ -163,6 +280,7 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
     </div>
   );
 }
+
 
 function RenovarOfertaForm({ onRenovar, onCancel }: { onRenovar: (fecha: string) => void; onCancel: () => void }) {
   const [nuevaFechaFin, setNuevaFechaFin] = useState("");

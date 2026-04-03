@@ -17,6 +17,16 @@ export const ProductoRepository = {
         categoria_id: filtros?.categoria_id ?? undefined,
         fecha_vencimiento: filtros?.fecha_vencimiento ?? undefined
       },
+      include: { 
+        ofertas: {
+          where: {
+            activa: true,
+            fecha_inicio: { lte: new Date() },
+            fecha_fin: { gte: new Date() }
+          }
+        },
+        categoria: true
+      },
       skip,
       take: itemsPerPage,
       orderBy: { id: 'desc' }

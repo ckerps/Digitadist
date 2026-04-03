@@ -5,7 +5,7 @@ const publicRoutes = ['/login', '/logout'];
 const adminOnlyRoutes = ['/usuarios'];
 const vendorExcludedRoutes = ['/ofertas', '/usuarios'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Las rutas públicas no necesitan autenticación

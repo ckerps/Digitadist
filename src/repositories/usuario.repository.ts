@@ -18,6 +18,7 @@ export const UsuarioRepository = {
                 email: filtros?.email ?? undefined,
                 activo: filtros?.activo ?? undefined
             },
+            include: { rol: true },
             skip,
             take: itemsPerPage,
             orderBy: { id: 'desc' }
@@ -33,9 +34,11 @@ export const UsuarioRepository = {
         }
     },
 
-    async obtenerPorId(id: number): Promise<Usuario> {
-        const usuario = await prisma.usuario.findUnique({ where: { id } });
-        return usuario;
+    async obtenerPorId(id: number): Promise<Usuario | null> {
+        return await prisma.usuario.findUnique({ 
+            where: { id },
+            include: { rol: true }
+        });
     },
 
     async crear(data: NuevoUsuario) {
@@ -47,8 +50,19 @@ export const UsuarioRepository = {
     },
 
     async actualizar(id: number, data: UpdateUsuario) {
-        const usuario = await UpdateUsuarioSchema.parse({ data })
-        const result = await prisma.usuario.update({ where: { id }, data: usuario })
+        const validado = UpdateUsuarioSchema.parse(data);
+        
+        if (validado.password) {
+            validado.password = await bcrypt.hash(validado.password, 10);
+        } else {
+            // Eliminar password si es undefined o string vacío (ya manejado por el transform del schema)
+            delete validado.password;
+        }
+
+        const result = await prisma.usuario.update({ 
+            where: { id }, 
+            data: validado 
+        });
         return result;
     },
 

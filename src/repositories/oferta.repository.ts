@@ -11,45 +11,47 @@ export class OfertaRepository {
 
     const where: any = {};
 
-    if (filtros?.id) where.id = filtros.id;
-    if (filtros?.producto_id) where.producto_id = filtros.producto_id;
-    if (filtros?.tipo) where.tipo = filtros.tipo;
+    if (filtros?.id && !isNaN(Number(filtros.id))) where.id = Number(filtros.id);
+    if (filtros?.producto_id && !isNaN(Number(filtros.producto_id))) {
+      where.producto_id = Number(filtros.producto_id);
+    }
+    if (filtros?.tipo && filtros.tipo !== '') where.tipo = filtros.tipo;
     if (filtros?.estado === 'activa') where.activa = true;
     if (filtros?.estado === 'inactiva') where.activa = false;
 
-    if (filtros?.fecha_inicio_desde) {
+    if (filtros?.fecha_inicio_desde && filtros.fecha_inicio_desde !== '') {
       where.fecha_inicio = {
         ...where.fecha_inicio,
         gte: new Date(filtros.fecha_inicio_desde),
       };
     }
-    if (filtros?.fecha_inicio_hasta) {
+    if (filtros?.fecha_inicio_hasta && filtros.fecha_inicio_hasta !== '') {
       where.fecha_inicio = {
         ...where.fecha_inicio,
         lte: new Date(filtros.fecha_inicio_hasta),
       };
     }
 
-    if (filtros?.fecha_fin_desde) {
+    if (filtros?.fecha_fin_desde && filtros.fecha_fin_desde !== '') {
       where.fecha_fin = {
         ...where.fecha_fin,
         gte: new Date(filtros.fecha_fin_desde),
       };
     }
-    if (filtros?.fecha_fin_hasta) {
+    if (filtros?.fecha_fin_hasta && filtros.fecha_fin_hasta !== '') {
       where.fecha_fin = {
         ...where.fecha_fin,
         lte: new Date(filtros.fecha_fin_hasta),
       };
     }
 
-    if (filtros?.fecha_creacion_desde) {
+    if (filtros?.fecha_creacion_desde && filtros.fecha_creacion_desde !== '') {
       where.fecha_creacion = {
         ...where.fecha_creacion,
         gte: new Date(filtros.fecha_creacion_desde),
       };
     }
-    if (filtros?.fecha_creacion_hasta) {
+    if (filtros?.fecha_creacion_hasta && filtros.fecha_creacion_hasta !== '') {
       where.fecha_creacion = {
         ...where.fecha_creacion,
         lte: new Date(filtros.fecha_creacion_hasta),
@@ -100,45 +102,47 @@ export class OfertaRepository {
   static async contar(filtros?: FiltrosOferta): Promise<number> {
     const where: any = {};
 
-    if (filtros?.id) where.id = filtros.id;
-    if (filtros?.producto_id) where.producto_id = filtros.producto_id;
-    if (filtros?.tipo) where.tipo = filtros.tipo;
+    if (filtros?.id && !isNaN(Number(filtros.id))) where.id = Number(filtros.id);
+    if (filtros?.producto_id && !isNaN(Number(filtros.producto_id))) {
+      where.producto_id = Number(filtros.producto_id);
+    }
+    if (filtros?.tipo && filtros.tipo !== '') where.tipo = filtros.tipo;
     if (filtros?.estado === 'activa') where.activa = true;
     if (filtros?.estado === 'inactiva') where.activa = false;
 
-    if (filtros?.fecha_inicio_desde) {
+    if (filtros?.fecha_inicio_desde && filtros.fecha_inicio_desde !== '') {
       where.fecha_inicio = {
         ...where.fecha_inicio,
         gte: new Date(filtros.fecha_inicio_desde),
       };
     }
-    if (filtros?.fecha_inicio_hasta) {
+    if (filtros?.fecha_inicio_hasta && filtros.fecha_inicio_hasta !== '') {
       where.fecha_inicio = {
         ...where.fecha_inicio,
         lte: new Date(filtros.fecha_inicio_hasta),
       };
     }
 
-    if (filtros?.fecha_fin_desde) {
+    if (filtros?.fecha_fin_desde && filtros.fecha_fin_desde !== '') {
       where.fecha_fin = {
         ...where.fecha_fin,
         gte: new Date(filtros.fecha_fin_desde),
       };
     }
-    if (filtros?.fecha_fin_hasta) {
+    if (filtros?.fecha_fin_hasta && filtros.fecha_fin_hasta !== '') {
       where.fecha_fin = {
         ...where.fecha_fin,
         lte: new Date(filtros.fecha_fin_hasta),
       };
     }
 
-    if (filtros?.fecha_creacion_desde) {
+    if (filtros?.fecha_creacion_desde && filtros.fecha_creacion_desde !== '') {
       where.fecha_creacion = {
         ...where.fecha_creacion,
         gte: new Date(filtros.fecha_creacion_desde),
       };
     }
-    if (filtros?.fecha_creacion_hasta) {
+    if (filtros?.fecha_creacion_hasta && filtros.fecha_creacion_hasta !== '') {
       where.fecha_creacion = {
         ...where.fecha_creacion,
         lte: new Date(filtros.fecha_creacion_hasta),

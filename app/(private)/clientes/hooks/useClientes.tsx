@@ -1,6 +1,5 @@
 import { clientesApi } from "@/api/clientes.api";
-import { Cliente } from "@prisma/client";
-import { ClientePaginado, FiltrosCliente, NuevoCliente } from "@/types/cliente";
+import { Cliente, ClientePaginado, FiltrosCliente, NuevoCliente } from "@/types/cliente";
 import { QueryObserverResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";
