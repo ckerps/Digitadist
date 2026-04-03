@@ -29,7 +29,8 @@ export default function LoginPage() {
       });
 
       if (!result?.ok) {
-        toast.error(result?.error || 'Error al iniciar sesión');
+        console.log(result?.error)
+        toast.error(result?.error ?? 'Error al iniciar sesión');
         return;
       }
 

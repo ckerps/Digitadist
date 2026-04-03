@@ -80,7 +80,7 @@ export function DetallePedidoTable({
 
   const footer = (
     <tr>
-      <td colSpan={hasActions ? 6 : 5} className="p-4 align-middle text-right font-semibold text-foreground">Total</td>
+      <td colSpan={hasActions ? 7 : 6} className="p-4 align-middle text-right font-semibold text-foreground">Total</td>
       <td className="p-4 align-middle text-right font-bold text-foreground">${formatCurrency(totalSubtotal)}</td>
     </tr>
   );

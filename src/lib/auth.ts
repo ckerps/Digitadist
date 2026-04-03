@@ -37,7 +37,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordValid) {
-          throw new Error('Contraseña incorrecta');
+          throw new Error('Credenciales inválidas');
         }
 
         return {
@@ -71,7 +71,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 días
+    maxAge: 60 * 3
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

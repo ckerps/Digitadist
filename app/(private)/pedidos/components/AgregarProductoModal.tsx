@@ -96,9 +96,10 @@ export function AgregarProductoModal({
     });
   };
 
+  console.log(open);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md overflow-visible relative">
+      <DialogContent className="sm:max-w-md overflow-visible">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-neutral-900">Agregar Producto</DialogTitle>
         </DialogHeader>
@@ -179,7 +180,6 @@ export function AgregarProductoModal({
           <Button
             onClick={handleConfirm}
             disabled={isLoading || !selectedProducto}
-            className="bg-blue-600 hover:bg-blue-700"
           >
             {isLoading ? 'Agregando...' : 'Agregar Producto'}
           </Button>

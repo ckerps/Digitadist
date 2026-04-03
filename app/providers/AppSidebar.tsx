@@ -1,13 +1,27 @@
 "use client";
 
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { User2, LayoutDashboard, BookUserIcon, ClipboardCheckIcon, BoxIcon, ChartLineIcon, UserIcon, CircleDollarSignIcon } from "lucide-react";
+import { User2, LayoutDashboard, BookUserIcon, ClipboardCheckIcon, BoxIcon, ChartLineIcon, UserIcon, CircleDollarSignIcon, Trash } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function AppSidebar() {
-  const { open } = useSidebar();
+  const { data: session } = useSession();
   const router = useRouter();
+  
+  const handleLogout = async (e: React.FormEvent) => {
+      e.preventDefault();  
+      try {
+        const result = await signOut({ redirect: true, callbackUrl: '/login' });
+      } catch (error) {
+        toast.error('Error al cerrar sesión');
+        console.error('Logout error:', error);
+      }
+    };
 
   return (
     <Sidebar className="p-2">
@@ -56,12 +70,23 @@ export default function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem className="border-t-2 border-solid pt-2">
-            <SidebarMenuButton className="justify-center" variant={'outline'}>
-              <User2 /> Username
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="items-center justify-center">
+                  <User2 /> {session?.user.name}
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-40" align="start">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem className=" hover:text-red-800" onClick={handleLogout}>
+                    <Trash className="text-red-500"/> Cerrar sesión
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-    </Sidebar>
+    </Sidebar >
   );
 }
