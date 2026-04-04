@@ -11,7 +11,12 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Digitadist App",
-  description: "Minimalist Management Portal",
+  description: "Portal de gestion de ventas",
+  manifest: "./manifest.ts",
+  icons: {
+    apple: "/apple-touch-icon.png",
+    icon: "/favicon-96x96.png"
+  }
 };
 
 import NextTopLoader from 'nextjs-toploader';
