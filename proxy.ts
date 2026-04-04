@@ -32,7 +32,7 @@ export async function proxy(request: NextRequest) {
   // Rutas solo para admin (ej: todo lo que empiece por /usuarios)
   if (
     adminOnlyRoutes.some((route) => pathname.startsWith(route)) &&
-    userRole !== 'ADMIN'
+    userRole.toLowerCase() !== 'admin'
   ) {
     return NextResponse.redirect(new URL('/', request.url));
   }
@@ -40,7 +40,7 @@ export async function proxy(request: NextRequest) {
   // Rutas excluidas para vendedor
   if (
     vendorExcludedRoutes.some((route) => pathname.startsWith(route)) &&
-    userRole === 'VENDOR'
+    userRole.toLowerCase() === 'vendedor'
   ) {
     return NextResponse.redirect(new URL('/', request.url));
   }
