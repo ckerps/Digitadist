@@ -5,8 +5,11 @@ import { Pool } from "pg";
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 const connectionString = process.env.DATABASE_URL!;
+const certBase64 = process.env.SUPABASE_CERT_BASE64;
 
-const pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
+const ca = certBase64 ? Buffer.from(certBase64, 'base64').toString('utf-8') : undefined;
+
+const pool = new Pool({ connectionString, ssl: ca ? { ca, rejectUnauthorized: true } : { rejectUnauthorized: false }, max: 1 });
 const adapter = new PrismaPg(pool);
 
 export const prisma =
