@@ -2,12 +2,8 @@ import webpush from 'web-push';
 import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
 
-// ─── VAPID setup ────────────────────────────────────────────────────────────
-webpush.setVapidDetails(
-  process.env.VAPID_EMAIL!,
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+// No llamar setVapidDetails aquí — se inicializa lazy dentro de sendPushToAll
+// para evitar errores durante el build (las env vars no existen en compile-time)
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -97,6 +93,18 @@ export async function sendPushToAll(payload: {
   body: string;
   url?: string;
 }) {
+  // Inicialización lazy: solo cuando se va a enviar (no en build-time)
+  const vapidPublic = process.env.VAPID_PUBLIC_KEY;
+  const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
+  const vapidEmail = process.env.VAPID_EMAIL;
+
+  if (!vapidPublic || !vapidPrivate || !vapidEmail) {
+    console.warn('[Push] Variables VAPID no configuradas — push omitido.');
+    return;
+  }
+
+  webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
+
   const subscriptions = await prisma.pushSubscription.findMany();
   if (subscriptions.length === 0) return;
 
@@ -114,6 +122,7 @@ export async function sendPushToAll(payload: {
     )
   );
 }
+
 
 // ─── Función principal: detecta alertas y despacha ambos canales ─────────────
 export async function dispatchAlerts() {
