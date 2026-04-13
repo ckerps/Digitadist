@@ -6,6 +6,7 @@ import { User2, LayoutDashboard, BookUserIcon, ClipboardCheckIcon, BoxIcon, Char
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 
 export default function AppSidebar() {
   const { data: session } = useSession();
@@ -23,6 +24,7 @@ export default function AppSidebar() {
 
   return (
     <Sidebar className="p-2">
+      <PushSubscriptionManager />
       <SidebarHeader className="justify-center items-center ">
         <img src={'/digitadist.png'} alt="Digitadist logo" width={200} height={100} />
       </SidebarHeader>

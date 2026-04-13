@@ -8,50 +8,10 @@ import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
-// ─── Push helpers ─────────────────────────────────────────────────────────────
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const output = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) output[i] = rawData.charCodeAt(i);
-  return output;
-}
-
-async function subscribeToPush() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
-
-  try {
-    const reg = await navigator.serviceWorker.ready;
-    const vapidRes = await fetch('/api/push/vapid-key');
-    const { publicKey } = await vapidRes.json();
-    if (!publicKey) return null;
-
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
-    });
-
-    await fetch('/api/push/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sub.toJSON()),
-    });
-
-    return sub;
-  } catch (e) {
-    console.error('[Push] Error al suscribirse:', e);
-    return null;
-  }
-}
-
-// ─── Componente ───────────────────────────────────────────────────────────────
 export function DashboardAlerts() {
   const [alertas, setAlertas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [pushEnabled, setPushEnabled] = useState(false);
   const router = useRouter();
-  const didRequestPush = useRef(false);
 
   useEffect(() => {
     const fetchAlertas = async () => {
@@ -70,33 +30,6 @@ export function DashboardAlerts() {
     fetchAlertas();
   }, []);
 
-  // Solicitar permiso push una sola vez (solo si hay alertas)
-  useEffect(() => {
-    if (!alertas.length || didRequestPush.current) return;
-    if (!('Notification' in window)) return;
-
-    didRequestPush.current = true;
-
-    const trySubscribe = async () => {
-      if (Notification.permission === 'granted') {
-        const sub = await subscribeToPush();
-        if (sub) setPushEnabled(true);
-      } else if (Notification.permission === 'default') {
-        const perm = await Notification.requestPermission();
-        if (perm === 'granted') {
-          const sub = await subscribeToPush();
-          if (sub) {
-            setPushEnabled(true);
-            toast.success('Notificaciones activadas', {
-              description: 'Recibirás alertas de stock y vencimiento.',
-            });
-          }
-        }
-      }
-    };
-    trySubscribe();
-  }, [alertas]);
-
   if (loading) {
     return <Skeleton className="w-full h-16 rounded-md mb-4" />;
   }
@@ -109,6 +42,8 @@ export function DashboardAlerts() {
   const expirAlertas = alertas.filter(
     (a) => a.tipo === 'vencido' || a.tipo === 'vencimiento_cercano'
   );
+
+  const pushEnabled = typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
 
   return (
     <div className="space-y-3 mb-6">
@@ -162,7 +97,7 @@ export function DashboardAlerts() {
         </Alert>
       )}
 
-      {/* Indicador de estado de Push */}
+      {/* Indicador de estado de Push simplificado */}
       {pushEnabled && (
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           <Bell className="w-3 h-3 text-green-500" /> Notificaciones push activadas
@@ -171,3 +106,4 @@ export function DashboardAlerts() {
     </div>
   );
 }
+

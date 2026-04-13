@@ -80,7 +80,7 @@ export async function sendAlertEmail(alertas: AlertaItem[]) {
     </div>`;
 
   await resend.emails.send({
-    from: 'Digitadist <alertas@digitadist.com>',
+    from: 'onboarding@resend.dev',
     to: adminEmails,
     subject: `⚠️ ${alertas.length} alerta(s) detectada(s) — ${new Date().toLocaleDateString('es-AR')}`,
     html,
