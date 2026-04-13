@@ -40,6 +40,7 @@ enum EnumAtributosLog {
   imagen
   categoria
   vencimiento
+  stock_actual
 }
 
 enum EnumTipoDescuento {
@@ -90,6 +91,7 @@ model Usuario {
   sessions            Session[]
   productoLogs        ProductoLog[]
   pedidos             Pedido[]
+  pushSubscriptions   PushSubscription[]
 }
 
 model Account {
@@ -232,4 +234,14 @@ model DetallePedido {
   subtotal        Float
 
   @@id([pedido_id, producto_id])
+}
+
+model PushSubscription {
+  id         Int      @id @default(autoincrement())
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  usuario_id Int?
+  usuario    Usuario? @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
 }

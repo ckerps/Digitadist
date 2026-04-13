@@ -107,7 +107,7 @@ export class PedidoService {
         const subtotalAnterior = parseFloat(detalleAnterior.subtotal as any);
         const diferenciaSubtotal = subtotalActualizado - subtotalAnterior;
 
-        // Actualizar el detalle
+        // Actualizar el detalle pasándole la diferencia de cantidad para que ajuste el stock
         await PedidoRepository.actualizarDetallePedido({
             producto_id: detalle.producto_id,
             pedido_id: pedidoId,
@@ -115,7 +115,7 @@ export class PedidoService {
             precio_unitario: precioActualizado,
             descuento: descuentoActualizado,
             subtotal: subtotalActualizado,
-        } as any);
+        } as any, cantidadActualizada - detalleAnterior.cantidad);
 
         // Actualizar totales del pedido
         const nuevoCosto = parseFloat(pedido.costo as any) + diferenciaCosto;

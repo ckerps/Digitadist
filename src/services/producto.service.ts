@@ -65,6 +65,32 @@ export class ProductoService {
                     }
                 });
             }
+
+            // Registrar cambio en stock_actual si aplica
+            if (validatedData.stock_actual !== undefined && validatedData.stock_actual !== productoActual.stock_actual) {
+                await prisma.productoLog.create({
+                    data: {
+                        usuario_id: usuarioId,
+                        producto_id: id,
+                        atributo: EnumAtributosLog.stock_actual,
+                        valor_anterior: productoActual.stock_actual.toString(),
+                        valor_nuevo: validatedData.stock_actual.toString(),
+                    }
+                });
+            }
+
+            // Registrar cambio en stock_minimo si aplica
+            if (validatedData.stock_minimo !== undefined && validatedData.stock_minimo !== productoActual.stock_minimo) {
+                await prisma.productoLog.create({
+                    data: {
+                        usuario_id: usuarioId,
+                        producto_id: id,
+                        atributo: EnumAtributosLog.stock_minimo,
+                        valor_anterior: productoActual.stock_minimo?.toString() || '0',
+                        valor_nuevo: validatedData.stock_minimo?.toString() || '0',
+                    }
+                });
+            }
         }
 
         return ProductoRepository.actualizar(id, validatedData);

@@ -1,6 +1,10 @@
 export { ProductosTable } from "./ProductosTable";
 export { MobileProductosTable } from "./MobileProductosTable";
 export { ProductoFilters } from "./ProductoFilters";
+export * from './ProductoHistorial';
+export * from './BulkEditModal';
+export * from './ImportCsvModal';
+export * from './ExportCsvButton';
 export { ProductoInfo } from './ProductoInfo';
 export { OfertasTable } from './OfertasTable';
 export { MobileOfertasTable } from './MobileOfertasTable';

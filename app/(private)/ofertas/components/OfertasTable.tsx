@@ -4,6 +4,7 @@ import { OfertaConProducto } from "@/types/oferta";
 import { DataTable, TableColumn } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import React from "react";
+import { RenovarOfertaModal } from "./RenovarOfertaModal";
 
 interface OfertasTableProps {
   ofertas: OfertaConProducto[];
@@ -76,6 +77,14 @@ export function OfertasTable({ ofertas, onRowClick }: OfertasTableProps) {
         >
           {oferta.activa ? "Activa" : "Inactiva"}
         </Badge>
+      )
+    },
+    {
+      header: "Acciones",
+      cell: (oferta) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          <RenovarOfertaModal ofertaId={oferta.id} onRenewComplete={() => window.location.reload()} />
+        </div>
       )
     }
   ];

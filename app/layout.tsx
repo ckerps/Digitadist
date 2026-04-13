@@ -12,7 +12,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Digitadist App",
   description: "Portal de gestion de ventas",
-  manifest: "./manifest.ts",
+  manifest: "/manifest.webmanifest",
   icons: {
     apple: "/apple-touch-icon.png",
     icon: "/favicon-96x96.png"
@@ -29,13 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href="/manifest.ts" />
+        <meta name="theme-color" content="#dc2626" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Digitadist" />
         <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <meta name="apple-mobile-web-app-title" content="Digitadist" />
-        <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className={`${poppins.variable} font-sans antialiased align-baseline bg-background text-foreground`}>
         <NextTopLoader color="#dc2626" showSpinner={true} />
@@ -44,6 +45,20 @@ export default function RootLayout({
             {children}
           </main>
         </SessionProvider>
+        {/* Registro del Service Worker */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('[SW] Registrado:', reg.scope))
+                    .catch(err => console.error('[SW] Error:', err));
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

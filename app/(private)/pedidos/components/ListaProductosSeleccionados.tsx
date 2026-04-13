@@ -4,7 +4,8 @@ import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { AgregarProducto } from "@/types/producto";
 import { Button } from "@/components/ui/button";
-import { Tag, Trash2, X, Percent, Check } from "lucide-react";
+import { Tag, Trash2, X, Minus, Plus } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export function ListaProductosSeleccionados({ 
@@ -67,7 +68,9 @@ export function ListaProductosSeleccionados({
     }, [setFormData]);
 
     return (
-        <div className="w-full overflow-x-auto rounded-md border border-neutral-200">
+        <div className="w-full">
+        {/* Desktop Table View */}
+        <div className="hidden md:block w-full overflow-x-auto rounded-md border border-neutral-200">
             <Table className="w-full min-w-[600px] border-collapse bg-white">
                 <TableHeader className="bg-neutral-50 font-bold">
                     <TableRow>
@@ -175,6 +178,111 @@ export function ListaProductosSeleccionados({
                     </TableRow>
                 </TableFooter>
             </Table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="flex md:hidden flex-col gap-3 w-full mt-2">
+            {productos.length === 0 ? (
+                <div className="text-center p-6 bg-neutral-50 text-neutral-500 rounded-md border border-neutral-200">
+                    No hay productos seleccionados
+                </div>
+            ) : (
+                productos.map((producto) => {
+                    const precioBase = producto.costo + (producto.costo * producto.recargo / 100);
+                    const precioFinal = calcularPrecioUnidadConOferta(producto);
+                    const tieneOferta = !!producto.oferta;
+                    const ofertaAplicada = tieneOferta && producto.usar_oferta !== false;
+
+                    return (
+                        <Card key={producto.id} className="border-neutral-200 shadow-xs">
+                            <div className="p-3 pb-2">
+                                <div className="flex justify-between items-start gap-2 mb-2">
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-sm text-neutral-900 leading-tight">{producto.nombre}</span>
+                                        <span className="text-[11px] text-neutral-500 mt-0.5">Cod: {producto.codigo}</span>
+                                        {tieneOferta && (
+                                            <button
+                                                onClick={() => toggleOferta(producto.id)}
+                                                className={cn(
+                                                    "mt-1.5 flex items-center gap-1 w-fit text-[10px] px-1.5 py-0.5 rounded font-bold uppercase transition-all",
+                                                    ofertaAplicada 
+                                                        ? "bg-red-100 text-red-700 border border-red-200" 
+                                                        : "bg-neutral-100 text-neutral-500 border border-neutral-200"
+                                                )}
+                                            >
+                                                <Tag className="h-2.5 w-2.5" />
+                                                {ofertaAplicada ? `Oferta: ${producto.oferta?.tipo === 'porcentaje' ? `${producto.oferta.valor}% OFF` : `$${producto.oferta?.valor} OFF`}` : "Aplicar Oferta"}
+                                                {ofertaAplicada && <X className="h-2.5 w-2.5 ml-1" />}
+                                            </button>
+                                        )}
+                                    </div>
+                                    {quitarProducto && (
+                                        <Button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            onClick={() => quitarProducto(producto.id)}
+                                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-between border-t border-neutral-100 mt-2 pt-2">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] uppercase tracking-wider text-neutral-400 mb-0.5 font-medium">P. Unitario</span>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className={cn("text-sm font-bold", ofertaAplicada ? "text-red-600" : "text-neutral-900")}>
+                                                ${precioFinal.toFixed(2)}
+                                            </span>
+                                            {ofertaAplicada && (
+                                                <span className="text-[10px] text-neutral-400 line-through">
+                                                    ${precioBase.toFixed(2)}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Button 
+                                            variant="outline" 
+                                            size="icon" 
+                                            className="h-8 w-8 text-neutral-600 bg-neutral-50 rounded-md"
+                                            onClick={() => actualizarCantidadProducto(producto.codigo, String(Math.max(1, producto.cantidad - 1)))}
+                                        >
+                                            <Minus className="h-3 w-3" />
+                                        </Button>
+                                        <Input
+                                            type="number"
+                                            min="1"
+                                            value={producto?.cantidad || ''}
+                                            onChange={(e) => actualizarCantidadProducto(producto.codigo, e.target.value)}
+                                            className="w-12 h-8 text-center text-sm font-semibold p-1"
+                                        />
+                                        <Button 
+                                            variant="outline" 
+                                            size="icon" 
+                                            className="h-8 w-8 text-neutral-600 bg-neutral-50 rounded-md"
+                                            onClick={() => actualizarCantidadProducto(producto.codigo, String(producto.cantidad + 1))}
+                                        >
+                                            <Plus className="h-3 w-3" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-neutral-50 p-2.5 rounded-b-md border-t border-neutral-200 flex justify-between items-center px-3">
+                                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Subtotal:</span>
+                                <span className="font-bold text-neutral-900">${(precioFinal * producto.cantidad).toFixed(2)}</span>
+                            </div>
+                        </Card>
+                    )
+                })
+            )}
+            <div className="mt-1 p-3.5 bg-neutral-900 text-white rounded-lg flex justify-between items-center shadow-md">
+                <span className="font-medium text-sm">Total Pedido</span>
+                <span className="font-bold text-lg">${suma.toFixed(2)}</span>
+            </div>
+        </div>
+
         </div>
     );
 }

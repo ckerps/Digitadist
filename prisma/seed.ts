@@ -3,16 +3,16 @@ import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 
 async function main() {
-  await prisma.detallePedido.deleteMany();
-  await prisma.pedido.deleteMany();
-  await prisma.oferta.deleteMany();
-  await prisma.productoLog.deleteMany();
-  await prisma.producto.deleteMany();
-  await prisma.categoria.deleteMany();
-  await prisma.cliente.deleteMany();
-  await prisma.usuario.deleteMany();
-  await prisma.rol.deleteMany();
-  await prisma.configuracion.deleteMany();
+  // await prisma.detallePedido.deleteMany();
+  // await prisma.pedido.deleteMany();
+  // await prisma.oferta.deleteMany();
+  // await prisma.productoLog.deleteMany();
+  // await prisma.producto.deleteMany();
+  // await prisma.categoria.deleteMany();
+  // await prisma.cliente.deleteMany();
+  // await prisma.usuario.deleteMany();
+  // await prisma.rol.deleteMany();
+  // await prisma.configuracion.deleteMany();
 
   // ========== CREAR ROLES ==========
   console.log('📋 Creando roles...');
@@ -56,7 +56,7 @@ async function main() {
     data: {
       nombre: 'Admin',
       apellido: 'Sistema',
-      email: 'admin@digitadist.com',
+      email: 'camilakerps@hotmail.com',
       telefono: '1100000000',
       password: hashedPassword,
       rol_id: rolAdmin.id,

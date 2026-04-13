@@ -56,10 +56,10 @@ export function FiltrosOfertas({ onApplyFiltros, onReset }: FiltrosOfertasProps)
 
 
   return (
-    <div className="p-2 md:p-4 border-b border-neutral-200 align-baseline">
-      <div className="flex flex-col lg:flex-row gap-2 md:gap-4 items-end justify-between align-baseline">
+    <div className="p-2 md:p-4 border-b border-neutral-200">
+      <div className="flex flex-col lg:flex-row gap-4 items-end justify-between">
         {/* Tipo */}
-        <div className="space-y-2">
+        <div className="space-y-2 w-full lg:w-auto">
           <Label htmlFor="tipo">Tipo</Label>
           <Select value={tipo} onValueChange={setTipo}>
             <SelectTrigger>
@@ -74,7 +74,7 @@ export function FiltrosOfertas({ onApplyFiltros, onReset }: FiltrosOfertasProps)
         </div>
 
         {/* Estado */}
-        <div className="space-y-2">
+        <div className="space-y-2 w-full lg:w-auto">
           <Label htmlFor="estado">Estado</Label>
           <Select value={estado} onValueChange={setEstado}>
             <SelectTrigger>
@@ -108,11 +108,11 @@ export function FiltrosOfertas({ onApplyFiltros, onReset }: FiltrosOfertasProps)
           />
         </div>
 
-        <div className="flex gap-2">
-          <Button onClick={handleApply} className="bg-red-600 hover:bg-red-700 text-white">
+        <div className="flex gap-2 w-full lg:w-auto mt-2 lg:mt-0">
+          <Button onClick={handleApply} className="bg-red-600 hover:bg-red-700 text-white flex-1 lg:flex-none">
             Buscar
           </Button>
-          <Button onClick={handleReset} variant="outline">
+          <Button onClick={handleReset} variant="outline" className="flex-1 lg:flex-none">
             Limpiar
           </Button>
         </div>

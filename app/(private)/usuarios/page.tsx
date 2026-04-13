@@ -7,7 +7,9 @@ import { useUsuariosComplete } from './hooks/useUsuariosComplete';
 import {
   UsuarioTable,
   UsuarioFilters,
-  UsuarioModal
+  UsuarioModal,
+  MobileUsuarioTable,
+  MobileUsuarioTableSkeleton
 } from './components';
 import { itemsPerPage } from '../utils';
 import { Pagination } from '../shared/Pagination';
@@ -143,19 +145,36 @@ export default function UsuariosPage() {
       {/* Data Table Section */}
       <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm">
         {isLoadingList && !usuarios ? (
-          <div className="p-6 space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
+          <>
+            <div className="hidden md:block p-6 space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+            <div className="block md:hidden p-4">
+              <MobileUsuarioTableSkeleton rows={4} />
+            </div>
+          </>
         ) : (
-          <UsuarioTable
-            usuarios={usuarios?.usuarios ?? []}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onActivate={handleActivate}
-          />
+          <>
+            <div className="hidden md:block">
+              <UsuarioTable
+                usuarios={usuarios?.usuarios ?? []}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onActivate={handleActivate}
+              />
+            </div>
+            <div className="block md:hidden">
+              <MobileUsuarioTable
+                usuarios={usuarios?.usuarios ?? []}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onActivate={handleActivate}
+              />
+            </div>
+          </>
         )}
       </div>
 

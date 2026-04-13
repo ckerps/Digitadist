@@ -6,4 +6,4 @@ export { OfertaInfoCards } from "./OfertaInfoCards";
 export * from "./EditarOfertaModal";
 export * from "./DesactivarOfertaModal";
 export * from "./NuevaOfertaModal";
-
+export * from "./RenovarOfertaModal";

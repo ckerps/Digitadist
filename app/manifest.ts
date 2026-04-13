@@ -4,48 +4,40 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Digitadist App',
     short_name: 'Digitadist',
-    lang: 'en-AR',
-    description: 'Aplicacion mobile para gestion de ventas',
+    lang: 'es-AR',
+    description: 'Aplicación mobile para gestión de ventas',
     start_url: '/',
     display: 'standalone',
+    orientation: 'portrait',
     background_color: '#f8fafc',
-    theme_color: '#f80000',
+    theme_color: '#dc2626',
+    prefer_related_applications: false,
+    categories: ['business', 'productivity'],
     icons: [
-      {
-        src: '/apple-touch-icon.png',
-        sizes: 'any',
-        type: 'image/png',
-      },
       {
         src: '/favicon-96x96.png',
         sizes: '96x96',
         type: 'image/png',
+        purpose: 'any',
       },
       {
-        src: '/favicon.ico',
-        sizes: 'any',
-        type: 'image/x-icon',
-      },
-      {
-        src: '/favicon.svg',
-        sizes: 'any',
-        type: 'image/svg+xml',
+        src: '/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/web-app-manifest-192x192.png',
         sizes: '192x192',
         type: 'image/png',
+        purpose: 'maskable',
       },
       {
         src: '/web-app-manifest-512x512.png',
         sizes: '512x512',
         type: 'image/png',
+        purpose: 'maskable',
       },
     ],
-  //   // "related_applications": [
-  //   // {
-  //   //   "platform": "web"
-  //   // }
-  // ]
   }
-}
+}

@@ -8,6 +8,9 @@ import {
   MobileProductosTable,
   ProductosTableSkeleton,
   MobileProductosTableSkeleton,
+  BulkEditModal,
+  ImportCsvModal,
+  ExportCsvButton,
 } from './components';
 import { useProductos } from './hooks/useProductos';
 import ErrorPage from '../../error';
@@ -60,14 +63,19 @@ export default function ProductosPage() {
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">Productos</h1>
           <p className="text-muted-foreground text-sm mt-1">Gestiona tu catálogo de productos</p>
         </div>
-        <Button
-          onClick={() => router.push('/productos/nuevo')}
-          size="lg"
-          className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nuevo Producto
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto overflow-x-auto whitespace-nowrap">
+          <ExportCsvButton />
+          <ImportCsvModal onImportComplete={() => setCurrentPage(1)} />
+          <BulkEditModal onUpdateComplete={() => setCurrentPage(1)} />
+          <Button
+            onClick={() => router.push('/productos/nuevo')}
+            size="lg"
+            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Producto
+          </Button>
+        </div>
       </div>
 
       {/* Filters Card */}

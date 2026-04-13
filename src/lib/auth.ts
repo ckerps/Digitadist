@@ -55,6 +55,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
+        token.name = user.name; // guardar nombre en el JWT
       }
       return token;
     },
@@ -62,6 +63,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
+        session.user.name = token.name as string; // propagar nombre a la sesión
       }
       return session;
     },
@@ -71,7 +73,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 60 * 3
+    maxAge: 60 * 60 * 8, // 8 horas
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

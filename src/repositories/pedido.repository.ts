@@ -65,73 +65,162 @@ export const PedidoRepository = {
   // },
 
   async crearDetallePedido(data: any) {
-    return await prisma.detallePedido.create({
-      data: {
-        producto_id: data.producto_id,
-        pedido_id: data.pedido_id,
-        cantidad: data.cantidad,
-        precio_unitario: data.precio_unitario,
-        descuento: data.descuento,
-        subtotal: data.subtotal,
-      }
+    return await prisma.$transaction(async (tx) => {
+      const detalle = await tx.detallePedido.create({
+        data: {
+          producto_id: data.producto_id,
+          pedido_id: data.pedido_id,
+          cantidad: data.cantidad,
+          precio_unitario: data.precio_unitario,
+          descuento: data.descuento,
+          subtotal: data.subtotal,
+        }
+      });
+
+      await tx.producto.update({
+        where: { id: data.producto_id },
+        data: { stock_actual: { decrement: data.cantidad } }
+      });
+
+      return detalle;
     });
   },
 
   async crearConDetalle(pedido: NuevoPedido, detalle: NuevoDetallePedido[]) {
-    return await prisma.pedido.create({
-      data: {
-        cliente_id: pedido.cliente_id!,
-        vendedor_id: pedido.vendedor_id!,
-        ...pedido,
-        detallePedidos: {
-          create: detalle.map(d => ({
-            producto_id: d.producto_id,
-            cantidad: d.cantidad,
-            precio_unitario: d.precio_unitario,
-            descuento: d.descuento,
-            subtotal: d.subtotal
-          }))
-        }
-      },
-      include: { detallePedidos: true }
+    return await prisma.$transaction(async (tx) => {
+      const nuevoPedido = await tx.pedido.create({
+        data: {
+          cliente_id: pedido.cliente_id!,
+          vendedor_id: pedido.vendedor_id!,
+          ...pedido,
+          detallePedidos: {
+            create: detalle.map(d => ({
+              producto_id: d.producto_id,
+              cantidad: d.cantidad,
+              precio_unitario: d.precio_unitario,
+              descuento: d.descuento,
+              subtotal: d.subtotal
+            }))
+          }
+        },
+        include: { detallePedidos: true }
+      });
+
+      for (const item of detalle) {
+        await tx.producto.update({
+          where: { id: item.producto_id },
+          data: { stock_actual: { decrement: item.cantidad } }
+        });
+      }
+
+      return nuevoPedido;
     });
   },
 
   async actualizar(id: number, data: UpdatePedido) {
-    const result = await prisma.pedido.update({ where: { id }, data: data })
-    return result;
+    return await prisma.$transaction(async (tx) => {
+      const pedidoAnterior = await tx.pedido.findUnique({
+        where: { id },
+        include: { detallePedidos: true }
+      });
+
+      if (!pedidoAnterior) throw new Error("Pedido no encontrado");
+
+      const result = await tx.pedido.update({ where: { id }, data: data });
+
+      // Check if it's being cancelled and wasn't before
+      if (data.estado === EnumEstadoPedido.cancelado && pedidoAnterior.estado !== EnumEstadoPedido.cancelado) {
+        for (const item of pedidoAnterior.detallePedidos) {
+          await tx.producto.update({
+            where: { id: item.producto_id },
+            data: { stock_actual: { increment: item.cantidad } }
+          });
+        }
+      }
+      
+      // Check if it was cancelled and is now being reactivated
+      if (pedidoAnterior.estado === EnumEstadoPedido.cancelado && data.estado && data.estado !== EnumEstadoPedido.cancelado) {
+        for (const item of pedidoAnterior.detallePedidos) {
+          await tx.producto.update({
+            where: { id: item.producto_id },
+            data: { stock_actual: { decrement: item.cantidad } }
+          });
+        }
+      }
+
+      return result;
+    });
   },
 
-  async actualizarDetallePedido(data: UpdateDetallePedido) {
-    const result = await prisma.detallePedido.update({
-      where: {
-        pedido_id_producto_id: {
-          pedido_id: data.pedido_id,
-          producto_id: data.producto_id
-        }
-      }, data
-    })
-    return result;
+  async actualizarDetallePedido(data: UpdateDetallePedido, diferenciaCantidad: number = 0) {
+    return await prisma.$transaction(async (tx) => {
+      const result = await tx.detallePedido.update({
+        where: {
+          pedido_id_producto_id: {
+            pedido_id: data.pedido_id!,
+            producto_id: data.producto_id!
+          }
+        }, data
+      });
+
+      if (diferenciaCantidad !== 0) {
+        await tx.producto.update({
+          where: { id: data.producto_id! },
+          data: { stock_actual: { decrement: diferenciaCantidad } }
+        });
+      }
+
+      return result;
+    });
   },
 
   async eliminar(id: number) {
-    const result = await prisma.pedido.update({
-      where: { id }, data: {
-        estado: EnumEstadoPedido.cancelado
+    return await prisma.$transaction(async (tx) => {
+      const pedidoAActualizar = await tx.pedido.findUnique({
+        where: { id },
+        include: { detallePedidos: true }
+      });
+      
+      if (!pedidoAActualizar) throw new Error("Pedido no encontrado");
+
+      if (pedidoAActualizar.estado === EnumEstadoPedido.cancelado) {
+        return pedidoAActualizar; // ya está cancelado
       }
-    })
-    return result;
+
+      const result = await tx.pedido.update({
+        where: { id }, data: {
+          estado: EnumEstadoPedido.cancelado
+        }
+      });
+
+      for (const item of pedidoAActualizar.detallePedidos) {
+        await tx.producto.update({
+          where: { id: item.producto_id },
+          data: { stock_actual: { increment: item.cantidad } }
+        });
+      }
+
+      return result;
+    });
   },
 
   async eliminarDetallePedido(producto_id: number, pedido_id: number) {
-    const result = await prisma.detallePedido.delete({
-      where: {
-        pedido_id_producto_id: {
-          pedido_id,
-          producto_id
+    return await prisma.$transaction(async (tx) => {
+      const result = await tx.detallePedido.delete({
+        where: {
+          pedido_id_producto_id: {
+            pedido_id,
+            producto_id
+          }
         }
-      }
-    })
-    return result;
+      });
+
+      await tx.producto.update({
+        where: { id: producto_id },
+        data: { stock_actual: { increment: result.cantidad } }
+      });
+
+      return result;
+    });
   }
 };
