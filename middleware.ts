@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-const publicRoutes = ['/login', '/logout'];
+const publicRoutes = ['/login', '/logout', '/manifest.webmanifest'];
 const adminOnlyRoutes = ['/usuarios'];
 const vendorExcludedRoutes = ['/ofertas', '/usuarios'];
 
