@@ -7,10 +7,16 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const body = await request.json();
+    console.log('[Push] Payload recibido:', body);
     const { endpoint, keys } = body;
 
     if (!endpoint || !keys?.p256dh || !keys?.auth) {
-      return NextResponse.json({ error: 'Datos de suscripción inválidos' }, { status: 400 });
+      console.warn('[Push] Datos inválidos:', { 
+        endpoint: !!endpoint, 
+        p256dh: !!keys?.p256dh, 
+        auth: !!keys?.auth 
+      });
+      return NextResponse.json({ error: 'Datos de suscripción inválidos (faltan llaves o endpoint)' }, { status: 400 });
     }
 
     const userId = (session?.user as any)?.id ?? null;
