@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
- 
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Digitadist App',
@@ -15,29 +15,23 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ['business', 'productivity'],
     icons: [
       {
-        src: '/favicon-96x96.png',
-        sizes: '96x96',
+        src: '/web-app-manifest-192x192.png',
+        sizes: '192x192',
         type: 'image/png',
-        purpose: 'any',
-      },
-      {
-        src: '/apple-touch-icon.png',
-        sizes: '180x180',
-        type: 'image/png',
-        purpose: 'any',
+        purpose: 'any', // Android necesita 'any' para el icono normal
       },
       {
         src: '/web-app-manifest-192x192.png',
         sizes: '192x192',
         type: 'image/png',
-        purpose: 'maskable',
+        purpose: 'maskable', // Para iconos adaptativos
       },
       {
         src: '/web-app-manifest-512x512.png',
         sizes: '512x512',
         type: 'image/png',
-        purpose: 'maskable',
+        purpose: 'any',
       },
     ],
   }
-}
+}
