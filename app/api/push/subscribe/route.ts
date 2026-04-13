@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Datos de suscripción inválidos (faltan llaves o endpoint)' }, { status: 400 });
     }
 
-    const userId = (session?.user as any)?.id ?? null;
+    const userIdRaw = (session?.user as any)?.id;
+    const userId = userIdRaw ? parseInt(userIdRaw) : null;
 
     await prisma.pushSubscription.upsert({
       where: { endpoint },

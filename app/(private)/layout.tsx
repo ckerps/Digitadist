@@ -21,6 +21,7 @@ export default function RootLayout({
                   {children}
                 </div>
               </main>
+              <Toaster richColors position="top-right" />
             </SidebarProvider>
           </QueryProvider>
         </SessionProvider>
