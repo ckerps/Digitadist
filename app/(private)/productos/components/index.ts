@@ -12,3 +12,4 @@ export { EditarProductoModal } from './EditarProductoModal';
 export { DesactivarProductoModal } from './DesactivarProductoModal';
 export { ProductosTableSkeleton } from './ProductosTableSkeleton';
 export { MobileProductosTableSkeleton } from './MobileProductosTableSkeleton';
+export { CrearProductoModal } from './CrearProductoModal';

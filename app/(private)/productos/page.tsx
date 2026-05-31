@@ -11,8 +11,9 @@ import {
   BulkEditModal,
   ImportCsvModal,
   ExportCsvButton,
+  CrearProductoModal,
 } from './components';
-import { useProductos } from './hooks/useProductos';
+import { useProductosComplete } from './hooks/useProductosComplete';
 import ErrorPage from '../../error';
 import { itemsPerPage } from '../utils';
 import { Pagination } from '../shared/Pagination';
@@ -24,13 +25,14 @@ export default function ProductosPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [actividadFilter, setActividadFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCrearModalOpen, setIsCrearModalOpen] = useState(false);
 
   const filters = {
     nombre: searchTerm.length > 0 ? searchTerm : undefined,
     activo: actividadFilter === 'all' ? undefined : actividadFilter === 'activo',
   };
 
-  const { productos, isLoadingList, errorList } = useProductos({
+  const { productos, isLoadingList, errorList, createProducto } = useProductosComplete({
     itemsPerPage,
     currentPage,
     filters: filters as any,
@@ -68,7 +70,7 @@ export default function ProductosPage() {
           <ImportCsvModal onImportComplete={() => setCurrentPage(1)} />
           <BulkEditModal onUpdateComplete={() => setCurrentPage(1)} />
           <Button
-            onClick={() => router.push('/productos/nuevo')}
+            onClick={() => setIsCrearModalOpen(true)}
             size="lg"
             className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
           >
@@ -128,6 +130,15 @@ export default function ProductosPage() {
           onPageChange={setCurrentPage}
         />
       </div>
+
+      <CrearProductoModal
+        open={isCrearModalOpen}
+        onOpenChange={setIsCrearModalOpen}
+        onSave={async (data) => {
+          await createProducto(data);
+          setCurrentPage(1);
+        }}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { OfertaConProducto, OfertaPaginada, NuevaOferta, ActualizarOferta, RenovarOferta } from "@/types/oferta";
 import { OfertaRepository } from "@/repositories/oferta.repository";
+import { NuevaOfertaSchema } from "@/repositories/zodSchemas";
 
 export class OfertaService {
   static async obtenerTodos(
@@ -32,13 +33,14 @@ export class OfertaService {
   }
 
   static async crear(data: NuevaOferta): Promise<OfertaConProducto> {
+    const validatedData = NuevaOfertaSchema.parse(data);
     const oferta = await OfertaRepository.crear({
-      producto_id: data.producto_id,
-      tipo: data.tipo,
-      valor: data.valor,
-      fecha_inicio: new Date(data.fecha_inicio),
-      fecha_fin: new Date(data.fecha_fin),
-      activa: true,
+      producto_id: validatedData.producto_id,
+      tipo: validatedData.tipo,
+      valor: validatedData.valor,
+      fecha_inicio: validatedData.fecha_inicio,
+      fecha_fin: validatedData.fecha_fin,
+      activa: validatedData.activa ?? true,
     });
     return oferta as OfertaConProducto;
   }

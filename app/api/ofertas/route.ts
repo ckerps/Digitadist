@@ -44,13 +44,14 @@ export async function POST(req: Request) {
     
     return NextResponse.json(resultado, { status: 201 });
   } catch (error: any) {
-    if (error instanceof z.ZodError) {
+    if (error instanceof z.ZodError) { 
       return NextResponse.json({ 
         type: "ValidationError", 
         details: error.flatten().fieldErrors 
       }, { status: 400 });
     }
 
+    console.error("OFERTAS ERROR 500:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Edit, Trash2, Tag, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -25,10 +25,18 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const [isDesactivarModalOpen, setIsDesactivarModalOpen] = useState(false);
   const router = useRouter();
 
-  const { producto, deleteProducto, updateProducto, isLoadingDetail, errorDetail, isUpdating, isDeleting } =
-    useProductoDetail({ productoId: +id });
+  const isNuevo = id === 'nuevo';
 
-  if (isLoadingDetail) {
+  useEffect(() => {
+    if (isNuevo) {
+      router.replace('/productos');
+    }
+  }, [isNuevo, router]);
+
+  const { producto, deleteProducto, updateProducto, isLoadingDetail, errorDetail, isUpdating, isDeleting } =
+    useProductoDetail({ productoId: isNuevo ? 0 : +id });
+
+  if (isNuevo || isLoadingDetail) {
     return <LoadingPage />;
   }
 
