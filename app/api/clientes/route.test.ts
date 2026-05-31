@@ -99,5 +99,26 @@ describe('Clientes API', () => {
       const json = await res.json();
       expect(json.error).toBe('Ya existe un cliente con ese CUIT');
     });
+
+    it('debería retornar 500 si hay un error inesperado', async () => {
+      prismaMock.cliente.findUnique.mockRejectedValue(new Error('Error de base de datos'));
+
+      const req = new Request('http://localhost/api/clientes', {
+        method: 'POST',
+        body: JSON.stringify({
+          nombre: 'Cliente Error',
+          telefono: '1123456789',
+          cuit: '20111111111',
+          direccion: 'Calle Falsa',
+          tipo: 'persona',
+          email: 'error@test.com',
+          activo: true
+        }),
+      });
+
+      const res = await POST(req);
+
+      expect(res.status).toBe(500);
+    });
   });
 });

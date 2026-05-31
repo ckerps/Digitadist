@@ -3,8 +3,73 @@ import { NextRequest, NextResponse } from 'next/server';
 import { UpdateDetallePedidoSchema } from '@/repositories/zodSchemas';
 
 /**
- * PATCH /api/pedidos/[id]/detalles/[productoId]
- * Actualiza la cantidad de un producto en el pedido
+ * @swagger
+ * /api/pedidos/{id}/detalles/{productoId}:
+ *   patch:
+ *     summary: Actualiza la cantidad o datos de un producto (detalle) en el pedido
+ *     tags: [Pedidos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del pedido
+ *       - in: path
+ *         name: productoId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del producto a modificar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               cantidad:
+ *                 type: integer
+ *               precio_unitario:
+ *                 type: number
+ *               descuento:
+ *                 type: number
+ *               subtotal:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Producto en el pedido actualizado exitosamente
+ *       400:
+ *         description: IDs inválidos o datos incorrectos
+ *       404:
+ *         description: El pedido o el producto no existe en el pedido
+ *       500:
+ *         description: Error al actualizar producto en el pedido
+ *   delete:
+ *     summary: Elimina un producto (detalle) del pedido
+ *     tags: [Pedidos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del pedido
+ *       - in: path
+ *         name: productoId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del producto a eliminar del pedido
+ *     responses:
+ *       200:
+ *         description: Producto eliminado del pedido exitosamente
+ *       400:
+ *         description: IDs inválidos
+ *       404:
+ *         description: El pedido o el producto no existe en el pedido
+ *       500:
+ *         description: Error al eliminar producto del pedido
  */
 export async function PATCH(
   request: NextRequest,
@@ -39,7 +104,7 @@ export async function PATCH(
 
     return NextResponse.json(pedidoActualizado, { status: 200 });
   } catch (error: any) {
-    console.error('Error al actualizar producto en pedido:', error);
+    console.log('Error al actualizar producto en pedido:', error);
 
     if (error.message?.includes('no existe')) {
       return NextResponse.json({ error: error.message }, { status: 404 });
@@ -49,10 +114,6 @@ export async function PATCH(
   }
 }
 
-/**
- * DELETE /api/pedidos/[id]/detalles/[productoId]
- * Elimina un producto del pedido
- */
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string; productoId: string }> }
@@ -70,7 +131,7 @@ export async function DELETE(
 
     return NextResponse.json(pedidoActualizado, { status: 200 });
   } catch (error: any) {
-    console.error('Error al eliminar producto del pedido:', error);
+    console.log('Error al eliminar producto del pedido:', error);
 
     if (error.message?.includes('no existe')) {
       return NextResponse.json({ error: error.message }, { status: 404 });

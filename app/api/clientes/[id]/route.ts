@@ -3,12 +3,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as z from 'zod';
 
 /**
- * GET /api/clientes/[id]
- * Obtiene un cliente por ID
+ * @swagger
+ * /api/clientes/{id}:
+ *   get:
+ *     summary: Obtiene un cliente por ID
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del cliente a obtener
+ *     responses:
+ *       200:
+ *         description: Cliente obtenido exitosamente
+ *       400:
+ *         description: ID inválido
+ *       404:
+ *         description: Cliente no encontrado
+ *       500:
+ *         description: Error al obtener cliente
  */
-
 export async function GET(
-  _request: NextRequest, // Agregado para mantener consistencia
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -23,7 +41,7 @@ export async function GET(
     return NextResponse.json(cliente, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al obtener cliente:', error);
+    console.log('Error al obtener cliente:', error);
 
     if (error.message === 'CLIENTE_NOT_FOUND') {
       return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 });
@@ -33,8 +51,46 @@ export async function GET(
 }
 
 /**
- * PUT /api/clientes/[id]
- * Actualiza un cliente existente
+ * @swagger
+ * /api/clientes/{id}:
+ *   put:
+ *     summary: Actualiza un cliente existente
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del cliente a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               cuit:
+ *                 type: string
+ *               telefono:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               direccion:
+ *                 type: string
+ *               activo:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Cliente actualizado exitosamente
+ *       400:
+ *         description: Datos inválidos
+ *       404:
+ *         description: Cliente no encontrado
+ *       500:
+ *         description: Error interno del servidor
  */
 export async function PUT(
   request: NextRequest,
@@ -50,12 +106,12 @@ export async function PUT(
     return NextResponse.json(clienteActualizado, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al actualizar cliente:', error);
-    
+    console.log('Error al actualizar cliente:', error);
+
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        error: 'Datos inválidos', 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        error: 'Datos inválidos',
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 
@@ -68,10 +124,26 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/clientes/[id]
- * Elimina (desactiva) un cliente
+ * @swagger
+ * /api/clientes/{id}:
+ *   delete:
+ *     summary: Elimina (desactiva) un cliente
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del cliente a eliminar
+ *     responses:
+ *       200:
+ *         description: Cliente eliminado correctamente
+ *       404:
+ *         description: Cliente no encontrado
+ *       500:
+ *         description: Error al eliminar cliente
  */
-
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -85,7 +157,7 @@ export async function DELETE(
     return NextResponse.json({ success: true, message: 'Cliente eliminado correctamente' }, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al eliminar cliente:', error);
+    console.log('Error al eliminar cliente:', error);
 
     if (error.message === 'Cliente no encontrado') {
       return NextResponse.json({ error: error.message }, { status: 404 });

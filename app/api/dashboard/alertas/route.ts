@@ -5,6 +5,35 @@ import { prisma } from '@/lib/prisma';
 // Clave para debounce: sólo enviamos alertas una vez cada 24 horas
 const DEBOUNCE_KEY = 'ultima_alerta_enviada';
 
+/**
+ * @swagger
+ * /api/dashboard/alertas:
+ *   get:
+ *     summary: Obtiene alertas del sistema (stock crítico, stock bajo, vencidos, vencimientos cercanos) y notifica vía push si corresponde
+ *     tags: [Dashboard]
+ *     responses:
+ *       200:
+ *         description: Alertas obtenidas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 alertas:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       tipo:
+ *                         type: string
+ *                         enum: [stock_critico, stock_bajo, vencido, vencimiento_cercano]
+ *                       producto:
+ *                         type: object
+ *                       mensaje:
+ *                         type: string
+ *       500:
+ *         description: Error interno del servidor
+ */
 export async function GET() {
   try {
     const config = await prisma.configuracion.findUnique({
@@ -64,13 +93,13 @@ export async function GET() {
         });
 
         // Disparar alertas en background (no bloquear la respuesta)
-        dispatchAlerts().catch(console.error);
+        dispatchAlerts().catch(console.log);
       }
     }
 
     return NextResponse.json({ alertas }, { status: 200 });
   } catch (e) {
-    console.error(e);
+    console.log(e);
     return NextResponse.json({ error: 'Error al cargar alertas' }, { status: 500 });
   }
 }

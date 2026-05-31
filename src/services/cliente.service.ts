@@ -13,7 +13,7 @@ export class ClienteService {
         const cliente = await ClienteRepository.obtenerPorId(id);
 
         if (!cliente) {
-            throw new Error("El cliente no existe");
+            throw new Error("CLIENTE_NOT_FOUND");
         }
 
         return cliente;
@@ -32,7 +32,7 @@ export class ClienteService {
 
     static async actualizar(id: number, data: UpdateCliente) {
         if (id <= 0) throw new Error("ID inválido");
-        
+
         const validatedData = UpdateClienteSchema.parse(data);
 
         const clienteActual = await ClienteRepository.obtenerPorId(id);

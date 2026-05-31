@@ -39,7 +39,7 @@ export default function LoginPage() {
       router.push(callbackUrl);
     } catch (error) {
       toast.error('Error al iniciar sesión');
-      console.error('Login error:', error);
+      console.log('Login error:', error);
     } finally {
       setLoading(false);
     }

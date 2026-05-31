@@ -93,7 +93,7 @@ export default function NuevoPedidoPage() {
 
     const [formData, setFormData] = useState<NuevoPedido>({
         direccion_entrega: '',
-        fecha_entrega_estimada: new Date(),
+        fecha_entrega_estimada: new Date(Date.now() + 7* 24 * 60 * 60 * 1000),
         total: 0,
         cliente_id: undefined,
         vendedor_id: undefined,

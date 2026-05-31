@@ -26,6 +26,7 @@ export function useClientes({ itemsPerPage, currentPage, filters}: { itemsPerPag
   const createMutation = useMutation({
     mutationFn: (cliente: NuevoCliente) => clientesApi.create(cliente),
     onSuccess: () => {
+      toast.success('Cliente creado correctamente');
       queryClient.invalidateQueries({ queryKey: ['clientes:list'] });
     },
     onError: (error: Error) => {

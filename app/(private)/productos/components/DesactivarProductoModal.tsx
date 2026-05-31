@@ -32,7 +32,7 @@ export function DesactivarProductoModal({
       await onConfirm();
       onClose();
     } catch (error) {
-      console.error('Error al desactivar producto:', error);
+      console.log('Error al desactivar producto:', error);
     }
   };
 

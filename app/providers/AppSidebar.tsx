@@ -18,7 +18,7 @@ export default function AppSidebar() {
       const result = await signOut({ redirect: true, callbackUrl: '/login' });
     } catch (error) {
       toast.error('Error al cerrar sesión');
-      console.error('Logout error:', error);
+      console.log('Logout error:', error);
     }
   };
 

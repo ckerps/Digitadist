@@ -33,7 +33,7 @@ export function ProductoHistorial({ productoId }: { productoId: number }) {
           setLogs(data);
         }
       } catch (e) {
-        console.error("Error loading logs");
+        console.log("Error loading logs");
       } finally {
         setLoading(false);
       }

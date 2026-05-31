@@ -65,7 +65,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Estado del pedido actualizado correctamente');
     } catch (error) {
       toast.error(`Error al cambiar estado del pedido: ${(error as Error).message}`);
-      console.error('Error al cambiar estado del pedido:', error);
+      console.log('Error al cambiar estado del pedido:', error);
     }
   };
 
@@ -75,7 +75,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Estado de pago actualizado correctamente');
     } catch (error) {
       toast.error(`Error al cambiar pago del pedido: ${(error as Error).message}`);
-      console.error('Error al cambiar pago del pedido:', error);
+      console.log('Error al cambiar pago del pedido:', error);
     }
   };
 
@@ -92,7 +92,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Producto agregado al pedido correctamente');
     } catch (error) {
       toast.error(`Error al agregar producto: ${(error as Error).message}`);
-      console.error('Error al agregar producto:', error);
+      console.log('Error al agregar producto:', error);
     }
   };
 
@@ -114,7 +114,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Cantidad actualizada correctamente');
     } catch (error) {
       toast.error(`Error al editar cantidad: ${(error as Error).message}`);
-      console.error('Error al editar cantidad:', error);
+      console.log('Error al editar cantidad:', error);
     }
   };
 
@@ -132,7 +132,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Producto eliminado del pedido correctamente');
     } catch (error) {
       toast.error(`Error al eliminar producto: ${(error as Error).message}`);
-      console.error('Error al eliminar producto:', error);
+      console.log('Error al eliminar producto:', error);
     }
   };
 
@@ -148,7 +148,7 @@ export default function PedidoDetailPage({ params }: { params: Promise<{ id: str
       router.push('/pedidos');
     } catch (error) {
       toast.error(`Error al cancelar el pedido: ${(error as Error).message}`);
-      console.error('Error al cancelar el pedido:', error);
+      console.log('Error al cancelar el pedido:', error);
     }
   };
 

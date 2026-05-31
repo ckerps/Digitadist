@@ -54,7 +54,7 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
       router.push('/ofertas');
     } catch (error) {
       toast.error(`Error al desactivar la oferta: ${(error as Error).message}`);
-      console.error('Error al desactivar la oferta:', error);
+      console.log('Error al desactivar la oferta:', error);
     }
   };
 
@@ -69,7 +69,7 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Oferta renovada correctamente');
     } catch (error) {
       toast.error(`Error al renovar la oferta: ${(error as Error).message}`);
-      console.error('Error al renovar la oferta:', error);
+      console.log('Error al renovar la oferta:', error);
     }
   };
 
@@ -80,7 +80,7 @@ export default function OfertaDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Oferta actualizada correctamente');
     } catch (error) {
       toast.error(`Error al actualizar la oferta: ${(error as Error).message}`);
-      console.error('Error al actualizar la oferta:', error);
+      console.log('Error al actualizar la oferta:', error);
     }
   };
 

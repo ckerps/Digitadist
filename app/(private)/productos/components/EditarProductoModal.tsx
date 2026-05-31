@@ -57,7 +57,7 @@ export function EditarProductoModal({
       await onSave(formData);
       onClose();
     } catch (error) {
-      console.error('Error al guardar producto:', error);
+      console.log('Error al guardar producto:', error);
     }
   };
 

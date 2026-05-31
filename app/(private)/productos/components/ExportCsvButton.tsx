@@ -44,7 +44,7 @@ export function ExportCsvButton() {
       toast.success("Catálogo exportado exitosamente");
     } catch (e) {
       toast.error("Error al exportar a CSV");
-      console.error(e);
+      console.log(e);
     }
   };
 

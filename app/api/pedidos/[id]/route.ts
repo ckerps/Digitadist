@@ -3,10 +3,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as z from 'zod';
 
 /**
- * GET /api/pedidos/[id]
- * Obtiene un pedido por ID
+ * @swagger
+ * /api/pedidos/{id}:
+ *   get:
+ *     summary: Obtiene un pedido por ID
+ *     tags: [Pedidos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del pedido a obtener
+ *     responses:
+ *       200:
+ *         description: Pedido obtenido exitosamente
+ *       400:
+ *         description: ID inválido
+ *       404:
+ *         description: Pedido no encontrado
+ *       500:
+ *         description: Error al obtener pedido
  */
-
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -23,7 +41,7 @@ export async function GET(
     return NextResponse.json(pedido, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al obtener pedido:', error);
+    console.log('Error al obtener pedido:', error);
 
     if (error.message === 'El pedido no existe') {
       return NextResponse.json({ error: 'Pedido no encontrado' }, { status: 404 });
@@ -33,8 +51,42 @@ export async function GET(
 }
 
 /**
- * PUT /api/pedidos/[id]
- * Actualiza un pedido existente
+ * @swagger
+ * /api/pedidos/{id}:
+ *   put:
+ *     summary: Actualiza un pedido existente (ej. su estado o datos)
+ *     tags: [Pedidos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del pedido a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               estado:
+ *                 type: string
+ *               estado_pago:
+ *                 type: string
+ *               direccion_entrega:
+ *                 type: string
+ *               condicion_venta:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Pedido actualizado exitosamente
+ *       400:
+ *         description: Datos inválidos
+ *       404:
+ *         description: El pedido a modificar no existe
+ *       500:
+ *         description: Error interno del servidor
  */
 export async function PUT(
   request: NextRequest,
@@ -50,12 +102,12 @@ export async function PUT(
     return NextResponse.json(pedidoActualizado, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al actualizar pedido:', error);
-    
+    console.log('Error al actualizar pedido:', error);
+
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        error: 'Datos inválidos', 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        error: 'Datos inválidos',
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 
@@ -68,10 +120,26 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/pedidos/[id]
- * Cancela un pedido
+ * @swagger
+ * /api/pedidos/{id}:
+ *   delete:
+ *     summary: Cancela/Elimina un pedido
+ *     tags: [Pedidos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del pedido a cancelar
+ *     responses:
+ *       200:
+ *         description: Pedido cancelado correctamente
+ *       400:
+ *         description: ID inválido
+ *       500:
+ *         description: Error al eliminar cliente
  */
-
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -85,7 +153,7 @@ export async function DELETE(
     return NextResponse.json({ success: true, message: 'Pedido cancelado correctamente' }, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al cancelar pedido:', error);
+    console.log('Error al cancelar pedido:', error);
 
     if (error.message === 'ID invalido') {
       return NextResponse.json({ error: error.message }, { status: 400 });

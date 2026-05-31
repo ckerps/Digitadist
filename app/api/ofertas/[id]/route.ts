@@ -4,12 +4,30 @@ import { ActualizarOfertaSchema, RenovarOfertaSchema } from "@/repositories/zodS
 import { z } from "zod";
 
 /**
- * GET /api/ofertas/[id]
- * Obtiene una oferta por ID
+ * @swagger
+ * /api/ofertas/{id}:
+ *   get:
+ *     summary: Obtiene una oferta por ID
+ *     tags: [Ofertas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la oferta a obtener
+ *     responses:
+ *       200:
+ *         description: Oferta obtenida exitosamente
+ *       400:
+ *         description: ID inválido
+ *       404:
+ *         description: Oferta no encontrada
+ *       500:
+ *         description: Error al obtener oferta
  */
-
 export async function GET(
-  _request: NextRequest, // Agregado para mantener consistencia
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -24,7 +42,7 @@ export async function GET(
     return NextResponse.json(oferta, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al obtener oferta:', error);
+    console.log('Error al obtener oferta:', error);
 
     if (error.message === 'OFERTA_NOT_FOUND') {
       return NextResponse.json({ error: 'Oferta no encontrada' }, { status: 404 });
@@ -34,10 +52,50 @@ export async function GET(
 }
 
 /**
- * PUT /api/ofertas/[id]
- * Actualiza una oferta existente
+ * @swagger
+ * /api/ofertas/{id}:
+ *   put:
+ *     summary: Actualiza una oferta existente
+ *     tags: [Ofertas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la oferta a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               titulo:
+ *                 type: string
+ *               tipo:
+ *                 type: string
+ *                 enum: [porcentaje, fijo]
+ *               valor:
+ *                 type: number
+ *               activo:
+ *                 type: boolean
+ *               fechaInicio:
+ *                 type: string
+ *                 format: date-time
+ *               fechaFin:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: Oferta actualizada exitosamente
+ *       400:
+ *         description: Datos inválidos
+ *       404:
+ *         description: Oferta no encontrada
+ *       500:
+ *         description: Error interno del servidor
  */
-
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -52,12 +110,12 @@ export async function PUT(
     return NextResponse.json(ofertaActualizada, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al actualizar oferta:', error);
-    
+    console.log('Error al actualizar oferta:', error);
+
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        error: 'Datos inválidos', 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        error: 'Datos inválidos',
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 
@@ -70,10 +128,26 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/ofertas/[id]
- * Elimina (desactiva) una oferta
+ * @swagger
+ * /api/ofertas/{id}:
+ *   delete:
+ *     summary: Elimina (desactiva) una oferta
+ *     tags: [Ofertas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la oferta a desactivar
+ *     responses:
+ *       200:
+ *         description: Oferta desactivada correctamente
+ *       404:
+ *         description: Oferta no encontrada
+ *       500:
+ *         description: Error al eliminar oferta
  */
-
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -87,7 +161,7 @@ export async function DELETE(
     return NextResponse.json({ success: true, message: 'Oferta eliminado correctamente' }, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al eliminar oferta:', error);
+    console.log('Error al eliminar oferta:', error);
 
     if (error.message === 'Oferta no encontrado') {
       return NextResponse.json({ error: error.message }, { status: 404 });

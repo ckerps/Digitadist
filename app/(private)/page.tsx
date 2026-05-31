@@ -50,7 +50,7 @@ export default function DashboardPage() {
     fetch('/api/dashboard/kpis')
       .then((r) => r.json())
       .then((data) => setKpis(data))
-      .catch(console.error)
+      .catch(console.log)
       .finally(() => setKpisLoading(false));
   }, []);
 

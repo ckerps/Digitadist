@@ -52,7 +52,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
       toast.success('Producto actualizado correctamente');
     } catch (error) {
       toast.error(`Error al actualizar el producto: ${(error as Error).message}`);
-      console.error('Error al actualizar el producto:', error);
+      console.log('Error al actualizar el producto:', error);
     }
   };
 
@@ -64,7 +64,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
       router.push('/productos');
     } catch (error) {
       toast.error(`Error al desactivar el producto: ${(error as Error).message}`);
-      console.error('Error al desactivar el producto:', error);
+      console.log('Error al desactivar el producto:', error);
     }
   };
 

@@ -25,7 +25,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     env: {
       // Usar la base de datos local definida en docker-compose
-      DATABASE_URL: 'postgresql://postgres:1234@localhost:5433/digitadist',
+      DATABASE_URL: 'postgresql://postgres:1234@localhost:5433/digitadist?sslmode=disable',
     }
   },
 });

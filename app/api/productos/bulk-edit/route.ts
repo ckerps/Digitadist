@@ -2,6 +2,49 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { EnumAtributosLog } from "@prisma/client";
 
+/**
+ * @swagger
+ * /api/productos/bulk-edit:
+ *   post:
+ *     summary: Edición masiva de costos de productos
+ *     tags: [Productos]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - tipo
+ *               - valor
+ *               - producto_ids
+ *             properties:
+ *               tipo:
+ *                 type: string
+ *                 enum: [porcentaje, fijo]
+ *                 description: Tipo de ajuste a aplicar al costo del producto
+ *               valor:
+ *                 type: number
+ *                 description: Valor del ajuste (porcentaje ej. 10 para +10% o monto fijo ej. 150)
+ *               producto_ids:
+ *                 oneOf:
+ *                   - type: array
+ *                     items:
+ *                       type: integer
+ *                   - type: string
+ *                     enum: [todos]
+ *                 description: Lista de IDs de productos a editar, o la palabra "todos" para actualizar todo el catálogo
+ *               usuario_id:
+ *                 type: integer
+ *                 description: ID del usuario que ejecuta la acción (para el registro de auditoría)
+ *     responses:
+ *       200:
+ *         description: Productos actualizados exitosamente
+ *       400:
+ *         description: Datos faltantes o inválidos
+ *       505:
+ *         description: Error en actualización masiva
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -49,7 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error(error);
+    console.log(error);
     return NextResponse.json({ error: "Error en actualización masiva" }, { status: 500 });
   }
 }

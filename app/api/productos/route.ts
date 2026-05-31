@@ -2,10 +2,47 @@ import { ProductoService } from '@/services/producto.service';
 import { NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod';
 
-
 /**
- * GET /api/productos
- * Obtiene todos los productos
+ * @swagger
+ * /api/productos:
+ *   get:
+ *     summary: Obtiene todos los productos
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: query
+ *         name: items
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Cantidad de productos por página
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página actual
+ *       - in: query
+ *         name: nombre
+ *         schema:
+ *           type: string
+ *         description: Filtrar por nombre
+ *       - in: query
+ *         name: SKU
+ *         schema:
+ *           type: string
+ *         description: Filtrar por SKU
+ *       - in: query
+ *         name: categoria
+ *         schema:
+ *           type: string
+ *         description: Filtrar por categoría
+ *     responses:
+ *       200:
+ *         description: Lista de productos obtenida exitosamente
+ *       400:
+ *         description: Error de validación en parámetros
+ *       500:
+ *         description: Error interno del servidor
  */
 export async function GET(request: NextRequest) {
   try {
@@ -13,10 +50,10 @@ export async function GET(request: NextRequest) {
     const itemsPerPage = parseInt(url.searchParams.get('items') || '10');
     const currentPage = parseInt(url.searchParams.get('page') || '1');
     const filters : Partial<{ [key: string]: string }> = {};
-      url.searchParams.forEach((value, key) => {
-        if (key !== 'itemsPerPage' && key !== 'currentPage') {
-          filters[key] = value;
-        }
+    url.searchParams.forEach((value, key) => {
+      if (key !== 'itemsPerPage' && key !== 'currentPage') {
+        filters[key] = value;
+      }
     });
 
     const productos = await ProductoService.obtenerTodos(itemsPerPage, currentPage, filters)
@@ -34,8 +71,41 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST /api/productos
- * Crea un nuevo producto
+ * @swagger
+ * /api/productos:
+ *   post:
+ *     summary: Crea un nuevo producto
+ *     tags: [Productos]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nombre
+ *               - SKU
+ *               - precioBase
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               SKU:
+ *                 type: string
+ *               descripcion:
+ *                 type: string
+ *               precioBase:
+ *                 type: number
+ *               stock:
+ *                 type: integer
+ *               categoriaId:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Producto creado exitosamente
+ *       400:
+ *         description: Error de validación en datos provistos
+ *       500:
+ *         description: Error interno del servidor
  */
 export async function POST(req: Request) {
   try {

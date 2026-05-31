@@ -1,82 +1,121 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Flujos Principales E2E', () => {
+test.describe.serial('Flujos Principales E2E', () => {
+  const login = async (page: any) => {
+    await page.goto('/');
+    await page.waitForURL(/.*\/login.*/);
+    await page.fill('#email', 'test@test.com');
+    await page.fill('#password', 'password123');
+    await page.click('button[type="submit"]');
+    await page.waitForURL('**/');
+    await expect(page.getByText(/bienvenido/i)).toBeVisible();
+  };
 
   test.beforeEach(async ({ page }) => {
-    // Autenticación usando el usuario creado en global-setup
-    await page.goto('/');
-    
-    // Asumimos que la redirección lleva al login
-    await page.waitForURL(/.*\/login.*/);
-    
-    // Completar el formulario de login. Los selectores pueden requerir ajuste 
-    // según el DOM exacto (usando getByLabel o getByPlaceholder)
-    await page.fill('input[type="email"]', 'test@test.com');
-    await page.fill('input[type="password"]', 'password123');
-    await page.click('button[type="submit"]');
-
-    // Esperar a que entre al dashboard
-    await page.waitForURL(/.*\/dashboard.*/, { timeout: 10000 });
+    await login(page);
   });
 
   test('Flujo de creación y modificación de cliente', async ({ page }) => {
-    // Navegar a clientes
-    await page.goto('/clientes');
-    
-    // Asumiendo que hay un botón de 'Nuevo Cliente' o similar
-    await page.getByRole('button', { name: /nuevo/i }).click();
-    
-    // Llenar datos de cliente
-    await page.getByLabel(/nombre/i).fill('Cliente E2E Test');
-    await page.getByLabel(/cuit/i).fill('20111111112');
-    await page.getByLabel(/direcci/i).fill('Calle E2E 123');
-    await page.getByLabel(/tel/i).fill('1122334455');
-    await page.getByLabel(/email/i).fill('cliente.e2e@test.com');
-    // Guardar
-    await page.getByRole('button', { name: /guardar|crear/i }).click();
-    
-    // Verificar que aparece en la lista
-    await expect(page.getByText('Cliente E2E Test')).toBeVisible();
+    const suffix = `${Date.now()}`;
+    const clientName = `Cliente E2E ${suffix}`;
+    const clientEmail = `cliente.e2e.${suffix}@test.com`;
 
-    // Modificar el cliente (buscamos un botón de editar cerca del texto)
-    const row = page.locator('tr').filter({ hasText: 'Cliente E2E Test' });
-    await row.getByRole('button', { name: /editar/i }).click();
-    
-    await page.getByLabel(/nombre/i).fill('Cliente E2E Modificado');
+    await page.goto('/clientes');
+    await page.getByRole('button', { name: /nuevo cliente/i }).click();
+
+    await page.getByLabel(/nombre/i).fill(clientName);
+    await page.getByLabel(/cuit/i).fill(Math.random().toString().slice(2, 13));
+    await page.getByLabel(/dirección/i).fill('Calle E2E 123');
+    await page.getByLabel(/teléfono/i).fill('1122334455');
+    await page.getByLabel(/email/i).fill(clientEmail);
+
     await page.getByRole('button', { name: /guardar/i }).click();
-    
-    await expect(page.getByText('Cliente E2E Modificado')).toBeVisible();
+
+    const createdRow = page.locator('tbody tr', { hasText: clientName }).first();
+    await expect(createdRow).toBeVisible();
+
+    await createdRow.click();
+    await page.waitForURL(/\/clientes\/[0-9]+$/);
+    await expect(page.getByRole('heading', { name: clientName })).toBeVisible();
+
+    await page.getByRole('button', { name: /editar/i }).click();
+    await page.getByLabel(/nombre/i).fill(`${clientName} Modificado`);
+    await page.getByRole('button', { name: /guardar cambios/i }).click();
+
+    await expect(await page.getByRole('heading', { name: `${clientName} Modificado` })).toBeVisible();
   });
 
   test('Flujo de creación de producto', async ({ page }) => {
+    const suffix = `${Date.now()}`;
+    const productCode = `PRD-E2E-${suffix}`;
+    const productName = `E2E ${suffix}`;
+
     await page.goto('/productos');
-    
-    await page.getByRole('button', { name: /nuevo/i }).click();
-    
-    await page.getByLabel(/código/i).fill('PRD-E2E-001');
-    await page.getByLabel(/nombre/i).fill('Producto E2E Test');
-    await page.getByLabel(/costo/i).fill('500');
-    await page.getByLabel(/recargo/i).fill('20');
-    await page.getByLabel(/stock/i).first().fill('100');
-    // Seleccionar categoría y presentación (depende de cómo esté hecho el select de Shadcn)
-    // omitimos campos complejos que requieren interacción específica para no fallar
-    
-    await page.getByRole('button', { name: /guardar/i }).click();
-    
-    await expect(page.getByText('Producto E2E Test')).toBeVisible();
+    await page.getByRole('button', { name: /nuevo producto/i }).click();
+
+    await page.getByLabel(/código/i).fill(productCode);
+    await page.getByLabel(/nombre \*/i).fill(productName);
+    await page.getByLabel(/tamaño de pack/i).fill('12');
+    await page.getByLabel(/costo \*/i).fill('500');
+    await page.getByLabel(/% recargo \*/i).fill('20');
+    await page.getByLabel(/stock actual \*/i).fill('100');
+    await page.getByLabel(/stock mínimo/i).fill('10');
+
+    await page.getByRole('button', { name: /crear producto/i }).click();
+
+    await expect(page.getByText("correctamente")).toBeVisible({ timeout: 10000 });
   });
 
   test('Flujo completo de crear pedido', async ({ page }) => {
-    await page.goto('/pedidos/nuevo'); // o la URL que corresponda
+    const suffix = `${Date.now()}`;
+    const clientName = `Cliente ${suffix}`;
+    const clientEmail = `pedido.cliente.${suffix}@test.com`;
+    const productCode = `PRD${suffix}`;
+    const productName = `Pedido ${suffix}`;
+
+    // Crear cliente necesario para el pedido
+    await page.goto('/clientes');
+    await page.getByRole('button', { name: /nuevo cliente/i }).click();
+    await page.getByLabel(/nombre/i).fill(clientName);
+    await page.getByLabel(/email/i).fill(clientEmail);
+    await page.getByLabel(/teléfono/i).fill('1144455566');
+    await page.getByLabel(/dirección/i).fill('Av. Pedido 456');
+    await page.getByRole('button', { name: /guardar/i }).click();
+    await expect(page.locator('tbody tr', { hasText: clientName })).toBeVisible();
+
+    // Crear producto necesario para el pedido
+    await page.goto('/productos');
+    await page.getByRole('button', { name: /nuevo producto/i }).click();
+    await page.getByLabel(/código/i).fill(productCode);
+    await page.getByLabel(/nombre \*/i).fill(productName);
+    await page.getByLabel(/tamaño de pack/i).fill('6');
+    await page.getByLabel(/costo \*/i).fill('250');
+    await page.getByLabel(/% recargo \*/i).fill('15');
+    await page.getByLabel(/stock actual \*/i).fill('50');
+    await page.getByRole('button', { name: /crear producto/i }).click();
+    await expect(page.getByText("correctamente")).toBeVisible({ timeout: 10000 });
+
+    // Crear pedido usando el cliente y producto creados
+    await page.goto('/pedidos/nuevo');
+    await page.waitForURL(/\/pedidos\/nuevo$/);
+    await expect(page.getByRole('heading', { name: "Nuevo Pedido" })).toBeVisible();
+
+    await page.getByPlaceholder('Seleccionar cliente').fill(clientName);
+    await page.getByText(clientName).click();
+
+    await page.getByLabel(/dirección de entrega/i).fill('Calle 789');
+
+    await page.getByPlaceholder('Escribi un nombre').fill(productName);
+    await page.getByText(new RegExp(productName)).click();
+
+    const selectedProductRow = page.locator('table tbody tr', { hasText: productName }).first();
+    await expect(selectedProductRow).toBeVisible();
+    await expect(page.locator('table tbody tr', { hasText: productName })).toBeVisible();
     
-    // Este test es un esqueleto. Dado que crear pedido suele involucrar
-    // buscar cliente, buscar productos, aplicar ofertas, etc.
-    // Aquí se debe validar que la interfaz de pedido cargue y permita interacción.
-    
-    await expect(page.getByText(/nuevo pedido/i)).toBeVisible();
-    
-    // Seleccionar cliente
-    // Añadir producto
-    // Confirmar pedido
+    await page.getByRole('button', { name: /crear pedido/i }).click();
+
+    await page.waitForURL(/\/pedidos$/);
+
+    await expect(await page.getByRole('heading', { name: `Pedidos` })).toBeVisible();
   });
 });

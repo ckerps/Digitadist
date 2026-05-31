@@ -51,7 +51,7 @@ export function CrearProductoModal({ open, onOpenChange, onSave }: CrearProducto
             setCategorias(data);
           }
         } catch (error) {
-          console.error("Error al cargar categorías:", error);
+          console.log("Error al cargar categorías:", error);
         }
       };
       fetchCategorias();
@@ -138,7 +138,7 @@ export function CrearProductoModal({ open, onOpenChange, onSave }: CrearProducto
       resetForm();
       onOpenChange(false);
     } catch (error) {
-      console.error("Error al guardar producto:", error);
+      console.log("Error al guardar producto:", error);
     } finally {
       setIsLoading(false);
     }

@@ -6,10 +6,26 @@ import { authOptions } from '@/lib/auth';
 import * as z from 'zod';
 
 /**
- * GET /api/productos/[id]
- * Obtiene un cliente por ID
+ * @swagger
+ * /api/productos/{id}:
+ *   get:
+ *     summary: Obtiene un producto por ID
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del producto a obtener
+ *     responses:
+ *       200:
+ *         description: Producto obtenido exitosamente
+ *       400:
+ *         description: ID inválido o producto no existe
+ *       500:
+ *         description: Error interno del servidor
  */
-
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -26,7 +42,7 @@ export async function GET(
     return NextResponse.json(producto, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al obtener producto:', error);
+    console.log('Error al obtener producto:', error);
 
     if (error.message === "El producto no existe") {
       return NextResponse.json({ error: error.message }, { status: 400 });
@@ -36,8 +52,46 @@ export async function GET(
 }
 
 /**
- * PUT /api/productos/[id]
- * Actualiza un producto existente
+ * @swagger
+ * /api/productos/{id}:
+ *   put:
+ *     summary: Actualiza un producto existente
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del producto a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               SKU:
+ *                 type: string
+ *               descripcion:
+ *                 type: string
+ *               precioBase:
+ *                 type: number
+ *               stock:
+ *                 type: integer
+ *               categoriaId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Producto actualizado exitosamente
+ *       400:
+ *         description: Datos inválidos
+ *       404:
+ *         description: El producto a modificar no existe
+ *       500:
+ *         description: Error interno del servidor
  */
 export async function PUT(
   request: NextRequest,
@@ -57,12 +111,12 @@ export async function PUT(
     return NextResponse.json(productoActualizado, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al actualizar producto:', error);
-    
+    console.log('Error al actualizar producto:', error);
+
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        error: 'Datos inválidos', 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        error: 'Datos inválidos',
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 
@@ -75,10 +129,26 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/productos/[id]
- * Elimina (desactiva) un producto
+ * @swagger
+ * /api/productos/{id}:
+ *   delete:
+ *     summary: Elimina (desactiva) un producto
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del producto a eliminar/desactivar
+ *     responses:
+ *       200:
+ *         description: Producto desactivado correctamente
+ *       400:
+ *         description: ID inválido
+ *       500:
+ *         description: Error al eliminar producto
  */
-
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -92,7 +162,7 @@ export async function DELETE(
     return NextResponse.json({ success: true, message: 'Producto desactivado correctamente' }, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error al eliminar producto:', error);
+    console.log('Error al eliminar producto:', error);
 
     if (error.message === 'ID inválido') {
       return NextResponse.json({ error: error.message }, { status: 400 });

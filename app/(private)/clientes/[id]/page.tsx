@@ -48,7 +48,7 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
       toast.success('Cliente actualizado correctamente');
     } catch (error) {
       toast.error(`Error al actualizar el cliente: ${(error as Error).message}`);
-      console.error('Error al actualizar el cliente:', error);
+      console.log('Error al actualizar el cliente:', error);
     }
   };
 
@@ -61,7 +61,7 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
       router.push('/clientes');
     } catch (error) {
       toast.error(`Error al desactivar el cliente: ${(error as Error).message}`);
-      console.error('Error al desactivar the client:', error);
+      console.log('Error al desactivar the client:', error);
     }
   };
 

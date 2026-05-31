@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * @swagger
+ * /api/productos/{id}/logs:
+ *   get:
+ *     summary: Obtiene los logs o historial de cambios de un producto
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del producto del cual obtener los logs
+ *     responses:
+ *       200:
+ *         description: Lista de logs del producto obtenida exitosamente
+ *       400:
+ *         description: ID inválido
+ *       500:
+ *         description: Error interno del servidor
+ */
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
     const params = await props.params;

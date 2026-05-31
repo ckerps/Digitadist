@@ -32,7 +32,7 @@ export function DesactivarOfertaModal({
       await onConfirm();
       onClose();
     } catch (error) {
-      console.error('Error al desactivar oferta:', error);
+      console.log('Error al desactivar oferta:', error);
     }
   };
 

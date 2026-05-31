@@ -25,7 +25,7 @@ export function ImportCsvModal({ onImportComplete }: { onImportComplete: () => v
       },
       error: (error) => {
         toast.error('Error al leer el archivo CSV');
-        console.error(error);
+        console.log(error);
       }
     });
   };
@@ -35,23 +35,23 @@ export function ImportCsvModal({ onImportComplete }: { onImportComplete: () => v
     setLoading(true);
 
     try {
-        // Here we could iteratively hit our API for each object or create a bulk import endpoint.
-        // For simplicity, showing a delayed mock simulating iteration over post endpoints.
-        for(const item of parsedData) {
-            // Validate mapping
-            if(item.codigo) {
-                // To DO -> Hit /api/productos
-            }
+      // Here we could iteratively hit our API for each object or create a bulk import endpoint.
+      // For simplicity, showing a delayed mock simulating iteration over post endpoints.
+      for (const item of parsedData) {
+        // Validate mapping
+        if (item.codigo) {
+          // To DO -> Hit /api/productos
         }
-        
-        toast.success(`Se simularon/importaron ${parsedData.length} productos.`);
-        setIsOpen(false);
-        onImportComplete();
+      }
+
+      toast.success(`Se simularon/importaron ${parsedData.length} productos.`);
+      setIsOpen(false);
+      onImportComplete();
     } catch (e) {
-        toast.error("Error al importar algunos productos.");
+      toast.error("Error al importar algunos productos.");
     } finally {
-        setLoading(false);
-        setParsedData([]);
+      setLoading(false);
+      setParsedData([]);
     }
   };
 
@@ -73,23 +73,23 @@ export function ImportCsvModal({ onImportComplete }: { onImportComplete: () => v
             <span className="text-sm font-medium text-neutral-600">
               {parsedData.length > 0 ? `Archivo cargado: ${parsedData.length} filas detectadas.` : 'Haz click para seleccionar un archivo CSV'}
             </span>
-            <input 
-                type="file" 
-                accept=".csv" 
-                className="hidden" 
-                ref={fileInputRef} 
-                onChange={handleFileUpload} 
+            <input
+              type="file"
+              accept=".csv"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
             />
           </div>
 
           <div className="bg-blue-50 text-blue-800 p-3 rounded text-xs flex gap-2">
-             <AlertCircle className="w-4 h-4 shrink-0" />
-             El CSV debe contener las columnas: codigo, nombre, categoria_id, presentacion, tam_pack, costo, porcentaje_recargo, stock_actual, stock_minimo.
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            El CSV debe contener las columnas: codigo, nombre, categoria_id, presentacion, tam_pack, costo, porcentaje_recargo, stock_actual, stock_minimo.
           </div>
 
           <div className="flex justify-end pt-4">
             <Button onClick={procesarImportacion} disabled={parsedData.length === 0 || loading}>
-                {loading ? 'Procesando...' : 'Comenzar Importación'}
+              {loading ? 'Procesando...' : 'Comenzar Importación'}
             </Button>
           </div>
         </div>

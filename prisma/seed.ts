@@ -512,7 +512,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Error en seeder:', e);
+    console.log('❌ Error en seeder:', e);
     process.exit(1);
   })
   .finally(async () => {

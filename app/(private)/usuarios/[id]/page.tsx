@@ -66,7 +66,7 @@ export default function UsuarioDetailPage() {
       await updateUsuario(usuarioId, formData);
       setIsEditModalOpen(false);
     } catch (error) {
-      console.error('Error al actualizar usuario:', error);
+      console.log('Error al actualizar usuario:', error);
     }
   };
 
@@ -76,7 +76,7 @@ export default function UsuarioDetailPage() {
       setIsDeleteModalOpen(false);
       router.push('/usuarios');
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
+      console.log('Error al eliminar usuario:', error);
     }
   };
 

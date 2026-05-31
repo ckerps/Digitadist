@@ -3,10 +3,72 @@ import { NuevoCliente } from '@/types/cliente'
 import { NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod';
 
-
 /**
- * GET /api/clientes
- * Obtiene todos los clientes
+ * @swagger
+ * /api/clientes:
+ *   get:
+ *     summary: Obtiene todos los clientes
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: query
+ *         name: itemsPerPage
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Cantidad de clientes por página
+ *       - in: query
+ *         name: currentPage
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página actual
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         description: ID del cliente
+ *       - in: query
+ *         name: nombre
+ *         schema:
+ *           type: string
+ *         description: Nombre del cliente
+ *       - in: query
+ *         name: telefono
+ *         schema:
+ *           type: string
+ *         description: Teléfono del cliente
+ *       - in: query
+ *         name: cuit
+ *         schema:
+ *           type: string
+ *         description: CUIT del cliente
+ *       - in: query
+ *         name: tipo
+ *         schema:
+ *           type: string
+ *         description: Tipo de cliente
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: Email del cliente
+ *       - in: query
+ *         name: activo
+ *         schema:
+ *           type: boolean
+ *         description: Estado activo/inactivo
+ *       - in: query
+ *         name: searchTerm
+ *         schema:
+ *           type: string
+ *         description: Término de búsqueda general
+ *     responses:
+ *       200:
+ *         description: Lista de clientes paginada obtenida exitosamente
+ *       400:
+ *         description: Error de validación
+ *       500:
+ *         description: Error interno del servidor
  */
 export async function GET(request: NextRequest) {
   try {
@@ -29,9 +91,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(clientes, { status: 200 })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        type: "ValidationError", 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        type: "ValidationError",
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 
@@ -40,21 +102,54 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST /api/clientes
- * Crea un nuevo cliente
+ * @swagger
+ * /api/clientes:
+ *   post:
+ *     summary: Crea un nuevo cliente
+ *     tags: [Clientes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nombre
+ *               - cuit
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               cuit:
+ *                 type: string
+ *               telefono:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               direccion:
+ *                 type: string
+ *               activo:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Cliente creado exitosamente
+ *       400:
+ *         description: Error de validación en los datos provistos
+ *       409:
+ *         description: Ya existe un cliente con ese CUIT
+ *       500:
+ *         description: Error interno del servidor
  */
-// app/api/clientes/route.ts
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const resultado = await ClienteService.crear(body);
     return NextResponse.json(resultado, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating cliente:', error);
+    console.log('Error creating cliente:', error);
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ 
-        type: "ValidationError", 
-        details: error.flatten().fieldErrors 
+      return NextResponse.json({
+        type: "ValidationError",
+        details: error.flatten().fieldErrors
       }, { status: 400 });
     }
 

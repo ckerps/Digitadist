@@ -33,7 +33,7 @@ export default function PushSubscriptionManager() {
 
       // Esperar a que el SW esté listo y activo
       const registration = await navigator.serviceWorker.ready;
-      
+
       // Pequeña espera para asegurar que el SW esté "activado"
       if (registration.active?.state !== 'activated') {
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -46,9 +46,9 @@ export default function PushSubscriptionManager() {
         // Obtener la Public Key del servidor
         const response = await fetch('/api/push/vapid-key');
         const data = await response.json();
-        
+
         if (!data.publicKey) {
-          console.error('No se pudo obtener la VAPID Public Key');
+          console.log('No se pudo obtener la VAPID Public Key');
           return;
         }
 
@@ -84,7 +84,7 @@ export default function PushSubscriptionManager() {
       }
 
     } catch (error) {
-      console.error('[Push] Error en el proceso de suscripción:', error);
+      console.log('[Push] Error en el proceso de suscripción:', error);
       toast.error('Error al activar notificaciones push', {
         description: 'Por favor, asegúrate de haber dado permisos en tu navegador.'
       });

@@ -43,8 +43,8 @@ export function useProductosComplete(
   const createMutation = useMutation({
     mutationFn: (producto: NuevoProducto) => productosApi.create(producto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['productos:list'] });
       toast.success('Producto creado correctamente');
+      queryClient.invalidateQueries({ queryKey: ['productos:list'] });
     },
     onError: (error: Error) => {
       toast.error(`Error al crear producto: ${error.message}`);
