@@ -10,6 +10,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { EnumPresentacion } from "@prisma/client";
 import { NuevoProductoSchema } from "@/repositories/zodSchemas";
 import { Package, Plus } from "lucide-react";
+import { DatePicker } from "@/components/ui/datepicker";
 
 interface CrearProductoModalProps {
   open: boolean;
@@ -310,13 +311,9 @@ export function CrearProductoModal({ open, onOpenChange, onSave }: CrearProducto
             <Label htmlFor="fecha_vencimiento" className="text-neutral-700 font-medium">
               Fecha Vencimiento (opcional)
             </Label>
-            <Input
-              id="fecha_vencimiento"
-              type="date"
-              value={formData.fecha_vencimiento}
-              onChange={(e) => handleChange('fecha_vencimiento', e.target.value)}
-              className="border-neutral-300"
-              disabled={isLoading}
+            <DatePicker
+              fecha={formData.fecha_vencimiento || undefined}
+              onChange={(date) => handleChange('fecha_vencimiento', date || '')}
             />
             {errors.fecha_vencimiento && <p className="text-red-500 text-xs mt-0.5">{errors.fecha_vencimiento}</p>}
           </div>

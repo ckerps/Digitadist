@@ -7,10 +7,13 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppSidebar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const sessionLoading = status === 'loading';
+  const role = session?.user?.role;
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,21 +58,25 @@ export default function AppSidebar() {
               <CircleDollarSignIcon /> Ofertas
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            {session?.user.role === 'admin' && <SidebarMenuButton onClick={() => router.push('/reportes')} >
-              <ChartLineIcon /> Reportes
-            </SidebarMenuButton>}
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            {session?.user.role === 'admin' && <SidebarMenuButton onClick={() => router.push('/usuarios')} >
-              <UserIcon /> Usuarios
-            </SidebarMenuButton>}
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            {session?.user.role === 'admin' && <SidebarMenuButton onClick={() => router.push('/configuracion')} >
-              <Settings /> Configuración
-            </SidebarMenuButton>}
-          </SidebarMenuItem>
+          {!sessionLoading && role === 'admin' && (
+            <>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => router.push('/reportes')} >
+                  <ChartLineIcon /> Reportes
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => router.push('/usuarios')} >
+                  <UserIcon /> Usuarios
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => router.push('/configuracion')} >
+                  <Settings /> Configuración
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </>
+          )}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
@@ -78,7 +85,7 @@ export default function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="items-center justify-center">
-                  <User2 /> {session?.user.name}
+                  <User2 /> {sessionLoading ? <Skeleton className="h-4 w-24" /> : session?.user.name}
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-40" align="start">

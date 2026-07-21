@@ -92,7 +92,7 @@ export const NuevoProductoSchema = z.object({
     activo: z.boolean().default(true),
     imagen: z.string().optional().or(z.literal("").transform(() => undefined)),
     categoria_id: z.number().int().gt(0, "ID de categoría inválido"),
-    fecha_vencimiento: z.date().optional(),
+    fecha_vencimiento: z.coerce.date().optional(),
 });
 
 

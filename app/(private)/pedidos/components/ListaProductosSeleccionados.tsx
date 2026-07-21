@@ -95,6 +95,7 @@ export function ListaProductosSeleccionados({
                             const precioFinal = calcularPrecioUnidadConOferta(producto);
                             const tieneOferta = !!producto.oferta;
                             const ofertaAplicada = tieneOferta && producto.usar_oferta !== false;
+                            const stockExcedido = producto.stock_actual !== undefined && producto.cantidad > producto.stock_actual;
 
                             return (
                                 <TableRow key={producto?.id} className="hover:bg-neutral-50 transition-colors">
@@ -121,14 +122,17 @@ export function ListaProductosSeleccionados({
                                     </TableCell>
                                     <TableCell className="px-4 py-3 text-center text-neutral-600 text-sm">{producto?.codigo}</TableCell>
                                     <TableCell className="px-4 py-3">
-                                        <div className="flex justify-center">
+                                        <div className="flex flex-col items-center gap-1">
                                             <Input
                                                 type="number"
                                                 min="1"
                                                 value={producto?.cantidad || ''}
                                                 onChange={(e) => actualizarCantidadProducto(producto.codigo, e.target.value)}
-                                                className="w-20 h-9 text-center"
+                                                className={cn("w-20 h-9 text-center", stockExcedido && "border-red-500 text-red-600")}
                                             />
+                                            {stockExcedido && (
+                                                <span className="text-[10px] text-red-500 font-medium">Stock: {producto.stock_actual}</span>
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell className="px-4 py-3 text-center">
@@ -192,6 +196,7 @@ export function ListaProductosSeleccionados({
                     const precioFinal = calcularPrecioUnidadConOferta(producto);
                     const tieneOferta = !!producto.oferta;
                     const ofertaAplicada = tieneOferta && producto.usar_oferta !== false;
+                    const stockExcedido = producto.stock_actual !== undefined && producto.cantidad > producto.stock_actual;
 
                     return (
                         <Card key={producto.id} className="border-neutral-200 shadow-xs">
@@ -256,7 +261,7 @@ export function ListaProductosSeleccionados({
                                             min="1"
                                             value={producto?.cantidad || ''}
                                             onChange={(e) => actualizarCantidadProducto(producto.codigo, e.target.value)}
-                                            className="w-12 h-8 text-center text-sm font-semibold p-1"
+                                            className={cn("w-12 h-8 text-center text-sm font-semibold p-1", stockExcedido && "border-red-500 text-red-600")}
                                         />
                                         <Button 
                                             variant="outline" 

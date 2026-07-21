@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { UpdateProducto } from '@/types/producto';
+import { DatePicker } from '@/components/ui/datepicker';
 
 interface EditarProductoModalProps {
   isOpen: boolean;
@@ -135,18 +136,15 @@ export function EditarProductoModal({
               <Label htmlFor="fecha_vencimiento" className="text-neutral-700 font-medium">
                 Fecha Vencimiento
               </Label>
-              <Input
-                id="fecha_vencimiento"
-                type="date"
-                value={
+              <DatePicker
+                fecha={
                   formData.fecha_vencimiento
                     ? new Date(formData.fecha_vencimiento).toISOString().split('T')[0]
-                    : ''
+                    : undefined
                 }
-                onChange={(e) =>
-                  handleChange('fecha_vencimiento', e.target.value ? new Date(e.target.value) : null)
+                onChange={(date) =>
+                  handleChange('fecha_vencimiento', date ? new Date(date) : null)
                 }
-                className="border-neutral-300"
               />
             </div>
           </div>

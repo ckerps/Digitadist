@@ -7,7 +7,7 @@ import { useState } from "react";
 
 interface SeleccionarProductosProps {
     productosSeleccionados?: AgregarProducto[];
-    agregarProducto: (id: number, codigo: string, nombre: string, costo: number, recargo: number, oferta?: Oferta | null) => void;
+    agregarProducto: (id: number, codigo: string, nombre: string, costo: number, recargo: number, stock_actual: number, oferta?: Oferta | null) => void;
 }
 
 export function SeleccionarProductos({ productosSeleccionados, agregarProducto }: SeleccionarProductosProps) {
@@ -15,7 +15,7 @@ export function SeleccionarProductos({ productosSeleccionados, agregarProducto }
     const { productos } = useProductos({ itemsPerPage: 50, currentPage: 1, filters: { activo: true, nombre: searchValue.length > 0 ? searchValue : undefined } });
 
     const filteredProductos = productos?.productos || [];
-    const handleAgregarProducto = (id: number, codigo: string, nombre: string, costo: number, recargo: number, ofertas?: Oferta[]) => {
+    const handleAgregarProducto = (id: number, codigo: string, nombre: string, costo: number, recargo: number, stock_actual: number, ofertas?: Oferta[]) => {
         const yaAgregado = productosSeleccionados?.some(p => p.codigo === codigo);
         if (yaAgregado) {
             return;
@@ -24,7 +24,7 @@ export function SeleccionarProductos({ productosSeleccionados, agregarProducto }
         // La primera oferta activa que encontremos (el repo ya filtró por vigencia)
         const ofertaActiva = ofertas && ofertas.length > 0 ? ofertas[0] : null;
         
-        agregarProducto(id, codigo, nombre, costo, recargo, ofertaActiva);
+        agregarProducto(id, codigo, nombre, costo, recargo, stock_actual, ofertaActiva);
     };
 
     return (
@@ -37,7 +37,7 @@ export function SeleccionarProductos({ productosSeleccionados, agregarProducto }
                     <ComboboxList>
                         {(item: Producto) => (
                             <ComboboxItem key={item?.id} onClick={() => {
-                                handleAgregarProducto(item?.id, item?.codigo, item?.nombre, item?.costo, item?.porcentaje_recargo, item?.ofertas);
+                                handleAgregarProducto(item?.id, item?.codigo, item?.nombre, item?.costo, item?.porcentaje_recargo, item?.stock_actual, item?.ofertas);
                                 setSearchValue('');
                             }}>
                                 <div className="flex flex-col">

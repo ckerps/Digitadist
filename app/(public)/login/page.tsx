@@ -36,6 +36,7 @@ export default function LoginPage() {
 
       toast.success('Sesión iniciada correctamente');
       const callbackUrl = searchParams.get('callbackUrl') || '/';
+      router.refresh();
       router.push(callbackUrl);
     } catch (error) {
       toast.error('Error al iniciar sesión');

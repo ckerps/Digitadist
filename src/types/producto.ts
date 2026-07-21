@@ -27,6 +27,7 @@ export interface AgregarProducto {
   costo: number;
   recargo: number;
   cantidad: number;
+  stock_actual?: number;
   oferta?: Oferta | null;
   usar_oferta?: boolean;
 }

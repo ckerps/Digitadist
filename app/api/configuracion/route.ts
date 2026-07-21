@@ -61,14 +61,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const configs = await request.json();
-    const config = await prisma.configuracion.findUnique({
-      where: { nombre: configs.nombre },
-    });
-    if (config) {
-      throw new Error("CONFIG_EXISTENTE");
-    }
 
-    console.log(configs)
     await prisma.$transaction(
       configs.map((c: any) =>
         prisma.configuracion.upsert({
@@ -86,9 +79,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Configuración guardada" }, { status: 201 });
   } catch (e: any) {
     console.log(e);
-    if (e instanceof Error && e.message === "CONFIG_EXISTENTE") {
-      return NextResponse.json({ error: e.message }, { status: 409 });
-    }
     return NextResponse.json({ error: "Error al guardar la configuración" }, { status: 500 });
   }
 }

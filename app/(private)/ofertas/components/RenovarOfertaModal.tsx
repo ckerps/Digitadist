@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RefreshCw } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/datepicker';
 import { toast } from 'sonner';
 
 export function RenovarOfertaModal({ ofertaId, onRenewComplete }: { ofertaId: number, onRenewComplete: () => void }) {
@@ -46,7 +46,7 @@ export function RenovarOfertaModal({ ofertaId, onRenewComplete }: { ofertaId: nu
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Nueva fecha de finalización</label>
-            <Input type="date" value={dateStr} onChange={e => setDateStr(e.target.value)} />
+            <DatePicker fecha={dateStr || undefined} onChange={(date) => setDateStr(date || '')} />
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => setIsOpen(false)}>Cancelar</Button>

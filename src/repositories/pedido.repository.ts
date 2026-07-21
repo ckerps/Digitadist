@@ -66,6 +66,12 @@ export const PedidoRepository = {
 
   async crearDetallePedido(data: any) {
     return await prisma.$transaction(async (tx) => {
+      const producto = await tx.producto.findUnique({ where: { id: data.producto_id } });
+      if (!producto) throw new Error(`Producto con ID ${data.producto_id} no encontrado`);
+      if (producto.stock_actual < data.cantidad) {
+        throw new Error(`Stock insuficiente para "${producto.nombre}". Disponible: ${producto.stock_actual}, solicitado: ${data.cantidad}`);
+      }
+
       const detalle = await tx.detallePedido.create({
         data: {
           producto_id: data.producto_id,
@@ -88,6 +94,14 @@ export const PedidoRepository = {
 
   async crearConDetalle(pedido: NuevoPedido, detalle: NuevoDetallePedido[]) {
     return await prisma.$transaction(async (tx) => {
+      for (const item of detalle) {
+        const producto = await tx.producto.findUnique({ where: { id: item.producto_id } });
+        if (!producto) throw new Error(`Producto con ID ${item.producto_id} no encontrado`);
+        if (producto.stock_actual < item.cantidad) {
+          throw new Error(`Stock insuficiente para "${producto.nombre}". Disponible: ${producto.stock_actual}, solicitado: ${item.cantidad}`);
+        }
+      }
+
       const nuevoPedido = await tx.pedido.create({
         data: {
           cliente_id: pedido.cliente_id!,
@@ -137,7 +151,7 @@ export const PedidoRepository = {
           });
         }
       }
-      
+
       // Check if it was cancelled and is now being reactivated
       if (pedidoAnterior.estado === EnumEstadoPedido.cancelado && data.estado && data.estado !== EnumEstadoPedido.cancelado) {
         for (const item of pedidoAnterior.detallePedidos) {
@@ -180,7 +194,7 @@ export const PedidoRepository = {
         where: { id },
         include: { detallePedidos: true }
       });
-      
+
       if (!pedidoAActualizar) throw new Error("Pedido no encontrado");
 
       if (pedidoAActualizar.estado === EnumEstadoPedido.cancelado) {

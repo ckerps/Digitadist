@@ -8,6 +8,7 @@ import { useProductos } from "../../productos/hooks/useProductos";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/datepicker";
 
 interface OfertaFormProps {
   oferta?: OfertaConProducto;
@@ -135,20 +136,16 @@ export function OfertaForm({ oferta, onSubmit, isLoading = false }: OfertaFormPr
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="fecha_inicio">Fecha de Inicio *</Label>
-              <Input
-                id="fecha_inicio"
-                type="date"
-                value={fecha_inicio}
-                onChange={(e) => setFecha_inicio(e.target.value)}
+              <DatePicker
+                fecha={fecha_inicio || undefined}
+                onChange={(date) => setFecha_inicio(date || '')}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="fecha_fin">Fecha de Fin *</Label>
-              <Input
-                id="fecha_fin"
-                type="date"
-                value={fecha_fin}
-                onChange={(e) => setFecha_fin(e.target.value)}
+              <DatePicker
+                fecha={fecha_fin || undefined}
+                onChange={(date) => setFecha_fin(date || '')}
               />
             </div>
           </div>

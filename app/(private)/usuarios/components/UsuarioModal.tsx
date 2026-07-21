@@ -163,8 +163,8 @@ export function UsuarioModal({ open, onOpenChange, onSave, editingUsuario }: Usu
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="3">Administrador</SelectItem>
-                  <SelectItem value="4">Vendedor</SelectItem>
+                  <SelectItem value="1">Administrador</SelectItem>
+                  <SelectItem value="2">Vendedor</SelectItem>
                 </SelectContent>
               </Select>
             </div>

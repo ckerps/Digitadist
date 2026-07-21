@@ -53,6 +53,12 @@ export default function NuevoPedidoPage() {
             return;
         }
 
+        const productoSinStock = formData.productos.find(p => p.stock_actual !== undefined && p.cantidad > p.stock_actual);
+        if (productoSinStock) {
+            toast.error(`Stock insuficiente para "${productoSinStock.nombre}". Disponible: ${productoSinStock.stock_actual}, solicitado: ${productoSinStock.cantidad}`);
+            return;
+        }
+
         try {
             const { productos, ...pedido } = formData;
             pedido.vendedor_id = Number(session.user.id);
@@ -93,7 +99,7 @@ export default function NuevoPedidoPage() {
 
     const [formData, setFormData] = useState<NuevoPedido>({
         direccion_entrega: '',
-        fecha_entrega_estimada: new Date(Date.now() + 7* 24 * 60 * 60 * 1000),
+        fecha_entrega_estimada: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         total: 0,
         cliente_id: undefined,
         vendedor_id: undefined,
@@ -111,13 +117,13 @@ export default function NuevoPedidoPage() {
         ) || [];
     }, [clientes?.clientes, searchValue]);
 
-    const handleAgregarProducto = (id: number, codigo: string, nombre: string, costo: number, recargo: number, oferta?: Oferta | null) => {
-        setFormData({ 
-            ...formData, 
+    const handleAgregarProducto = (id: number, codigo: string, nombre: string, costo: number, recargo: number, stock_actual: number, oferta?: Oferta | null) => {
+        setFormData({
+            ...formData,
             productos: [
-                ...(formData.productos || []), 
-                { id, codigo, nombre, cantidad: 1, costo, recargo, oferta, usar_oferta: !!oferta }
-            ] 
+                ...(formData.productos || []),
+                { id, codigo, nombre, cantidad: 1, costo, recargo, stock_actual, oferta, usar_oferta: !!oferta }
+            ]
         });
     };
 

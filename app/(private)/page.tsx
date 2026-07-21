@@ -38,11 +38,12 @@ function KpiSkeleton() {
 }
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [kpis, setKpis] = useState<KPIs | null>(null);
   const [kpisLoading, setKpisLoading] = useState(true);
 
+  const sessionLoading = status === 'loading';
   const userName = session?.user?.name || 'Usuario';
   const role = (session?.user as any)?.role || '';
 
@@ -63,14 +64,18 @@ export default function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
-            Bienvenido, {userName}
+            {sessionLoading ? (
+              <span className="flex items-center gap-2">Bienvenido, <Skeleton className="h-9 w-40 inline-block" /></span>
+            ) : (
+              <>Bienvenido, {userName}</>
+            )}
           </h1>
           <p className="text-muted-foreground mt-1">
             Revisá el estado general de tu negocio.
           </p>
         </div>
         <div className="flex gap-2">
-          {role === 'admin' && (
+          {!sessionLoading && role === 'admin' && (
             <Button onClick={() => router.push('/usuarios')} variant="outline" className="gap-2">
               <Users className="h-4 w-4" />
               Usuarios
