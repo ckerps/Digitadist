@@ -35,12 +35,12 @@ export function DetallePedidoTable({
 
   const columns: TableColumn<DetallePedido & { producto: Producto }>[] = [
     { header: "Producto", className: "font-medium", cell: (item) => item.producto.nombre },
-    { header: "Código", className: "text-muted-foreground", cell: (item) => item.producto.codigo },
-    { header: "Cantidad", className: "text-center", accessorKey: "cantidad" },
-    { header: "Costo", className: "text-right", cell: (item) => `$${formatCurrency(item.producto.costo)}` },
-    { header: "Precio Unitario", className: "text-right", cell: (item) => `$${formatCurrency(item.precio_unitario)}` },
-    { header: "Descuento", className: "text-right text-muted-foreground", cell: (item) => item.descuento ? `-$${formatCurrency(item.descuento)}` : '-' },
-    { header: "Subtotal", className: "text-right font-semibold", cell: (item) => `$${formatCurrency(item.subtotal)}` }
+    { header: "Código", className: "text-muted-foreground text-xs", cell: (item) => item.producto.codigo },
+    { header: "Cant.", className: "text-center", accessorKey: "cantidad" },
+    { header: "Costo", className: "text-right whitespace-nowrap", cell: (item) => `$${formatCurrency(item.producto.costo)}` },
+    { header: "P. Unitario", className: "text-right whitespace-nowrap", cell: (item) => `$${formatCurrency(item.precio_unitario)}` },
+    { header: "Dto.", className: "text-right text-muted-foreground whitespace-nowrap", cell: (item) => item.descuento ? `-$${formatCurrency(item.descuento)}` : '\u2013' },
+    { header: "Subtotal", className: "text-right font-semibold whitespace-nowrap", cell: (item) => `$${formatCurrency(item.subtotal)}` }
   ];
 
   if (hasActions) {
@@ -80,8 +80,8 @@ export function DetallePedidoTable({
 
   const footer = (
     <tr>
-      <td colSpan={hasActions ? 7 : 6} className="p-4 align-middle text-right font-semibold text-foreground">Total</td>
-      <td className="p-4 align-middle text-right font-bold text-foreground">${formatCurrency(totalSubtotal)}</td>
+      <td colSpan={hasActions ? 7 : 6} className="px-3 py-2 align-middle text-right font-semibold text-foreground">Total</td>
+      <td className="px-3 py-2 align-middle text-right font-bold text-foreground">${formatCurrency(totalSubtotal)}</td>
     </tr>
   );
 
