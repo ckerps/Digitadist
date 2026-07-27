@@ -150,7 +150,7 @@ export default function NuevoPedidoPage() {
             <Card>
                 <CardContent>
                     <div className="grid grid-cols-1 gap-4">
-                        <div className="flex flex-row items-center gap-2">
+                        <div className="flex flex-col sm:flex-row gap-4">
                             <div className="w-full gap-2">
                                 <Label htmlFor="clienteLabel">Cliente</Label>
                                 <Combobox

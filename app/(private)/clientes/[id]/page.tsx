@@ -107,7 +107,7 @@ export default function ClienteDetailPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Info Cards Row */}
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-neutral-200">

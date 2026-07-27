@@ -66,7 +66,7 @@ export default function PedidosPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-neutral-200 rounded-lg shadow-sm">
+      <div className="">
         <PedidoFilters
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}

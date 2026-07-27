@@ -82,7 +82,7 @@ export default function ClientesPage() {
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white border border-neutral-200 rounded-lg p-2 shadow-sm">
+      <div className="p-2">
         <ClienteFilters
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
