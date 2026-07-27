@@ -82,7 +82,7 @@ export default function ClientesPage() {
       </div>
 
       {/* Filters Card */}
-      <div className="p-2">
+      <div className="bg-white border border-neutral-200 rounded-lg p-2 shadow-sm">
         <ClienteFilters
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
@@ -92,7 +92,7 @@ export default function ClientesPage() {
       </div>
 
       {/* Data Table Section */}
-      <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="overflow-hidden">
         {isLoadingList || !clientes ? (
           <>
             <div className='hidden md:block'>

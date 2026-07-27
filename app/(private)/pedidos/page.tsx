@@ -66,7 +66,7 @@ export default function PedidosPage() {
         </Button>
       </div>
 
-      <div className="">
+      <div className="bg-white border border-neutral-200 rounded-lg shadow-sm">
         <PedidoFilters
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
@@ -77,7 +77,7 @@ export default function PedidosPage() {
       </div>
 
       {/* Data Table Section */}
-      <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="overflow-hidden">
         {isLoadingList || !pedidos ? (
           <>
             <div className='hidden md:block'>
