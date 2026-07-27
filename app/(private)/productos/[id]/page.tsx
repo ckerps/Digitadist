@@ -75,19 +75,27 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
           <p className="text-muted-foreground text-sm mt-1">Productos</p>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">{producto.nombre}</h1>
         </div>
+
         <Button
           onClick={() => router.push('/productos')}
-          size="lg"
           variant="outline"
+          className="hidden sm:flex gap-2"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver
+          <ArrowLeft className="h-4 w-4" />
+          <span>Volver</span>
         </Button>
       </div>
 
-
       {/* Action Buttons */}
       <div className="flex gap-2 flex-wrap">
+        <Button
+          onClick={() => router.push('/productos')}
+          variant="outline"
+          className="sm:hidden gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Volver</span>
+        </Button>
         <Button
           onClick={() => setIsEditModalOpen(true)}
           disabled={isUpdating || isDeleting}
@@ -118,12 +126,12 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 Imagen del Producto
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 p-6 flex items-center justify-center bg-white min-h-[300px]">
+            <CardContent className="flex-1 p-6 flex items-center justify-center bg-white min-h-[200px]">
               {producto.imagen ? (
                 <img
                   src={producto.imagen}
                   alt={producto.nombre}
-                  className="max-w-full max-h-[400px] object-contain rounded-md transition-transform duration-300 hover:scale-105"
+                  className="max-w-full max-h-[250px] object-contain rounded-md transition-transform duration-300 hover:scale-105"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=No+Imagen';
                   }}

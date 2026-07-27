@@ -23,7 +23,7 @@ export function ProductoFilters({
     <div className="p-2 md:p-4">
       <div className="flex flex-col lg:flex-row gap-2 md:gap-4 items-start lg:items-center justify-between">
         <div className="flex-1 flex flex-col sm:flex-row gap-2 md:gap-3 w-full lg:w-auto items-center">
-          <div className="relative flex-1">
+          <div className="w-full relative flex-1">
             <DebouncedInput
               placeholder="Buscar por nombre o código..."
               value={searchTerm}

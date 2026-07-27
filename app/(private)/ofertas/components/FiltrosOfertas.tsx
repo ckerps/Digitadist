@@ -59,53 +59,58 @@ export function FiltrosOfertas({ onApplyFiltros, onReset }: FiltrosOfertasProps)
     <div className="p-2 md:p-4 border-b border-neutral-200">
       <div className="flex flex-col lg:flex-row gap-4 items-end justify-between">
         {/* Tipo */}
-        <div className="space-y-2 w-full lg:w-auto">
-          <Label htmlFor="tipo">Tipo</Label>
-          <Select value={tipo} onValueChange={setTipo}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="porcentaje">Porcentaje</SelectItem>
-              <SelectItem value="monto">Monto</SelectItem>
-            </SelectContent>
-          </Select>
+
+        <div className="flex gap-3 w-full">
+          <div className="space-y-2 w-full lg:w-auto">
+            <Label htmlFor="tipo">Tipo</Label>
+            <Select value={tipo} onValueChange={setTipo}>
+              <SelectTrigger>
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="porcentaje">Porcentaje</SelectItem>
+                <SelectItem value="monto">Monto</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Estado */}
+          <div className="space-y-2 w-full lg:w-auto">
+            <Label htmlFor="estado">Estado</Label>
+            <Select value={estado} onValueChange={setEstado}>
+              <SelectTrigger>
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="activa">Activa</SelectItem>
+                <SelectItem value="inactiva">Inactiva</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Estado */}
-        <div className="space-y-2 w-full lg:w-auto">
-          <Label htmlFor="estado">Estado</Label>
-          <Select value={estado} onValueChange={setEstado}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="activa">Activa</SelectItem>
-              <SelectItem value="inactiva">Inactiva</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="flex gap-3 w-full">
+          {/* Rango de Fechas de Inicio */}
+          <div className="flex-1 w-full lg:w-auto">
+            <Label className="mb-2 block">Fecha de Inicio</Label>
+            <DatePickerWithRange
+              date={rangeInicio}
+              setDate={setRangeInicio}
+              placeholder="Desde - Hasta"
+            />
+          </div>
 
-        {/* Rango de Fechas de Inicio */}
-        <div className="flex-1 w-full lg:w-auto">
-          <Label className="mb-2 block">Fecha de Inicio</Label>
-          <DatePickerWithRange
-            date={rangeInicio}
-            setDate={setRangeInicio}
-            placeholder="Desde - Hasta"
-          />
-        </div>
-
-        {/* Rango de Fechas de Fin */}
-        <div className="flex-1 w-full lg:w-auto">
-          <Label className="mb-2 block">Fecha de Fin</Label>
-          <DatePickerWithRange
-            date={rangeFin}
-            setDate={setRangeFin}
-            placeholder="Desde - Hasta"
-          />
+          {/* Rango de Fechas de Fin */}
+          <div className="flex-1 w-full lg:w-auto">
+            <Label className="mb-2 block">Fecha de Fin</Label>
+            <DatePickerWithRange
+              date={rangeFin}
+              setDate={setRangeFin}
+              placeholder="Desde - Hasta"
+            />
+          </div>
         </div>
 
         <div className="flex gap-2 w-full lg:w-auto mt-2 lg:mt-0">

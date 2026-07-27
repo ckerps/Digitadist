@@ -72,10 +72,10 @@ export default function OfertasPage() {
       </div>
 
       {/* Data Table Section */}
-      <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="overflow-hidden">
         {isLoadingList || !ofertas ? (
           <>
-            <div className='hidden md:block'>
+            <div className='hidden md:block bg-white border border-neutral-200 rounded-lg shadow-sm'>
               <OfertaTableSkeleton rows={itemsPerPage} />
             </div>
             <div className='block md:hidden'>
@@ -84,7 +84,7 @@ export default function OfertasPage() {
           </>
         ) : (
           <>
-            <div className='hidden md:block'>
+            <div className='hidden md:block bg-white border border-neutral-200 rounded-lg shadow-sm'>
               <OfertasTable ofertas={ofertas} onRowClick={handleRowClick} />
             </div>
 

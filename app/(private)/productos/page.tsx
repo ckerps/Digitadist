@@ -58,25 +58,29 @@ export default function ProductosPage() {
   }
 
   return (
-    <div className="full w-full space-y-6">
+    <div className="w-full space-y-6">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">Productos</h1>
           <p className="text-muted-foreground text-sm mt-1">Gestiona tu catálogo de productos</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto overflow-x-auto whitespace-nowrap">
-          <ExportCsvButton />
-          <ImportCsvModal onImportComplete={() => setCurrentPage(1)} />
-          <BulkEditModal onUpdateComplete={() => setCurrentPage(1)} />
-          <Button
-            onClick={() => setIsCrearModalOpen(true)}
-            size="lg"
-            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Nuevo Producto
-          </Button>
+        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+          <div className='grid grid-cols-2 gap-2'>
+            <ExportCsvButton />
+            <ImportCsvModal onImportComplete={() => setCurrentPage(1)} />
+          </div>
+          <div className='grid grid-cols-2 gap-2'>
+            <BulkEditModal onUpdateComplete={() => setCurrentPage(1)} />
+            <Button
+              onClick={() => setIsCrearModalOpen(true)}
+              size="lg"
+              className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Producto
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -91,10 +95,10 @@ export default function ProductosPage() {
       </div>
 
       {/* Data Table Section */}
-      <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="overflow-hidden rounded-lg">
         {isLoadingList || !productos ? (
           <>
-            <div className='hidden md:block'>
+            <div className='hidden md:block bg-white border border-neutral-200 rounded-lg shadow-sm'>
               <ProductosTableSkeleton rows={itemsPerPage} />
             </div>
             <div className='block md:hidden'>
@@ -103,7 +107,7 @@ export default function ProductosPage() {
           </>
         ) : (
           <>
-            <div className='hidden md:block'>
+            <div className='hidden md:block bg-white border border-neutral-200 rounded-lg shadow-sm'>
               <ProductosTable
                 productos={(productos?.productos ?? []) as any}
                 onRowClick={handleRowClick}
